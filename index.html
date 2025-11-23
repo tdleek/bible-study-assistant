@@ -44,7 +44,107 @@
             opacity: 0.9;
         }
 
-        /* Model Selector Styling */
+        /* Study Method Selector */
+        .study-methods {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .study-methods h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .method-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .method-btn {
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .method-btn:hover {
+            background: #f0f4ff;
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .method-btn.active {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .method-btn strong {
+            display: block;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .method-btn small {
+            color: #666;
+            font-size: 0.85em;
+        }
+
+        .method-progress {
+            display: none;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .method-progress.active {
+            display: block;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 8px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            padding: 5px;
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .step.active {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .step.completed {
+            color: #28a745;
+        }
+
+        /* Model Selector */
         .provider-selector {
             background: #f8f9fa;
             padding: 20px;
@@ -55,12 +155,6 @@
             margin-bottom: 10px;
             color: #333;
             font-size: 1.2em;
-        }
-
-        .provider-selector p {
-            color: #666;
-            font-size: 0.95em;
-            margin-bottom: 15px;
         }
 
         .provider-buttons {
@@ -111,7 +205,7 @@
             font-weight: 600;
         }
 
-        /* Translation Selector */
+        /* Translation Controls */
         .controls {
             padding: 20px;
             background: #f8f9fa;
@@ -198,6 +292,14 @@
             border: 1px solid #ddd;
         }
 
+        .message.system {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            margin: 0 10%;
+            text-align: center;
+        }
+
         .message.error {
             background: #ffe6e6;
             border: 1px solid #ffcccc;
@@ -255,6 +357,10 @@
                 flex-direction: column;
             }
 
+            .method-buttons {
+                grid-template-columns: 1fr;
+            }
+
             .message.user {
                 margin-left: 10%;
             }
@@ -277,10 +383,59 @@
             <p>Your AI-Powered Journey Through Scripture</p>
         </div>
 
+        <!-- Study Method Templates -->
+        <div class="study-methods">
+            <h3>📚 Guided Study Methods</h3>
+            <p style="color: #666; font-size: 0.95em; margin-bottom: 15px;">
+                Choose a structured method to guide your Bible study, or chat freely below.
+            </p>
+            
+            <div class="method-buttons">
+                <button class="method-btn" onclick="selectMethod('inductive')">
+                    <strong>Inductive Study</strong>
+                    <small>Observation → Interpretation → Application</small>
+                </button>
+                
+                <button class="method-btn" onclick="selectMethod('lectio')">
+                    <strong>Lectio Divina</strong>
+                    <small>Read → Meditate → Pray → Contemplate</small>
+                </button>
+                
+                <button class="method-btn" onclick="selectMethod('soap')">
+                    <strong>SOAP Method</strong>
+                    <small>Scripture → Observation → Application → Prayer</small>
+                </button>
+                
+                <button class="method-btn" onclick="selectMethod('5ws')">
+                    <strong>5 W's Method</strong>
+                    <small>Who, What, When, Where, Why, How</small>
+                </button>
+                
+                <button class="method-btn" onclick="selectMethod('free')" style="background: #e9ecef;">
+                    <strong>Free Chat</strong>
+                    <small>Ask anything without structure</small>
+                </button>
+            </div>
+
+            <div id="method-progress" class="method-progress">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <strong id="method-name">Study Method</strong>
+                    <button onclick="exitMethod()" style="width: auto; padding: 8px 15px; background: #dc3545; color: white; border: none; font-size: 0.9em;">
+                        Exit Method
+                    </button>
+                </div>
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+                </div>
+                <div id="step-indicator" class="step-indicator">
+                    <!-- Steps will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+
         <!-- AI Model Selector -->
         <div class="provider-selector">
-            <h3>🤖 AI Model Selection</h3>
-            <p>Choose which AI model to use for your Bible study:</p>
+            <h3>🤖 AI Model</h3>
             
             <div class="provider-buttons">
                 <button id="groq-btn" class="provider-btn active" onclick="switchToGroq()">
@@ -288,9 +443,9 @@
                     <small>FREE • Fast • Good Quality</small>
                 </button>
                 
-                <button id="claude-btn" class="provider-btn" onclick="switchToClaude()">
-                    <strong>Claude (Anthropic)</strong>
-                    <small>Premium • Excellent Theology</small>
+                <button id="claude-btn" class="provider-btn" onclick="switchToClaude()" disabled style="opacity: 0.5; cursor: not-allowed;">
+                    <strong>Claude (Disabled)</strong>
+                    <small>Premium - Coming Soon</small>
                 </button>
             </div>
             
@@ -314,7 +469,6 @@
                     <option value="MSG">MSG - The Message</option>
                     <option value="AMP">AMP - Amplified Bible</option>
                     <option value="NRSV">NRSV - New Revised Standard Version</option>
-                    <option value="TYNDALE">Tyndale - William Tyndale Translation</option>
                 </select>
             </div>
 
@@ -338,7 +492,6 @@
                         <option value="MSG">MSG - The Message</option>
                         <option value="AMP">AMP - Amplified Bible</option>
                         <option value="NRSV">NRSV - New Revised Standard Version</option>
-                        <option value="TYNDALE">Tyndale - William Tyndale Translation</option>
                     </select>
                 </div>
             </div>
@@ -349,12 +502,13 @@
             <div id="chat-messages" class="chat-messages">
                 <div class="message assistant">
                     Welcome to GospelPath! 🙏<br><br>
-                    I'm here to help you study the Bible with AI assistance. You can:<br>
-                    • Ask questions about any Bible passage<br>
-                    • Request explanations of difficult verses<br>
+                    <strong>NEW: Guided Study Methods!</strong><br>
+                    Choose a structured study method above to be guided step-by-step through proven Bible study techniques.<br><br>
+                    Or chat freely - I'm here to help you:<br>
+                    • Understand Bible passages<br>
                     • Explore theological concepts<br>
-                    • Compare different translations<br>
-                    • Get historical and cultural context<br><br>
+                    • Compare translations<br>
+                    • Apply Scripture to your life<br><br>
                     How can I help you grow in your faith today?
                 </div>
             </div>
@@ -362,7 +516,7 @@
             <div class="input-area">
                 <textarea 
                     id="user-input" 
-                    placeholder="Ask me anything about the Bible... (e.g., 'Explain John 3:16' or 'What does the Bible say about love?')"
+                    placeholder="Ask me anything about the Bible, or select a study method above for guided study..."
                     onkeypress="handleKeyPress(event)"
                 ></textarea>
                 <button id="send-btn" onclick="sendMessage()">Send</button>
@@ -383,25 +537,132 @@
         // GLOBAL STATE & CONFIGURATION
         // =====================================================================
         
-        // Conversation history - stores all messages for context
-        // AI models need full conversation history to maintain context
-        // This is how "memory" works in AI chat applications
+        // Conversation history
         let conversationHistory = [];
         
-        // Current AI provider selection
-        // 'groq' = free Llama models
-        // 'claude' = premium Claude models
+        // AI provider
         let currentProvider = 'groq';
-        
-        // Specific model to use (null = use provider's default)
         let currentModel = null;
         
-        // Track if comparison mode is active
+        // Translation comparison
         let compareMode = false;
         
-        // System prompt - defines AI behavior and knowledge
-        // This is like giving the AI its "job description"
-        const SYSTEM_PROMPT = `You are a knowledgeable and compassionate Bible study assistant. Your purpose is to help people understand Scripture more deeply and grow closer to Christ.
+        // =====================================================================
+        // STUDY METHOD STATE
+        // =====================================================================
+        // This is the key learning concept: tracking where users are in a process
+        
+        let currentMethod = null;  // Which study method is active
+        let currentStep = 0;       // Which step in the method
+        let methodSteps = [];      // Array of steps for current method
+        let studyPassage = null;   // The passage being studied
+        
+        // Study method definitions
+        const STUDY_METHODS = {
+            inductive: {
+                name: "Inductive Bible Study",
+                steps: [
+                    {
+                        name: "Observation",
+                        prompt: "Let's start with careful observation. What passage would you like to study?",
+                        systemPrompt: "You are guiding someone through the OBSERVATION step of inductive Bible study. Help them notice: who is speaking, who is being addressed, repeated words, literary devices, commands, promises, and key themes. Ask questions to help them see what's in the text."
+                    },
+                    {
+                        name: "Interpretation",
+                        prompt: "Great observations! Now let's interpret what the passage means. Based on what you observed, what do you think the author is trying to communicate?",
+                        systemPrompt: "You are guiding someone through the INTERPRETATION step. Help them understand the meaning of the text in its original context. Ask about: historical background, cultural context, word meanings, grammar, and the author's intent. Help them understand what it meant to the original audience."
+                    },
+                    {
+                        name: "Application",
+                        prompt: "Excellent interpretation! Now for application - how does this truth apply to your life today?",
+                        systemPrompt: "You are guiding someone through the APPLICATION step. Help them make the passage personal and practical. Ask: How does this apply to your life? What specific action can you take? What needs to change? How will you obey this truth? Be encouraging and practical."
+                    }
+                ]
+            },
+            lectio: {
+                name: "Lectio Divina",
+                steps: [
+                    {
+                        name: "Lectio (Read)",
+                        prompt: "Welcome to Lectio Divina - sacred reading. What passage would you like to read slowly and prayerfully?",
+                        systemPrompt: "You are guiding someone through LECTIO (sacred reading). Encourage them to read the passage slowly, multiple times. Ask them what words or phrases stand out. Help them notice what captures their attention. Be gentle and contemplative in tone."
+                    },
+                    {
+                        name: "Meditatio (Meditate)",
+                        prompt: "Now let's meditate on what you've read. What word or phrase is speaking to your heart? What is God saying to you through this passage?",
+                        systemPrompt: "You are guiding MEDITATIO (meditation). Help them reflect deeply on what stood out. Ask: Why might this word/phrase be significant for you right now? What is God revealing? Be reflective and help them listen to the Spirit."
+                    },
+                    {
+                        name: "Oratio (Pray)",
+                        prompt: "Now respond to God in prayer. Talk to Him about what you've heard. What do you want to say to God?",
+                        systemPrompt: "You are guiding ORATIO (prayer). Encourage them to respond to God personally. This is a conversation with God about what He's shown them. Help them express their thoughts, feelings, requests, or commitments to God. Be reverent and prayerful."
+                    },
+                    {
+                        name: "Contemplatio (Contemplate)",
+                        prompt: "Finally, rest in God's presence. Simply be with Him, holding this truth in your heart. How do you sense God's love and presence?",
+                        systemPrompt: "You are guiding CONTEMPLATIO (contemplation). This is about resting in God's presence, not doing but being. Help them simply enjoy communion with God. Be peaceful and still in tone. Encourage them to carry this truth with them."
+                    }
+                ]
+            },
+            soap: {
+                name: "SOAP Method",
+                steps: [
+                    {
+                        name: "Scripture",
+                        prompt: "Let's study Scripture together using the SOAP method. What passage would you like to read?",
+                        systemPrompt: "You are guiding the SCRIPTURE step of SOAP method. Help them read the passage carefully and identify the key verse or verses that stand out. Ask what captures their attention."
+                    },
+                    {
+                        name: "Observation",
+                        prompt: "What do you observe in this passage? What stands out to you? What is the context?",
+                        systemPrompt: "You are guiding OBSERVATION in SOAP method. Help them notice details: who, what, when, where, why. What's the situation? What's happening? Be inquisitive and help them see the passage clearly."
+                    },
+                    {
+                        name: "Application",
+                        prompt: "How does this passage apply to your life right now? What is God teaching you?",
+                        systemPrompt: "You are guiding APPLICATION in SOAP method. Help them make it personal: How does this truth apply today? What needs to change? What action will you take? Be practical and encouraging."
+                    },
+                    {
+                        name: "Prayer",
+                        prompt: "Now pray about what you've learned. Talk to God about how you'll respond to this truth.",
+                        systemPrompt: "You are guiding PRAYER in SOAP method. Help them formulate a prayer response. Encourage them to ask God for help in applying this truth, to thank Him for what they've learned, or to commit to obedience. Be reverent and personal."
+                    }
+                ]
+            },
+            '5ws': {
+                name: "5 W's Method",
+                steps: [
+                    {
+                        name: "Select Passage",
+                        prompt: "Let's study using the 5 W's method: Who, What, When, Where, Why, and How. What passage shall we study?",
+                        systemPrompt: "You are starting the 5 W's method. Help them choose a passage and prepare to analyze it systematically using the 5 W's framework."
+                    },
+                    {
+                        name: "Who & What",
+                        prompt: "WHO is involved in this passage? WHAT is happening?",
+                        systemPrompt: "Guide them through WHO and WHAT questions. Who is speaking? Who is being addressed? Who are the characters? What is happening? What is being said? What actions are taking place?"
+                    },
+                    {
+                        name: "When & Where",
+                        prompt: "WHEN does this take place? WHERE is this happening?",
+                        systemPrompt: "Guide them through WHEN and WHERE. When in history? What's the timeframe? Where geographically? What's the setting? Help them understand the context."
+                    },
+                    {
+                        name: "Why & How",
+                        prompt: "WHY is this happening? HOW is it happening?",
+                        systemPrompt: "Guide them through WHY and HOW. Why is this significant? Why did the author include this? How does this happen? How should we respond? Help them see purpose and method."
+                    },
+                    {
+                        name: "Application",
+                        prompt: "Based on your answers to the 5 W's, what is God teaching you? How will you apply this?",
+                        systemPrompt: "Help them synthesize their 5 W's analysis into practical application. What have they learned? How does it apply to their life? What action will they take?"
+                    }
+                ]
+            }
+        };
+        
+        // Base system prompt for free chat
+        const BASE_SYSTEM_PROMPT = `You are a knowledgeable and compassionate Bible study assistant. Your purpose is to help people understand Scripture more deeply and grow closer to Christ.
 
 Key Guidelines:
 - Be respectful of all Christian traditions and denominations
@@ -415,11 +676,132 @@ Key Guidelines:
 
 Your goal is to illuminate Scripture and help users encounter God through His Word.`;
 
-        // Initialize conversation with system prompt
+        // Initialize conversation with base system prompt
         conversationHistory.push({
             role: 'system',
-            content: SYSTEM_PROMPT
+            content: BASE_SYSTEM_PROMPT
         });
+
+        // =====================================================================
+        // STUDY METHOD FUNCTIONS
+        // =====================================================================
+        
+        function selectMethod(methodKey) {
+            // Exit free chat mode
+            if (methodKey === 'free') {
+                exitMethod();
+                return;
+            }
+            
+            // Initialize the selected study method
+            currentMethod = methodKey;
+            currentStep = 0;
+            methodSteps = STUDY_METHODS[methodKey].steps;
+            studyPassage = null;
+            
+            // Update UI
+            updateMethodUI();
+            
+            // Clear conversation and set new system prompt for first step
+            conversationHistory = [{
+                role: 'system',
+                content: methodSteps[0].systemPrompt
+            }];
+            
+            // Send first prompt from the method
+            addMessage(`📚 Starting ${STUDY_METHODS[methodKey].name}`, 'system');
+            addMessage(methodSteps[0].prompt, 'assistant');
+        }
+        
+        function exitMethod() {
+            // Return to free chat mode
+            currentMethod = null;
+            currentStep = 0;
+            methodSteps = [];
+            studyPassage = null;
+            
+            // Reset conversation to base system prompt
+            conversationHistory = [{
+                role: 'system',
+                content: BASE_SYSTEM_PROMPT
+            }];
+            
+            // Update UI
+            updateMethodUI();
+            addMessage('Returned to free chat mode. Ask me anything!', 'system');
+        }
+        
+        function advanceStep() {
+            currentStep++;
+            
+            if (currentStep < methodSteps.length) {
+                // Move to next step
+                updateMethodUI();
+                
+                // Update system prompt for new step
+                conversationHistory[0] = {
+                    role: 'system',
+                    content: methodSteps[currentStep].systemPrompt
+                };
+                
+                // Send next step prompt
+                addMessage(methodSteps[currentStep].prompt, 'assistant');
+            } else {
+                // Method completed!
+                addMessage(`🎉 You've completed the ${STUDY_METHODS[currentMethod].name}! Great work studying God's Word. You can start a new method or chat freely.`, 'system');
+                exitMethod();
+            }
+        }
+        
+        function updateMethodUI() {
+            const progressDiv = document.getElementById('method-progress');
+            const methodNameDiv = document.getElementById('method-name');
+            const progressFill = document.getElementById('progress-fill');
+            const stepIndicator = document.getElementById('step-indicator');
+            
+            // Update method buttons
+            document.querySelectorAll('.method-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            if (currentMethod) {
+                // Show progress
+                progressDiv.classList.add('active');
+                methodNameDiv.textContent = STUDY_METHODS[currentMethod].name;
+                
+                // Update progress bar
+                const progress = ((currentStep + 1) / methodSteps.length) * 100;
+                progressFill.style.width = `${progress}%`;
+                
+                // Update step indicators
+                stepIndicator.innerHTML = '';
+                methodSteps.forEach((step, index) => {
+                    const stepDiv = document.createElement('div');
+                    stepDiv.className = 'step';
+                    stepDiv.textContent = step.name;
+                    
+                    if (index < currentStep) {
+                        stepDiv.classList.add('completed');
+                    } else if (index === currentStep) {
+                        stepDiv.classList.add('active');
+                    }
+                    
+                    stepIndicator.appendChild(stepDiv);
+                });
+                
+                // Highlight active method button
+                const methodBtn = document.querySelector(`[onclick="selectMethod('${currentMethod}')"]`);
+                if (methodBtn) methodBtn.classList.add('active');
+                
+            } else {
+                // Hide progress
+                progressDiv.classList.remove('active');
+                
+                // Highlight free chat
+                const freeBtn = document.querySelector(`[onclick="selectMethod('free')"]`);
+                if (freeBtn) freeBtn.classList.add('active');
+            }
+        }
 
         // =====================================================================
         // AI PROVIDER SWITCHING
@@ -429,14 +811,11 @@ Your goal is to illuminate Scripture and help users encounter God through His Wo
             currentProvider = 'groq';
             currentModel = null;
             updateProviderUI();
-            console.log('Switched to Groq (Llama) - FREE');
         }
 
         function switchToClaude() {
-            currentProvider = 'claude';
-            currentModel = null;
-            updateProviderUI();
-            console.log('Switched to Claude (Premium) - PAID');
+            // Disabled for now
+            alert('Claude is temporarily disabled. Using Llama (Groq) - it works great!');
         }
 
         function updateProviderUI() {
@@ -444,15 +823,9 @@ Your goal is to illuminate Scripture and help users encounter God through His Wo
             const claudeBtn = document.getElementById('claude-btn');
             const statusDiv = document.getElementById('provider-status');
             
-            if (currentProvider === 'groq') {
-                groqBtn.classList.add('active');
-                claudeBtn.classList.remove('active');
-                statusDiv.textContent = 'Using: Llama (Free)';
-            } else {
-                claudeBtn.classList.add('active');
-                groqBtn.classList.remove('active');
-                statusDiv.textContent = 'Using: Claude (Premium)';
-            }
+            groqBtn.classList.add('active');
+            claudeBtn.classList.remove('active');
+            statusDiv.textContent = 'Using: Llama (Free)';
         }
 
         // =====================================================================
@@ -484,52 +857,36 @@ Your goal is to illuminate Scripture and help users encounter God through His Wo
             
             if (!message) return;
             
-            // Get selected translation(s)
+            // Get translation preference
             const translation = document.getElementById('translation').value;
             let finalMessage = message;
             
-            // Add translation preference to message
+            // Add translation preference
             if (compareMode) {
                 const compareTranslation = document.getElementById('compare-translation').value;
-                finalMessage = `${message}\n\n[Please provide your response using the ${translation} translation, and then compare it with the ${compareTranslation} translation, highlighting any significant differences.]`;
+                finalMessage = `${message}\n\n[Please use the ${translation} translation, and compare with ${compareTranslation}, highlighting significant differences.]`;
             } else {
-                finalMessage = `${message}\n\n[Please use the ${translation} translation in your response.]`;
+                finalMessage = `${message}\n\n[Please use the ${translation} translation.]`;
             }
             
-            // Add user message to UI
+            // Add to UI
             addMessage(message, 'user');
             userInput.value = '';
             
-            // Disable input while processing
+            // Disable input
             sendBtn.disabled = true;
             userInput.disabled = true;
             
-            // Add to conversation history
+            // Add to history
             conversationHistory.push({
                 role: 'user',
                 content: finalMessage
             });
             
-            // Show loading indicator
-            const providerLabel = currentProvider === 'groq' ? 'Llama' : 'Claude';
-            const loadingDiv = addMessage(`${providerLabel} is thinking...`, 'assistant');
+            // Loading indicator
+            const loadingDiv = addMessage('Thinking...', 'assistant');
             
             try {
-                // =========================================================
-                // CALL YOUR BACKEND API
-                // =========================================================
-                // This is where the magic happens!
-                // Instead of calling Groq/Claude directly (which would expose your API key),
-                // we call YOUR backend that you deployed on Vercel
-                // 
-                // The backend:
-                // 1. Receives the request securely
-                // 2. Adds YOUR secret API key
-                // 3. Calls the AI provider
-                // 4. Returns the response
-                //
-                // This keeps your API keys SECRET and SECURE
-                
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: {
@@ -547,35 +904,46 @@ Your goal is to illuminate Scripture and help users encounter God through His Wo
                     throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
                 }
                 
-                // Parse the response from your backend
                 const data = await response.json();
                 const assistantMessage = data.message;
                 
-                // Remove loading, add real response
+                // Remove loading, add response
                 loadingDiv.remove();
                 addMessage(assistantMessage, 'assistant');
                 
-                // Add to conversation history
+                // Add to history
                 conversationHistory.push({
                     role: 'assistant',
                     content: assistantMessage
                 });
                 
-                // Optional: Log token usage for learning/debugging
-                if (data.usage) {
-                    console.log(`Tokens - Input: ${data.usage.prompt_tokens}, Output: ${data.usage.completion_tokens}`);
-                    console.log(`Provider: ${data.provider}, Model: ${data.model}`);
+                // If in a study method, check if we should advance
+                if (currentMethod) {
+                    // After AI responds, offer to move to next step
+                    setTimeout(() => {
+                        if (currentStep < methodSteps.length - 1) {
+                            const continueBtn = document.createElement('div');
+                            continueBtn.className = 'message system';
+                            continueBtn.innerHTML = `
+                                <button onclick="advanceStep()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1em;">
+                                    Continue to ${methodSteps[currentStep + 1].name} →
+                                </button>
+                                <button onclick="exitMethod()" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px; font-size: 1em;">
+                                    Exit Method
+                                </button>
+                            `;
+                            document.getElementById('chat-messages').appendChild(continueBtn);
+                            document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+                        }
+                    }, 500);
                 }
                 
             } catch (error) {
                 loadingDiv.remove();
                 addMessage(`Sorry, there was an error: ${error.message}. Please try again.`, 'assistant', 'error');
                 console.error('Error:', error);
-                
-                // Remove the failed message from history
                 conversationHistory.pop();
             } finally {
-                // Re-enable input
                 sendBtn.disabled = false;
                 userInput.disabled = false;
                 userInput.focus();
@@ -590,14 +958,19 @@ Your goal is to illuminate Scripture and help users encounter God through His Wo
             const messagesDiv = document.getElementById('chat-messages');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${role} ${type}`;
-            messageDiv.textContent = text;
+            
+            if (role === 'system') {
+                messageDiv.innerHTML = text;
+            } else {
+                messageDiv.textContent = text;
+            }
+            
             messagesDiv.appendChild(messageDiv);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
             return messageDiv;
         }
 
         function handleKeyPress(event) {
-            // Send on Enter (without Shift)
             if (event.key === 'Enter' && !event.shiftKey) {
                 event.preventDefault();
                 sendMessage();
@@ -608,53 +981,10 @@ Your goal is to illuminate Scripture and help users encounter God through His Wo
         // INITIALIZATION
         // =====================================================================
         
-        // Set up event listeners when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('GospelPath initialized');
-            console.log('Current provider:', currentProvider);
-            
-            // Focus on input
+            console.log('GospelPath with Study Methods initialized');
             document.getElementById('user-input').focus();
         });
-
-        // =====================================================================
-        // EDUCATIONAL NOTES
-        // =====================================================================
-        //
-        // WHAT YOU'VE LEARNED IN THIS FILE:
-        //
-        // 1. CONVERSATION MEMORY
-        //    - conversationHistory array stores all messages
-        //    - Sent with every API call for context
-        //    - This is how AI "remembers" your conversation
-        //
-        // 2. SYSTEM PROMPTS
-        //    - Define AI behavior and personality
-        //    - Like giving the AI instructions before the conversation
-        //    - Critical for specialized applications
-        //
-        // 3. BACKEND INTEGRATION
-        //    - Frontend calls YOUR backend (not AI directly)
-        //    - Backend handles API keys securely
-        //    - Clean separation of concerns
-        //
-        // 4. MULTI-PROVIDER SUPPORT
-        //    - Easy switching between AI models
-        //    - Compare quality and cost
-        //    - Future-proof architecture
-        //
-        // 5. USER EXPERIENCE
-        //    - Loading states (disable buttons while thinking)
-        //    - Error handling (graceful failures)
-        //    - Visual feedback (animations, status updates)
-        //
-        // NEXT STEPS:
-        // - Deploy this to Vercel
-        // - Test both Groq and Claude
-        // - Compare their theological depth
-        // - Add more features (notes, history, etc.)
-        //
-        // =====================================================================
     </script>
 </body>
 </html>

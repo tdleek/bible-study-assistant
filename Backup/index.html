@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GospelPath - AI-Powered Bible Study Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        /* Model Selector Styling */
+        .provider-selector {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .provider-selector h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 1.2em;
+        }
+
+        .provider-selector p {
+            color: #666;
+            font-size: 0.95em;
+            margin-bottom: 15px;
+        }
+
+        .provider-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .provider-btn {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .provider-btn:hover {
+            background: #f5f5f5;
+            transform: translateY(-2px);
+        }
+
+        .provider-btn.active {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .provider-btn strong {
+            display: block;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .provider-btn small {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .provider-status {
+            text-align: center;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        /* Translation Selector */
+        .controls {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        select, button {
+            width: 100%;
+            padding: 12px;
+            font-size: 1em;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, button:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .compare-container {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .compare-container.active {
+            display: block;
+        }
+
+        /* Chat Interface */
+        .chat-container {
+            padding: 20px;
+        }
+
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            background: #667eea;
+            color: white;
+            margin-left: 20%;
+        }
+
+        .message.assistant {
+            background: white;
+            margin-right: 20%;
+            border: 1px solid #ddd;
+        }
+
+        .message.error {
+            background: #ffe6e6;
+            border: 1px solid #ffcccc;
+            color: #cc0000;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 10px;
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 15px;
+            font-size: 1em;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        #user-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        #send-btn {
+            width: 120px;
+            background: #667eea;
+            color: white;
+            border: none;
+            font-weight: 600;
+        }
+
+        #send-btn:hover {
+            background: #5568d3;
+        }
+
+        #send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            color: #666;
+            border-top: 2px solid #e9ecef;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .provider-buttons {
+                flex-direction: column;
+            }
+
+            .message.user {
+                margin-left: 10%;
+            }
+
+            .message.assistant {
+                margin-right: 10%;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📖 GospelPath</h1>
+            <p>Your AI-Powered Journey Through Scripture</p>
+        </div>
+
+        <!-- AI Model Selector -->
+        <div class="provider-selector">
+            <h3>🤖 AI Model Selection</h3>
+            <p>Choose which AI model to use for your Bible study:</p>
+            
+            <div class="provider-buttons">
+                <button id="groq-btn" class="provider-btn active" onclick="switchToGroq()">
+                    <strong>Llama (Groq)</strong>
+                    <small>FREE • Fast • Good Quality</small>
+                </button>
+                
+                <button id="claude-btn" class="provider-btn" onclick="switchToClaude()">
+                    <strong>Claude (Anthropic)</strong>
+                    <small>Premium • Excellent Theology</small>
+                </button>
+            </div>
+            
+            <div id="provider-status" class="provider-status">
+                Using: Llama (Free)
+            </div>
+        </div>
+
+        <!-- Bible Translation Controls -->
+        <div class="controls">
+            <div class="control-group">
+                <label for="translation">Bible Translation:</label>
+                <select id="translation">
+                    <option value="ESV">ESV - English Standard Version</option>
+                    <option value="NIV">NIV - New International Version</option>
+                    <option value="KJV">KJV - King James Version</option>
+                    <option value="NKJV">NKJV - New King James Version</option>
+                    <option value="NASB">NASB - New American Standard Bible</option>
+                    <option value="NLT">NLT - New Living Translation</option>
+                    <option value="CSB">CSB - Christian Standard Bible</option>
+                    <option value="MSG">MSG - The Message</option>
+                    <option value="AMP">AMP - Amplified Bible</option>
+                    <option value="NRSV">NRSV - New Revised Standard Version</option>
+                    <option value="TYNDALE">Tyndale - William Tyndale Translation</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <button id="compare-btn" onclick="toggleCompare()">
+                    📊 Compare Translations
+                </button>
+            </div>
+
+            <div id="compare-container" class="compare-container">
+                <div class="control-group">
+                    <label for="compare-translation">Compare with:</label>
+                    <select id="compare-translation">
+                        <option value="NIV">NIV - New International Version</option>
+                        <option value="ESV">ESV - English Standard Version</option>
+                        <option value="KJV">KJV - King James Version</option>
+                        <option value="NKJV">NKJV - New King James Version</option>
+                        <option value="NASB">NASB - New American Standard Bible</option>
+                        <option value="NLT">NLT - New Living Translation</option>
+                        <option value="CSB">CSB - Christian Standard Bible</option>
+                        <option value="MSG">MSG - The Message</option>
+                        <option value="AMP">AMP - Amplified Bible</option>
+                        <option value="NRSV">NRSV - New Revised Standard Version</option>
+                        <option value="TYNDALE">Tyndale - William Tyndale Translation</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Interface -->
+        <div class="chat-container">
+            <div id="chat-messages" class="chat-messages">
+                <div class="message assistant">
+                    Welcome to GospelPath! 🙏<br><br>
+                    I'm here to help you study the Bible with AI assistance. You can:<br>
+                    • Ask questions about any Bible passage<br>
+                    • Request explanations of difficult verses<br>
+                    • Explore theological concepts<br>
+                    • Compare different translations<br>
+                    • Get historical and cultural context<br><br>
+                    How can I help you grow in your faith today?
+                </div>
+            </div>
+
+            <div class="input-area">
+                <textarea 
+                    id="user-input" 
+                    placeholder="Ask me anything about the Bible... (e.g., 'Explain John 3:16' or 'What does the Bible say about love?')"
+                    onkeypress="handleKeyPress(event)"
+                ></textarea>
+                <button id="send-btn" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>📖 "Your word is a lamp to my feet and a light to my path." - Psalm 119:105</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">
+                Built to bring people closer to Christ through deeper engagement with Scripture
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // =====================================================================
+        // GLOBAL STATE & CONFIGURATION
+        // =====================================================================
+        
+        // Conversation history - stores all messages for context
+        // AI models need full conversation history to maintain context
+        // This is how "memory" works in AI chat applications
+        let conversationHistory = [];
+        
+        // Current AI provider selection
+        // 'groq' = free Llama models
+        // 'claude' = premium Claude models
+        let currentProvider = 'groq';
+        
+        // Specific model to use (null = use provider's default)
+        let currentModel = null;
+        
+        // Track if comparison mode is active
+        let compareMode = false;
+        
+        // System prompt - defines AI behavior and knowledge
+        // This is like giving the AI its "job description"
+        const SYSTEM_PROMPT = `You are a knowledgeable and compassionate Bible study assistant. Your purpose is to help people understand Scripture more deeply and grow closer to Christ.
+
+Key Guidelines:
+- Be respectful of all Christian traditions and denominations
+- Provide historically and theologically accurate information
+- Cite specific Bible verses when relevant
+- Explain difficult concepts in accessible language
+- Acknowledge when topics are debated among scholars
+- Encourage personal application and spiritual growth
+- Be warm, encouraging, and patient
+- When discussing translations, note meaningful differences respectfully
+
+Your goal is to illuminate Scripture and help users encounter God through His Word.`;
+
+        // Initialize conversation with system prompt
+        conversationHistory.push({
+            role: 'system',
+            content: SYSTEM_PROMPT
+        });
+
+        // =====================================================================
+        // AI PROVIDER SWITCHING
+        // =====================================================================
+        
+        function switchToGroq() {
+            currentProvider = 'groq';
+            currentModel = null;
+            updateProviderUI();
+            console.log('Switched to Groq (Llama) - FREE');
+        }
+
+        function switchToClaude() {
+            currentProvider = 'claude';
+            currentModel = null;
+            updateProviderUI();
+            console.log('Switched to Claude (Premium) - PAID');
+        }
+
+        function updateProviderUI() {
+            const groqBtn = document.getElementById('groq-btn');
+            const claudeBtn = document.getElementById('claude-btn');
+            const statusDiv = document.getElementById('provider-status');
+            
+            if (currentProvider === 'groq') {
+                groqBtn.classList.add('active');
+                claudeBtn.classList.remove('active');
+                statusDiv.textContent = 'Using: Llama (Free)';
+            } else {
+                claudeBtn.classList.add('active');
+                groqBtn.classList.remove('active');
+                statusDiv.textContent = 'Using: Claude (Premium)';
+            }
+        }
+
+        // =====================================================================
+        // TRANSLATION COMPARISON
+        // =====================================================================
+        
+        function toggleCompare() {
+            compareMode = !compareMode;
+            const container = document.getElementById('compare-container');
+            const btn = document.getElementById('compare-btn');
+            
+            if (compareMode) {
+                container.classList.add('active');
+                btn.textContent = '❌ Disable Comparison';
+            } else {
+                container.classList.remove('active');
+                btn.textContent = '📊 Compare Translations';
+            }
+        }
+
+        // =====================================================================
+        // MESSAGE HANDLING
+        // =====================================================================
+        
+        async function sendMessage() {
+            const userInput = document.getElementById('user-input');
+            const sendBtn = document.getElementById('send-btn');
+            const message = userInput.value.trim();
+            
+            if (!message) return;
+            
+            // Get selected translation(s)
+            const translation = document.getElementById('translation').value;
+            let finalMessage = message;
+            
+            // Add translation preference to message
+            if (compareMode) {
+                const compareTranslation = document.getElementById('compare-translation').value;
+                finalMessage = `${message}\n\n[Please provide your response using the ${translation} translation, and then compare it with the ${compareTranslation} translation, highlighting any significant differences.]`;
+            } else {
+                finalMessage = `${message}\n\n[Please use the ${translation} translation in your response.]`;
+            }
+            
+            // Add user message to UI
+            addMessage(message, 'user');
+            userInput.value = '';
+            
+            // Disable input while processing
+            sendBtn.disabled = true;
+            userInput.disabled = true;
+            
+            // Add to conversation history
+            conversationHistory.push({
+                role: 'user',
+                content: finalMessage
+            });
+            
+            // Show loading indicator
+            const providerLabel = currentProvider === 'groq' ? 'Llama' : 'Claude';
+            const loadingDiv = addMessage(`${providerLabel} is thinking...`, 'assistant');
+            
+            try {
+                // =========================================================
+                // CALL YOUR BACKEND API
+                // =========================================================
+                // This is where the magic happens!
+                // Instead of calling Groq/Claude directly (which would expose your API key),
+                // we call YOUR backend that you deployed on Vercel
+                // 
+                // The backend:
+                // 1. Receives the request securely
+                // 2. Adds YOUR secret API key
+                // 3. Calls the AI provider
+                // 4. Returns the response
+                //
+                // This keeps your API keys SECRET and SECURE
+                
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        messages: conversationHistory,
+                        provider: currentProvider,
+                        model: currentModel
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                }
+                
+                // Parse the response from your backend
+                const data = await response.json();
+                const assistantMessage = data.message;
+                
+                // Remove loading, add real response
+                loadingDiv.remove();
+                addMessage(assistantMessage, 'assistant');
+                
+                // Add to conversation history
+                conversationHistory.push({
+                    role: 'assistant',
+                    content: assistantMessage
+                });
+                
+                // Optional: Log token usage for learning/debugging
+                if (data.usage) {
+                    console.log(`Tokens - Input: ${data.usage.prompt_tokens}, Output: ${data.usage.completion_tokens}`);
+                    console.log(`Provider: ${data.provider}, Model: ${data.model}`);
+                }
+                
+            } catch (error) {
+                loadingDiv.remove();
+                addMessage(`Sorry, there was an error: ${error.message}. Please try again.`, 'assistant', 'error');
+                console.error('Error:', error);
+                
+                // Remove the failed message from history
+                conversationHistory.pop();
+            } finally {
+                // Re-enable input
+                sendBtn.disabled = false;
+                userInput.disabled = false;
+                userInput.focus();
+            }
+        }
+
+        // =====================================================================
+        // UI HELPERS
+        // =====================================================================
+        
+        function addMessage(text, role, type = '') {
+            const messagesDiv = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role} ${type}`;
+            messageDiv.textContent = text;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            return messageDiv;
+        }
+
+        function handleKeyPress(event) {
+            // Send on Enter (without Shift)
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        // =====================================================================
+        // INITIALIZATION
+        // =====================================================================
+        
+        // Set up event listeners when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('GospelPath initialized');
+            console.log('Current provider:', currentProvider);
+            
+            // Focus on input
+            document.getElementById('user-input').focus();
+        });
+
+        // =====================================================================
+        // EDUCATIONAL NOTES
+        // =====================================================================
+        //
+        // WHAT YOU'VE LEARNED IN THIS FILE:
+        //
+        // 1. CONVERSATION MEMORY
+        //    - conversationHistory array stores all messages
+        //    - Sent with every API call for context
+        //    - This is how AI "remembers" your conversation
+        //
+        // 2. SYSTEM PROMPTS
+        //    - Define AI behavior and personality
+        //    - Like giving the AI instructions before the conversation
+        //    - Critical for specialized applications
+        //
+        // 3. BACKEND INTEGRATION
+        //    - Frontend calls YOUR backend (not AI directly)
+        //    - Backend handles API keys securely
+        //    - Clean separation of concerns
+        //
+        // 4. MULTI-PROVIDER SUPPORT
+        //    - Easy switching between AI models
+        //    - Compare quality and cost
+        //    - Future-proof architecture
+        //
+        // 5. USER EXPERIENCE
+        //    - Loading states (disable buttons while thinking)
+        //    - Error handling (graceful failures)
+        //    - Visual feedback (animations, status updates)
+        //
+        // NEXT STEPS:
+        // - Deploy this to Vercel
+        // - Test both Groq and Claude
+        // - Compare their theological depth
+        // - Add more features (notes, history, etc.)
+        //
+        // =====================================================================
+    </script>
+</body>
+</html>
