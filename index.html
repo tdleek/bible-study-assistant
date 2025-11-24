@@ -1,990 +1,551 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GospelPath - AI-Powered Bible Study Assistant</title>
+    <title>GospelPath – AI-Powered Bible Study Assistant</title>
+    
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Alpine.js for interactivity -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Google Fonts: Playfair Display SC, Lora, Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display+SC:wght@400;700;900&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* Dark mode color palette */
+        :root {
+            --charcoal: #0B1118;
+            --midnight-card: #112240;
+            --moonlit-silver: #C0C5D9;
+            --silver-glow: #E8ECF4;
+            --ivory-text: #F5F5F0;
+            --deep-blue: #1A2B4A;
+            --soft-silver: #9BA4B8;
         }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+        
+        /* Font families */
+        .font-playfair { font-family: 'Playfair Display SC', serif; }
+        .font-lora { font-family: 'Lora', serif; }
+        .font-inter { font-family: 'Inter', sans-serif; }
+        
+        /* Hero gradient background - Gethsemane night theme */
+        .hero-gradient-dark {
+            background: linear-gradient(180deg, 
+                #0B1118 0%, 
+                #1A2B4A 50%, 
+                #112240 100%
+            );
+            position: relative;
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
+        
+        /* Subtle texture overlay */
+        .hero-gradient-dark::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.05"/></svg>');
+            opacity: 0.08;
+            pointer-events: none;
         }
-
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
+        
+        /* Moonlit silver path animation */
+        @keyframes pathGlowMoon {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(192, 197, 217, 0.5)); }
+            50% { filter: drop-shadow(0 0 35px rgba(232, 236, 244, 0.8)); }
         }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+        
+        @keyframes pathDraw {
+            from { stroke-dashoffset: 2000; }
+            to { stroke-dashoffset: 0; }
         }
-
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
+        
+        @keyframes crossGlowMoon {
+            0%, 100% { opacity: 0.8; filter: drop-shadow(0 0 18px rgba(232, 236, 244, 0.7)); }
+            50% { opacity: 1; filter: drop-shadow(0 0 35px rgba(232, 236, 244, 1)); }
         }
-
-        /* Study Method Selector */
-        .study-methods {
-            background: #f8f9fa;
-            padding: 20px;
-            border-bottom: 2px solid #e9ecef;
+        
+        .moonlit-path {
+            animation: pathGlowMoon 4s ease-in-out infinite;
         }
-
-        .study-methods h3 {
-            margin-bottom: 15px;
-            color: #333;
+        
+        .path-line {
+            stroke-dasharray: 2000;
+            stroke-dashoffset: 2000;
+            animation: pathDraw 3s ease-out forwards;
         }
-
-        .method-buttons {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            margin-bottom: 15px;
+        
+        .cross-glow-moon {
+            animation: crossGlowMoon 3s ease-in-out infinite;
         }
-
-        .method-btn {
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            background: white;
-            cursor: pointer;
+        
+        /* Dark mode input styling */
+        .parchment-input-dark {
+            background: rgba(17, 34, 64, 0.95);
+            box-shadow: 
+                0 4px 6px rgba(0, 0, 0, 0.3),
+                0 10px 25px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(192, 197, 217, 0.1);
             transition: all 0.3s ease;
-            text-align: left;
+            color: var(--ivory-text);
         }
-
-        .method-btn:hover {
-            background: #f0f4ff;
-            border-color: #667eea;
-            transform: translateY(-2px);
+        
+        .parchment-input-dark::placeholder {
+            color: rgba(155, 164, 184, 0.6);
         }
-
-        .method-btn.active {
-            border-color: #667eea;
-            background: #f0f4ff;
-        }
-
-        .method-btn strong {
-            display: block;
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .method-btn small {
-            color: #666;
-            font-size: 0.85em;
-        }
-
-        .method-progress {
-            display: none;
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-        }
-
-        .method-progress.active {
-            display: block;
-        }
-
-        .progress-bar {
-            background: #e9ecef;
-            border-radius: 10px;
-            height: 8px;
-            margin: 10px 0;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            height: 100%;
-            transition: width 0.3s ease;
-        }
-
-        .step-indicator {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-        }
-
-        .step {
-            flex: 1;
-            text-align: center;
-            padding: 5px;
-            font-size: 0.85em;
-            color: #666;
-        }
-
-        .step.active {
-            color: #667eea;
-            font-weight: 600;
-        }
-
-        .step.completed {
-            color: #28a745;
-        }
-
-        /* Model Selector */
-        .provider-selector {
-            background: #f8f9fa;
-            padding: 20px;
-            border-bottom: 2px solid #e9ecef;
-        }
-
-        .provider-selector h3 {
-            margin-bottom: 10px;
-            color: #333;
-            font-size: 1.2em;
-        }
-
-        .provider-buttons {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .provider-btn {
-            flex: 1;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            background: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
-        .provider-btn:hover {
-            background: #f5f5f5;
-            transform: translateY(-2px);
-        }
-
-        .provider-btn.active {
-            border-color: #667eea;
-            background: #f0f4ff;
-        }
-
-        .provider-btn strong {
-            display: block;
-            font-size: 1.1em;
-            margin-bottom: 5px;
-            color: #333;
-        }
-
-        .provider-btn small {
-            color: #666;
-            font-size: 0.9em;
-        }
-
-        .provider-status {
-            text-align: center;
-            padding: 10px;
-            background: white;
-            border-radius: 5px;
-            color: #667eea;
-            font-weight: 600;
-        }
-
-        /* Translation Controls */
-        .controls {
-            padding: 20px;
-            background: #f8f9fa;
-            border-bottom: 2px solid #e9ecef;
-        }
-
-        .control-group {
-            margin-bottom: 15px;
-        }
-
-        .control-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        select, button {
-            width: 100%;
-            padding: 12px;
-            font-size: 1em;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            background: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        select:focus, button:focus {
+        
+        .parchment-input-dark:focus {
             outline: none;
-            border-color: #667eea;
+            box-shadow: 
+                0 6px 12px rgba(0, 0, 0, 0.4),
+                0 15px 35px rgba(0, 0, 0, 0.3),
+                inset 0 0 0 2px rgba(192, 197, 217, 0.4),
+                0 0 25px rgba(192, 197, 217, 0.3);
+            background: rgba(17, 34, 64, 1);
         }
-
-        button:hover {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
+        
+        /* Scripture card entrance animation */
+        @keyframes cardEntrance {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
         }
-
-        .compare-container {
-            display: none;
-            margin-top: 15px;
+        
+        .scripture-card {
+            animation: cardEntrance 0.8s ease-out forwards;
         }
-
-        .compare-container.active {
-            display: block;
-        }
-
-        /* Chat Interface */
-        .chat-container {
-            padding: 20px;
-        }
-
-        .chat-messages {
-            height: 400px;
-            overflow-y: auto;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        .message {
-            margin-bottom: 15px;
-            padding: 15px;
-            border-radius: 8px;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .message.user {
-            background: #667eea;
-            color: white;
-            margin-left: 20%;
-        }
-
-        .message.assistant {
-            background: white;
-            margin-right: 20%;
-            border: 1px solid #ddd;
-        }
-
-        .message.system {
-            background: #fff3cd;
-            border: 1px solid #ffc107;
-            color: #856404;
-            margin: 0 10%;
-            text-align: center;
-        }
-
-        .message.error {
-            background: #ffe6e6;
-            border: 1px solid #ffcccc;
-            color: #cc0000;
-        }
-
-        .input-area {
-            display: flex;
-            gap: 10px;
-        }
-
-        #user-input {
-            flex: 1;
-            padding: 15px;
-            font-size: 1em;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            resize: vertical;
-            min-height: 60px;
-        }
-
-        #user-input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        #send-btn {
-            width: 120px;
-            background: #667eea;
-            color: white;
-            border: none;
-            font-weight: 600;
-        }
-
-        #send-btn:hover {
-            background: #5568d3;
-        }
-
-        #send-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 20px;
-            background: #f8f9fa;
-            color: #666;
-            border-top: 2px solid #e9ecef;
-        }
-
-        /* Responsive Design */
+        
+        /* Mobile path adjustments */
         @media (max-width: 768px) {
-            .provider-buttons {
-                flex-direction: column;
-            }
-
-            .method-buttons {
-                grid-template-columns: 1fr;
-            }
-
-            .message.user {
-                margin-left: 10%;
-            }
-
-            .message.assistant {
-                margin-right: 10%;
-            }
-
-            .header h1 {
-                font-size: 1.8em;
+            .moonlit-path-svg {
+                width: 120px !important;
+                height: 70vh !important;
             }
         }
+        
+        /* Letter spacing for logo */
+        .logo-spacing {
+            letter-spacing: 0.15em;
+        }
+        
+        /* Small caps effect */
+        .small-caps {
+            font-variant: small-caps;
+            letter-spacing: 0.08em;
+        }
+        
+        /* Loading spinner */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+        
+        /* Typing indicator */
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+        
+        .typing-dot {
+            animation: pulse 1.4s ease-in-out infinite;
+        }
+        
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
     </style>
 </head>
-<body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>📖 GospelPath</h1>
-            <p>Your AI-Powered Journey Through Scripture</p>
-        </div>
-
-        <!-- Study Method Templates -->
-        <div class="study-methods">
-            <h3>📚 Guided Study Methods</h3>
-            <p style="color: #666; font-size: 0.95em; margin-bottom: 15px;">
-                Choose a structured method to guide your Bible study, or chat freely below.
-            </p>
-            
-            <div class="method-buttons">
-                <button class="method-btn" onclick="selectMethod('inductive')">
-                    <strong>Inductive Study</strong>
-                    <small>Observation → Interpretation → Application</small>
-                </button>
-                
-                <button class="method-btn" onclick="selectMethod('lectio')">
-                    <strong>Lectio Divina</strong>
-                    <small>Read → Meditate → Pray → Contemplate</small>
-                </button>
-                
-                <button class="method-btn" onclick="selectMethod('soap')">
-                    <strong>SOAP Method</strong>
-                    <small>Scripture → Observation → Application → Prayer</small>
-                </button>
-                
-                <button class="method-btn" onclick="selectMethod('5ws')">
-                    <strong>5 W's Method</strong>
-                    <small>Who, What, When, Where, Why, How</small>
-                </button>
-                
-                <button class="method-btn" onclick="selectMethod('free')" style="background: #e9ecef;">
-                    <strong>Free Chat</strong>
-                    <small>Ask anything without structure</small>
-                </button>
-            </div>
-
-            <div id="method-progress" class="method-progress">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <strong id="method-name">Study Method</strong>
-                    <button onclick="exitMethod()" style="width: auto; padding: 8px 15px; background: #dc3545; color: white; border: none; font-size: 0.9em;">
-                        Exit Method
+<body class="font-inter antialiased bg-[#0B1118]" x-data="bibleApp()">
+    
+    <!-- Navigation -->
+    <nav 
+        x-show="showNav" 
+        x-transition
+        class="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm"
+    >
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 bg-[#112240]/90 border-b border-[#C0C5D9]/20">
+            <div class="flex items-center justify-between">
+                <div class="font-playfair text-xl md:text-2xl text-[#C0C5D9] logo-spacing cursor-pointer" @click="resetView()">
+                    GospelPath
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Translation Selector -->
+                    <select 
+                        x-model="selectedTranslation"
+                        class="bg-[#112240] text-[#F5F5F0] border border-[#C0C5D9]/30 rounded-lg px-3 py-2 text-sm font-inter focus:border-[#C0C5D9] focus:outline-none"
+                    >
+                        <option value="ESV">ESV</option>
+                        <option value="NIV">NIV</option>
+                        <option value="KJV">KJV</option>
+                        <option value="NKJV">NKJV</option>
+                        <option value="NASB">NASB</option>
+                        <option value="NLT">NLT</option>
+                        <option value="CSB">CSB</option>
+                        <option value="MSG">MSG</option>
+                        <option value="AMP">AMP</option>
+                        <option value="NRSV">NRSV</option>
+                    </select>
+                    
+                    <!-- API Key Status -->
+                    <button 
+                        @click="showSettings = !showSettings"
+                        class="w-10 h-10 rounded-full bg-[#C0C5D9]/10 hover:bg-[#C0C5D9]/20 transition-colors flex items-center justify-center"
+                        :title="apiKey ? 'API Connected' : 'Set API Key'"
+                    >
+                        <span x-show="apiKey">⚙️</span>
+                        <span x-show="!apiKey">🔑</span>
                     </button>
                 </div>
-                <div class="progress-bar">
-                    <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
-                </div>
-                <div id="step-indicator" class="step-indicator">
-                    <!-- Steps will be dynamically added here -->
-                </div>
             </div>
         </div>
-
-        <!-- AI Model Selector -->
-        <div class="provider-selector">
-            <h3>🤖 AI Model</h3>
-            
-            <div class="provider-buttons">
-                <button id="groq-btn" class="provider-btn active" onclick="switchToGroq()">
-                    <strong>Llama (Groq)</strong>
-                    <small>FREE • Fast • Good Quality</small>
-                </button>
-                
-                <button id="claude-btn" class="provider-btn" onclick="switchToClaude()" disabled style="opacity: 0.5; cursor: not-allowed;">
-                    <strong>Claude (Disabled)</strong>
-                    <small>Premium - Coming Soon</small>
-                </button>
-            </div>
-            
-            <div id="provider-status" class="provider-status">
-                Using: Llama (Free)
-            </div>
-        </div>
-
-        <!-- Bible Translation Controls -->
-        <div class="controls">
-            <div class="control-group">
-                <label for="translation">Bible Translation:</label>
-                <select id="translation">
-                    <option value="ESV">ESV - English Standard Version</option>
-                    <option value="NIV">NIV - New International Version</option>
-                    <option value="KJV">KJV - King James Version</option>
-                    <option value="NKJV">NKJV - New King James Version</option>
-                    <option value="NASB">NASB - New American Standard Bible</option>
-                    <option value="NLT">NLT - New Living Translation</option>
-                    <option value="CSB">CSB - Christian Standard Bible</option>
-                    <option value="MSG">MSG - The Message</option>
-                    <option value="AMP">AMP - Amplified Bible</option>
-                    <option value="NRSV">NRSV - New Revised Standard Version</option>
-                </select>
-            </div>
-
-            <div class="control-group">
-                <button id="compare-btn" onclick="toggleCompare()">
-                    📊 Compare Translations
-                </button>
-            </div>
-
-            <div id="compare-container" class="compare-container">
-                <div class="control-group">
-                    <label for="compare-translation">Compare with:</label>
-                    <select id="compare-translation">
-                        <option value="NIV">NIV - New International Version</option>
-                        <option value="ESV">ESV - English Standard Version</option>
-                        <option value="KJV">KJV - King James Version</option>
-                        <option value="NKJV">NKJV - New King James Version</option>
-                        <option value="NASB">NASB - New American Standard Bible</option>
-                        <option value="NLT">NLT - New Living Translation</option>
-                        <option value="CSB">CSB - Christian Standard Bible</option>
-                        <option value="MSG">MSG - The Message</option>
-                        <option value="AMP">AMP - Amplified Bible</option>
-                        <option value="NRSV">NRSV - New Revised Standard Version</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <!-- Chat Interface -->
-        <div class="chat-container">
-            <div id="chat-messages" class="chat-messages">
-                <div class="message assistant">
-                    Welcome to GospelPath! 🙏<br><br>
-                    <strong>NEW: Guided Study Methods!</strong><br>
-                    Choose a structured study method above to be guided step-by-step through proven Bible study techniques.<br><br>
-                    Or chat freely - I'm here to help you:<br>
-                    • Understand Bible passages<br>
-                    • Explore theological concepts<br>
-                    • Compare translations<br>
-                    • Apply Scripture to your life<br><br>
-                    How can I help you grow in your faith today?
-                </div>
-            </div>
-
-            <div class="input-area">
-                <textarea 
-                    id="user-input" 
-                    placeholder="Ask me anything about the Bible, or select a study method above for guided study..."
-                    onkeypress="handleKeyPress(event)"
-                ></textarea>
-                <button id="send-btn" onclick="sendMessage()">Send</button>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="footer">
-            <p>📖 "Your word is a lamp to my feet and a light to my path." - Psalm 119:105</p>
-            <p style="margin-top: 10px; font-size: 0.9em;">
-                Built to bring people closer to Christ through deeper engagement with Scripture
+    </nav>
+    
+    <!-- Settings Modal -->
+    <div 
+        x-show="showSettings" 
+        x-transition
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
+        @click.self="showSettings = false"
+    >
+        <div class="bg-[#112240] rounded-2xl p-8 max-w-md w-full border border-[#C0C5D9]/30 shadow-2xl">
+            <h2 class="font-playfair text-2xl text-[#C0C5D9] mb-4">API Settings</h2>
+            <p class="font-lora text-sm text-[#9BA4B8] mb-6">
+                Enter your Groq API key to enable AI-powered Bible study assistance. Get a free key at 
+                <a href="https://console.groq.com" target="_blank" class="text-[#C0C5D9] hover:underline">console.groq.com</a>
             </p>
+            <input 
+                type="password"
+                x-model="tempApiKey"
+                placeholder="gsk_..."
+                class="w-full bg-[#0B1118] text-[#F5F5F0] border border-[#C0C5D9]/30 rounded-lg px-4 py-3 mb-4 font-mono text-sm focus:border-[#C0C5D9] focus:outline-none"
+            >
+            <div class="flex gap-3">
+                <button 
+                    @click="saveApiKey()"
+                    class="flex-1 bg-[#C0C5D9] text-[#0B1118] font-inter font-semibold py-3 rounded-lg hover:bg-[#E8ECF4] transition-colors"
+                >
+                    Save
+                </button>
+                <button 
+                    @click="showSettings = false"
+                    class="flex-1 bg-[#112240] text-[#F5F5F0] border border-[#C0C5D9]/30 font-inter font-semibold py-3 rounded-lg hover:bg-[#1A2B4A] transition-colors"
+                >
+                    Cancel
+                </button>
+            </div>
         </div>
     </div>
-
+    
+    <!-- Hero Section -->
+    <section 
+        x-show="!hasSearched"
+        x-transition
+        class="hero-gradient-dark min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-4 sm:px-6"
+    >
+        <!-- Moonlit Silver Path SVG -->
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <svg 
+                class="moonlit-path-svg" 
+                width="200" 
+                height="80vh" 
+                viewBox="0 0 200 800" 
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path 
+                    class="path-line moonlit-path"
+                    d="M 100 800 Q 60 700, 100 600 Q 140 500, 100 400 Q 60 300, 100 200 L 100 120"
+                    fill="none" 
+                    stroke="#C0C5D9" 
+                    stroke-width="3"
+                    stroke-linecap="round"
+                    opacity="0.8"
+                />
+                <g class="cross-glow-moon" transform="translate(100, 80)">
+                    <line x1="0" y1="-30" x2="0" y2="30" stroke="#E8ECF4" stroke-width="5" stroke-linecap="round"/>
+                    <line x1="-20" y1="0" x2="20" y2="0" stroke="#E8ECF4" stroke-width="5" stroke-linecap="round"/>
+                    <circle cx="0" cy="0" r="25" fill="rgba(232, 236, 244, 0.15)"/>
+                    <circle cx="0" cy="0" r="15" fill="rgba(232, 236, 244, 0.25)"/>
+                </g>
+            </svg>
+        </div>
+        
+        <!-- Content -->
+        <div class="relative z-10 text-center max-w-4xl mx-auto space-y-8">
+            <h1 class="font-playfair text-4xl sm:text-5xl md:text-7xl text-[#C0C5D9] logo-spacing font-bold">
+                GospelPath
+            </h1>
+            <h2 class="font-lora text-lg sm:text-xl md:text-2xl text-[#F5F5F0] font-medium">
+                Your AI-Powered Journey Through Scripture
+            </h2>
+            <p class="font-lora text-base md:text-lg text-[#9BA4B8] italic">
+                Walk the Word. Ask anything.
+            </p>
+            
+            <!-- Search Input -->
+            <div class="mt-12 max-w-2xl mx-auto">
+                <input 
+                    type="text"
+                    x-model="userQuery"
+                    @keydown.enter="handleSearch()"
+                    @focus="showNav = true"
+                    placeholder="Ask about any verse, topic, or biblical question..."
+                    class="parchment-input-dark w-full px-6 sm:px-8 md:px-10 py-4 sm:py-5 md:py-6 rounded-2xl font-lora text-base sm:text-lg md:text-xl border-t-2 border-[#C0C5D9]/30"
+                />
+                <button 
+                    @click="handleSearch()"
+                    :disabled="!userQuery || loading"
+                    class="mt-4 px-8 py-3 bg-[#C0C5D9] text-[#0B1118] font-inter font-semibold rounded-lg hover:bg-[#E8ECF4] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    Search Scripture
+                </button>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Results Section -->
+    <section 
+        x-show="hasSearched" 
+        x-transition
+        class="min-h-screen py-20 px-4 sm:px-6 bg-gradient-to-b from-[#112240] to-[#0B1118]"
+        :class="{ 'pt-28': showNav }"
+    >
+        <div class="max-w-4xl mx-auto">
+            
+            <!-- Back to Search -->
+            <button 
+                @click="resetView()"
+                class="mb-8 flex items-center gap-2 text-[#C0C5D9] hover:text-[#E8ECF4] transition-colors font-inter"
+            >
+                <span>←</span> New Search
+            </button>
+            
+            <!-- User Query Display -->
+            <div class="mb-8 bg-[#112240]/60 rounded-lg p-6 border-l-4 border-[#C0C5D9]">
+                <p class="font-lora text-lg text-[#F5F5F0]" x-text="userQuery"></p>
+            </div>
+            
+            <!-- Loading State -->
+            <div x-show="loading" class="flex flex-col items-center justify-center py-20">
+                <div class="w-16 h-16 border-4 border-[#C0C5D9]/30 border-t-[#C0C5D9] rounded-full spinner"></div>
+                <p class="mt-6 font-lora text-[#9BA4B8] text-lg">Searching the Scriptures...</p>
+                <div class="flex gap-2 mt-4">
+                    <span class="w-2 h-2 bg-[#C0C5D9] rounded-full typing-dot"></span>
+                    <span class="w-2 h-2 bg-[#C0C5D9] rounded-full typing-dot"></span>
+                    <span class="w-2 h-2 bg-[#C0C5D9] rounded-full typing-dot"></span>
+                </div>
+            </div>
+            
+            <!-- Error Message -->
+            <div x-show="errorMessage" class="bg-red-900/20 border border-red-500/50 rounded-lg p-6 mb-8">
+                <p class="font-lora text-red-300" x-text="errorMessage"></p>
+            </div>
+            
+            <!-- AI Response -->
+            <div x-show="aiResponse && !loading" class="space-y-8">
+                <article class="scripture-card bg-gradient-to-br from-[#C0C5D9]/10 to-[#9BA4B8]/10 backdrop-blur-sm rounded-lg p-6 sm:p-8 md:p-10 border-l-4 border-[#C0C5D9] shadow-xl">
+                    <h3 class="font-playfair text-2xl text-[#E8ECF4] mb-4 flex items-center gap-2">
+                        <span>✨</span> AI Insight
+                    </h3>
+                    <div class="font-lora text-base sm:text-lg leading-relaxed text-[#F5F5F0]/90 prose prose-invert" x-html="formatResponse(aiResponse)"></div>
+                </article>
+                
+                <!-- Conversation History -->
+                <template x-for="(msg, index) in conversationHistory" :key="index">
+                    <div x-show="index > 0">
+                        <div x-show="msg.role === 'user'" class="bg-[#112240]/60 rounded-lg p-4 sm:p-6 mb-4">
+                            <p class="font-inter text-sm text-[#9BA4B8] mb-2">You asked:</p>
+                            <p class="font-lora text-base sm:text-lg text-[#F5F5F0]" x-text="msg.content"></p>
+                        </div>
+                        <div x-show="msg.role === 'assistant'" class="scripture-card bg-[#112240]/95 backdrop-blur-sm rounded-lg p-6 sm:p-8 border-t-2 border-[#C0C5D9]/40 shadow-xl mb-8">
+                            <div class="font-lora text-base sm:text-lg leading-relaxed text-[#F5F5F0]/90 prose prose-invert" x-html="formatResponse(msg.content)"></div>
+                        </div>
+                    </div>
+                </template>
+                
+                <!-- Follow-up Question -->
+                <div class="bg-[#112240]/60 rounded-lg p-6 border border-[#C0C5D9]/30">
+                    <label class="font-inter text-sm text-[#9BA4B8] mb-3 block">Ask a follow-up question:</label>
+                    <div class="flex gap-3">
+                        <input 
+                            type="text"
+                            x-model="followUpQuery"
+                            @keydown.enter="askFollowUp()"
+                            placeholder="Continue the conversation..."
+                            class="flex-1 bg-[#0B1118] text-[#F5F5F0] border border-[#C0C5D9]/30 rounded-lg px-4 py-3 font-lora focus:border-[#C0C5D9] focus:outline-none"
+                        />
+                        <button 
+                            @click="askFollowUp()"
+                            :disabled="!followUpQuery || loading"
+                            class="px-6 py-3 bg-[#C0C5D9] text-[#0B1118] font-inter font-semibold rounded-lg hover:bg-[#E8ECF4] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Send
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
     <script>
-        // =====================================================================
-        // GLOBAL STATE & CONFIGURATION
-        // =====================================================================
-        
-        // Conversation history
-        let conversationHistory = [];
-        
-        // AI provider
-        let currentProvider = 'groq';
-        let currentModel = null;
-        
-        // Translation comparison
-        let compareMode = false;
-        
-        // =====================================================================
-        // STUDY METHOD STATE
-        // =====================================================================
-        // This is the key learning concept: tracking where users are in a process
-        
-        let currentMethod = null;  // Which study method is active
-        let currentStep = 0;       // Which step in the method
-        let methodSteps = [];      // Array of steps for current method
-        let studyPassage = null;   // The passage being studied
-        
-        // Study method definitions
-        const STUDY_METHODS = {
-            inductive: {
-                name: "Inductive Bible Study",
-                steps: [
-                    {
-                        name: "Observation",
-                        prompt: "Let's start with careful observation. What passage would you like to study?",
-                        systemPrompt: "You are guiding someone through the OBSERVATION step of inductive Bible study. Help them notice: who is speaking, who is being addressed, repeated words, literary devices, commands, promises, and key themes. Ask questions to help them see what's in the text."
-                    },
-                    {
-                        name: "Interpretation",
-                        prompt: "Great observations! Now let's interpret what the passage means. Based on what you observed, what do you think the author is trying to communicate?",
-                        systemPrompt: "You are guiding someone through the INTERPRETATION step. Help them understand the meaning of the text in its original context. Ask about: historical background, cultural context, word meanings, grammar, and the author's intent. Help them understand what it meant to the original audience."
-                    },
-                    {
-                        name: "Application",
-                        prompt: "Excellent interpretation! Now for application - how does this truth apply to your life today?",
-                        systemPrompt: "You are guiding someone through the APPLICATION step. Help them make the passage personal and practical. Ask: How does this apply to your life? What specific action can you take? What needs to change? How will you obey this truth? Be encouraging and practical."
-                    }
-                ]
-            },
-            lectio: {
-                name: "Lectio Divina",
-                steps: [
-                    {
-                        name: "Lectio (Read)",
-                        prompt: "Welcome to Lectio Divina - sacred reading. What passage would you like to read slowly and prayerfully?",
-                        systemPrompt: "You are guiding someone through LECTIO (sacred reading). Encourage them to read the passage slowly, multiple times. Ask them what words or phrases stand out. Help them notice what captures their attention. Be gentle and contemplative in tone."
-                    },
-                    {
-                        name: "Meditatio (Meditate)",
-                        prompt: "Now let's meditate on what you've read. What word or phrase is speaking to your heart? What is God saying to you through this passage?",
-                        systemPrompt: "You are guiding MEDITATIO (meditation). Help them reflect deeply on what stood out. Ask: Why might this word/phrase be significant for you right now? What is God revealing? Be reflective and help them listen to the Spirit."
-                    },
-                    {
-                        name: "Oratio (Pray)",
-                        prompt: "Now respond to God in prayer. Talk to Him about what you've heard. What do you want to say to God?",
-                        systemPrompt: "You are guiding ORATIO (prayer). Encourage them to respond to God personally. This is a conversation with God about what He's shown them. Help them express their thoughts, feelings, requests, or commitments to God. Be reverent and prayerful."
-                    },
-                    {
-                        name: "Contemplatio (Contemplate)",
-                        prompt: "Finally, rest in God's presence. Simply be with Him, holding this truth in your heart. How do you sense God's love and presence?",
-                        systemPrompt: "You are guiding CONTEMPLATIO (contemplation). This is about resting in God's presence, not doing but being. Help them simply enjoy communion with God. Be peaceful and still in tone. Encourage them to carry this truth with them."
-                    }
-                ]
-            },
-            soap: {
-                name: "SOAP Method",
-                steps: [
-                    {
-                        name: "Scripture",
-                        prompt: "Let's study Scripture together using the SOAP method. What passage would you like to read?",
-                        systemPrompt: "You are guiding the SCRIPTURE step of SOAP method. Help them read the passage carefully and identify the key verse or verses that stand out. Ask what captures their attention."
-                    },
-                    {
-                        name: "Observation",
-                        prompt: "What do you observe in this passage? What stands out to you? What is the context?",
-                        systemPrompt: "You are guiding OBSERVATION in SOAP method. Help them notice details: who, what, when, where, why. What's the situation? What's happening? Be inquisitive and help them see the passage clearly."
-                    },
-                    {
-                        name: "Application",
-                        prompt: "How does this passage apply to your life right now? What is God teaching you?",
-                        systemPrompt: "You are guiding APPLICATION in SOAP method. Help them make it personal: How does this truth apply today? What needs to change? What action will you take? Be practical and encouraging."
-                    },
-                    {
-                        name: "Prayer",
-                        prompt: "Now pray about what you've learned. Talk to God about how you'll respond to this truth.",
-                        systemPrompt: "You are guiding PRAYER in SOAP method. Help them formulate a prayer response. Encourage them to ask God for help in applying this truth, to thank Him for what they've learned, or to commit to obedience. Be reverent and personal."
-                    }
-                ]
-            },
-            '5ws': {
-                name: "5 W's Method",
-                steps: [
-                    {
-                        name: "Select Passage",
-                        prompt: "Let's study using the 5 W's method: Who, What, When, Where, Why, and How. What passage shall we study?",
-                        systemPrompt: "You are starting the 5 W's method. Help them choose a passage and prepare to analyze it systematically using the 5 W's framework."
-                    },
-                    {
-                        name: "Who & What",
-                        prompt: "WHO is involved in this passage? WHAT is happening?",
-                        systemPrompt: "Guide them through WHO and WHAT questions. Who is speaking? Who is being addressed? Who are the characters? What is happening? What is being said? What actions are taking place?"
-                    },
-                    {
-                        name: "When & Where",
-                        prompt: "WHEN does this take place? WHERE is this happening?",
-                        systemPrompt: "Guide them through WHEN and WHERE. When in history? What's the timeframe? Where geographically? What's the setting? Help them understand the context."
-                    },
-                    {
-                        name: "Why & How",
-                        prompt: "WHY is this happening? HOW is it happening?",
-                        systemPrompt: "Guide them through WHY and HOW. Why is this significant? Why did the author include this? How does this happen? How should we respond? Help them see purpose and method."
-                    },
-                    {
-                        name: "Application",
-                        prompt: "Based on your answers to the 5 W's, what is God teaching you? How will you apply this?",
-                        systemPrompt: "Help them synthesize their 5 W's analysis into practical application. What have they learned? How does it apply to their life? What action will they take?"
-                    }
-                ]
-            }
-        };
-        
-        // Base system prompt for free chat
-        const BASE_SYSTEM_PROMPT = `You are a knowledgeable and compassionate Bible study assistant. Your purpose is to help people understand Scripture more deeply and grow closer to Christ.
-
-Key Guidelines:
-- Be respectful of all Christian traditions and denominations
-- Provide historically and theologically accurate information
-- Cite specific Bible verses when relevant
-- Explain difficult concepts in accessible language
-- Acknowledge when topics are debated among scholars
-- Encourage personal application and spiritual growth
-- Be warm, encouraging, and patient
-- When discussing translations, note meaningful differences respectfully
-
-Your goal is to illuminate Scripture and help users encounter God through His Word.`;
-
-        // Initialize conversation with base system prompt
-        conversationHistory.push({
-            role: 'system',
-            content: BASE_SYSTEM_PROMPT
-        });
-
-        // =====================================================================
-        // STUDY METHOD FUNCTIONS
-        // =====================================================================
-        
-        function selectMethod(methodKey) {
-            // Exit free chat mode
-            if (methodKey === 'free') {
-                exitMethod();
-                return;
-            }
-            
-            // Initialize the selected study method
-            currentMethod = methodKey;
-            currentStep = 0;
-            methodSteps = STUDY_METHODS[methodKey].steps;
-            studyPassage = null;
-            
-            // Update UI
-            updateMethodUI();
-            
-            // Clear conversation and set new system prompt for first step
-            conversationHistory = [{
-                role: 'system',
-                content: methodSteps[0].systemPrompt
-            }];
-            
-            // Send first prompt from the method
-            addMessage(`📚 Starting ${STUDY_METHODS[methodKey].name}`, 'system');
-            addMessage(methodSteps[0].prompt, 'assistant');
-        }
-        
-        function exitMethod() {
-            // Return to free chat mode
-            currentMethod = null;
-            currentStep = 0;
-            methodSteps = [];
-            studyPassage = null;
-            
-            // Reset conversation to base system prompt
-            conversationHistory = [{
-                role: 'system',
-                content: BASE_SYSTEM_PROMPT
-            }];
-            
-            // Update UI
-            updateMethodUI();
-            addMessage('Returned to free chat mode. Ask me anything!', 'system');
-        }
-        
-        function advanceStep() {
-            currentStep++;
-            
-            if (currentStep < methodSteps.length) {
-                // Move to next step
-                updateMethodUI();
+        function bibleApp() {
+            return {
+                // State
+                showNav: false,
+                showSettings: false,
+                hasSearched: false,
+                loading: false,
+                userQuery: '',
+                followUpQuery: '',
+                aiResponse: '',
+                errorMessage: '',
+                selectedTranslation: 'NIV',
+                apiKey: localStorage.getItem('groqApiKey') || '',
+                tempApiKey: '',
+                conversationHistory: [], // For maintaining context
                 
-                // Update system prompt for new step
-                conversationHistory[0] = {
-                    role: 'system',
-                    content: methodSteps[currentStep].systemPrompt
-                };
-                
-                // Send next step prompt
-                addMessage(methodSteps[currentStep].prompt, 'assistant');
-            } else {
-                // Method completed!
-                addMessage(`🎉 You've completed the ${STUDY_METHODS[currentMethod].name}! Great work studying God's Word. You can start a new method or chat freely.`, 'system');
-                exitMethod();
-            }
-        }
-        
-        function updateMethodUI() {
-            const progressDiv = document.getElementById('method-progress');
-            const methodNameDiv = document.getElementById('method-name');
-            const progressFill = document.getElementById('progress-fill');
-            const stepIndicator = document.getElementById('step-indicator');
-            
-            // Update method buttons
-            document.querySelectorAll('.method-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            if (currentMethod) {
-                // Show progress
-                progressDiv.classList.add('active');
-                methodNameDiv.textContent = STUDY_METHODS[currentMethod].name;
-                
-                // Update progress bar
-                const progress = ((currentStep + 1) / methodSteps.length) * 100;
-                progressFill.style.width = `${progress}%`;
-                
-                // Update step indicators
-                stepIndicator.innerHTML = '';
-                methodSteps.forEach((step, index) => {
-                    const stepDiv = document.createElement('div');
-                    stepDiv.className = 'step';
-                    stepDiv.textContent = step.name;
-                    
-                    if (index < currentStep) {
-                        stepDiv.classList.add('completed');
-                    } else if (index === currentStep) {
-                        stepDiv.classList.add('active');
-                    }
-                    
-                    stepIndicator.appendChild(stepDiv);
-                });
-                
-                // Highlight active method button
-                const methodBtn = document.querySelector(`[onclick="selectMethod('${currentMethod}')"]`);
-                if (methodBtn) methodBtn.classList.add('active');
-                
-            } else {
-                // Hide progress
-                progressDiv.classList.remove('active');
-                
-                // Highlight free chat
-                const freeBtn = document.querySelector(`[onclick="selectMethod('free')"]`);
-                if (freeBtn) freeBtn.classList.add('active');
-            }
-        }
-
-        // =====================================================================
-        // AI PROVIDER SWITCHING
-        // =====================================================================
-        
-        function switchToGroq() {
-            currentProvider = 'groq';
-            currentModel = null;
-            updateProviderUI();
-        }
-
-        function switchToClaude() {
-            // Disabled for now
-            alert('Claude is temporarily disabled. Using Llama (Groq) - it works great!');
-        }
-
-        function updateProviderUI() {
-            const groqBtn = document.getElementById('groq-btn');
-            const claudeBtn = document.getElementById('claude-btn');
-            const statusDiv = document.getElementById('provider-status');
-            
-            groqBtn.classList.add('active');
-            claudeBtn.classList.remove('active');
-            statusDiv.textContent = 'Using: Llama (Free)';
-        }
-
-        // =====================================================================
-        // TRANSLATION COMPARISON
-        // =====================================================================
-        
-        function toggleCompare() {
-            compareMode = !compareMode;
-            const container = document.getElementById('compare-container');
-            const btn = document.getElementById('compare-btn');
-            
-            if (compareMode) {
-                container.classList.add('active');
-                btn.textContent = '❌ Disable Comparison';
-            } else {
-                container.classList.remove('active');
-                btn.textContent = '📊 Compare Translations';
-            }
-        }
-
-        // =====================================================================
-        // MESSAGE HANDLING
-        // =====================================================================
-        
-        async function sendMessage() {
-            const userInput = document.getElementById('user-input');
-            const sendBtn = document.getElementById('send-btn');
-            const message = userInput.value.trim();
-            
-            if (!message) return;
-            
-            // Get translation preference
-            const translation = document.getElementById('translation').value;
-            let finalMessage = message;
-            
-            // Add translation preference
-            if (compareMode) {
-                const compareTranslation = document.getElementById('compare-translation').value;
-                finalMessage = `${message}\n\n[Please use the ${translation} translation, and compare with ${compareTranslation}, highlighting significant differences.]`;
-            } else {
-                finalMessage = `${message}\n\n[Please use the ${translation} translation.]`;
-            }
-            
-            // Add to UI
-            addMessage(message, 'user');
-            userInput.value = '';
-            
-            // Disable input
-            sendBtn.disabled = true;
-            userInput.disabled = true;
-            
-            // Add to history
-            conversationHistory.push({
-                role: 'user',
-                content: finalMessage
-            });
-            
-            // Loading indicator
-            const loadingDiv = addMessage('Thinking...', 'assistant');
-            
-            try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        messages: conversationHistory,
-                        provider: currentProvider,
-                        model: currentModel
-                    })
-                });
-                
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                const assistantMessage = data.message;
-                
-                // Remove loading, add response
-                loadingDiv.remove();
-                addMessage(assistantMessage, 'assistant');
-                
-                // Add to history
-                conversationHistory.push({
-                    role: 'assistant',
-                    content: assistantMessage
-                });
-                
-                // If in a study method, check if we should advance
-                if (currentMethod) {
-                    // After AI responds, offer to move to next step
+                // Initialize
+                init() {
+                    // Show nav after 8 seconds if no interaction
                     setTimeout(() => {
-                        if (currentStep < methodSteps.length - 1) {
-                            const continueBtn = document.createElement('div');
-                            continueBtn.className = 'message system';
-                            continueBtn.innerHTML = `
-                                <button onclick="advanceStep()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1em;">
-                                    Continue to ${methodSteps[currentStep + 1].name} →
-                                </button>
-                                <button onclick="exitMethod()" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px; font-size: 1em;">
-                                    Exit Method
-                                </button>
-                            `;
-                            document.getElementById('chat-messages').appendChild(continueBtn);
-                            document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
-                        }
-                    }, 500);
-                }
+                        if (!this.hasSearched) this.showNav = true;
+                    }, 8000);
+                },
                 
-            } catch (error) {
-                loadingDiv.remove();
-                addMessage(`Sorry, there was an error: ${error.message}. Please try again.`, 'assistant', 'error');
-                console.error('Error:', error);
-                conversationHistory.pop();
-            } finally {
-                sendBtn.disabled = false;
-                userInput.disabled = false;
-                userInput.focus();
+                // Save API key to localStorage
+                saveApiKey() {
+                    if (this.tempApiKey.trim()) {
+                        this.apiKey = this.tempApiKey.trim();
+                        localStorage.setItem('groqApiKey', this.apiKey);
+                        this.showSettings = false;
+                        this.tempApiKey = '';
+                        alert('API key saved successfully!');
+                    }
+                },
+                
+                // Handle main search
+                async handleSearch() {
+                    if (!this.userQuery.trim()) return;
+                    
+                    if (!this.apiKey) {
+                        this.errorMessage = 'Please set your Groq API key in the settings (⚙️) to use AI features.';
+                        this.showSettings = true;
+                        return;
+                    }
+                    
+                    this.hasSearched = true;
+                    this.loading = true;
+                    this.errorMessage = '';
+                    this.showNav = true;
+                    
+                    // Initialize conversation with system prompt
+                    this.conversationHistory = [{
+                        role: 'system',
+                        content: `You are a knowledgeable and reverent Bible study assistant. Help users understand Scripture with accuracy, context, and spiritual insight. When referencing verses, use the ${this.selectedTranslation} translation when possible. Provide thoughtful explanations that honor the text and help users grow in their faith. Format your responses with clear paragraphs.`
+                    }, {
+                        role: 'user',
+                        content: this.userQuery
+                    }];
+                    
+                    await this.callGroqAPI();
+                },
+                
+                // Handle follow-up questions
+                async askFollowUp() {
+                    if (!this.followUpQuery.trim()) return;
+                    
+                    this.loading = true;
+                    this.errorMessage = '';
+                    
+                    // Add user's follow-up to conversation
+                    this.conversationHistory.push({
+                        role: 'user',
+                        content: this.followUpQuery
+                    });
+                    
+                    // Clear the input
+                    this.followUpQuery = '';
+                    
+                    await this.callGroqAPI();
+                },
+                
+                // Call Groq API with conversation history
+                async callGroqAPI() {
+                    try {
+                        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${this.apiKey}`
+                            },
+                            body: JSON.stringify({
+                                model: 'llama-3.3-70b-versatile', // Updated model
+                                messages: this.conversationHistory,
+                                temperature: 0.7,
+                                max_tokens: 2000
+                            })
+                        });
+                        
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.error?.message || 'API request failed');
+                        }
+                        
+                        const data = await response.json();
+                        const assistantMessage = data.choices[0].message.content;
+                        
+                        // Add assistant response to conversation history
+                        this.conversationHistory.push({
+                            role: 'assistant',
+                            content: assistantMessage
+                        });
+                        
+                        this.aiResponse = assistantMessage;
+                        this.loading = false;
+                        
+                    } catch (error) {
+                        console.error('Error calling Groq API:', error);
+                        this.errorMessage = `Error: ${error.message}. Please check your API key and try again.`;
+                        this.loading = false;
+                    }
+                },
+                
+                // Format response with basic markdown-like rendering
+                formatResponse(text) {
+                    if (!text) return '';
+                    
+                    return text
+                        .split('\n\n')
+                        .map(paragraph => `<p class="mb-4">${paragraph.trim()}</p>`)
+                        .join('')
+                        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+                },
+                
+                // Reset to initial view
+                resetView() {
+                    this.hasSearched = false;
+                    this.userQuery = '';
+                    this.aiResponse = '';
+                    this.errorMessage = '';
+                    this.conversationHistory = [];
+                }
             }
         }
-
-        // =====================================================================
-        // UI HELPERS
-        // =====================================================================
-        
-        function addMessage(text, role, type = '') {
-            const messagesDiv = document.getElementById('chat-messages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${role} ${type}`;
-            
-            if (role === 'system') {
-                messageDiv.innerHTML = text;
-            } else {
-                messageDiv.textContent = text;
-            }
-            
-            messagesDiv.appendChild(messageDiv);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            return messageDiv;
-        }
-
-        function handleKeyPress(event) {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                sendMessage();
-            }
-        }
-
-        // =====================================================================
-        // INITIALIZATION
-        // =====================================================================
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('GospelPath with Study Methods initialized');
-            document.getElementById('user-input').focus();
-        });
     </script>
 </body>
 </html>
