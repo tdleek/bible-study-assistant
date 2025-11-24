@@ -1715,6 +1715,10 @@
                         };
                         this.hasSearched = true;
                         this.showNav = true;
+
+                        // Auto-fetch interlinear data in the background
+                        this.fetchInterlinear();
+
                         return true;
                     }
                     
@@ -1723,7 +1727,7 @@
                         this.loading = true;
                         const response = await fetch(`/api/verse?ref=${encodeURIComponent(query)}&translation=${this.selectedTranslation}`);
                         const data = await response.json();
-                        
+
                         if (data.text) {
                             this.verseLookupResult = {
                                 reference: data.reference,
@@ -1732,12 +1736,16 @@
                             this.hasSearched = true;
                             this.showNav = true;
                             this.loading = false;
+
+                            // Auto-fetch interlinear data in the background
+                            this.fetchInterlinear();
+
                             return true;
                         }
                     } catch (error) {
                         console.log('Verse API fetch failed, falling back to AI:', error);
                     }
-                    
+
                     this.loading = false;
                     return false;
                 },
