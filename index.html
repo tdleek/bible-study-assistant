@@ -1769,8 +1769,11 @@
                 hasInterlinear() {
                     if (!this.verseLookupResult) return false;
                     const key = this.verseLookupResult.reference.toLowerCase().trim();
+                    const hasData = !!(this.INTERLINEAR_DATABASE[key] || this.interlinearCache[key]);
+                    console.log('hasInterlinear: key=', key, 'hasData=', hasData);
+                    console.log('hasInterlinear: Database has?', !!this.INTERLINEAR_DATABASE[key], 'Cache has?', !!this.interlinearCache[key]);
                     // Check both local database and cache
-                    return !!(this.INTERLINEAR_DATABASE[key] || this.interlinearCache[key]);
+                    return hasData;
                 },
                 
                 // Check if interlinear could potentially be fetched from API
@@ -1784,8 +1787,10 @@
                 getInterlinearData() {
                     if (!this.verseLookupResult) return null;
                     const key = this.verseLookupResult.reference.toLowerCase().trim();
+                    const data = this.INTERLINEAR_DATABASE[key] || this.interlinearCache[key] || null;
+                    console.log('getInterlinearData: key=', key, 'data=', data ? `${data.words?.length} words` : 'null');
                     // Check local database first, then cache
-                    return this.INTERLINEAR_DATABASE[key] || this.interlinearCache[key] || null;
+                    return data;
                 },
                 
                 // Fetch interlinear data from API
@@ -1818,13 +1823,17 @@
                         console.log('fetchInterlinear: Response data:', data);
 
                         if (data.words && data.words.length > 0) {
-                            // Store in cache
-                            this.interlinearCache[key] = {
-                                language: data.language,
-                                words: data.words,
-                                fullText: data.fullText || ''
+                            // Store in cache - use Alpine's reactive assignment
+                            this.interlinearCache = {
+                                ...this.interlinearCache,
+                                [key]: {
+                                    language: data.language,
+                                    words: data.words,
+                                    fullText: data.fullText || ''
+                                }
                             };
-                            console.log('fetchInterlinear: Stored', data.words.length, 'words in cache');
+                            console.log('fetchInterlinear: Stored', data.words.length, 'words in cache for key:', key);
+                            console.log('fetchInterlinear: Cache now contains:', Object.keys(this.interlinearCache));
                             // Also store in localStorage for persistence
                             try {
                                 const cached = JSON.parse(localStorage.getItem('interlinearCache') || '{}');
