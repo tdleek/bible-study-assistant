@@ -3,25 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GospelPath – AI-Powered Bible Study Assistant</title>
+    <title>GospelPath – Your AI-Powered Journey Through Scripture</title>
     
-    <!-- Tailwind CSS via CDN -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Alpine.js for interactivity -->
+    <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
-    <!-- Google Fonts: Playfair Display SC, Lora, Inter -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display+SC:wght@400;700;900&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* =================================================================
-           COLOR PALETTES - DUAL THEME SYSTEM
-           ================================================================= */
-        
-        /* DARK MODE - Gethsemane (Night Prayer) */
+        /* Dark Theme - Gethsemane */
         .dark {
             --charcoal: #0B1118;
             --midnight-card: #112240;
@@ -37,7 +33,7 @@
             --text-secondary: #9BA4B8;
         }
         
-        /* LIGHT MODE - Emmaus Road (Dawn) */
+        /* Light Theme - Emmaus Road */
         :root {
             --scripture-blue: #0F1C3A;
             --sunrise-gold: #D4A017;
@@ -51,263 +47,103 @@
             --text-secondary: #5D7555;
         }
         
-        /* Font families */
         .font-playfair { font-family: 'Playfair Display SC', serif; }
         .font-lora { font-family: 'Lora', serif; }
         .font-inter { font-family: 'Inter', sans-serif; }
         
-        /* =================================================================
-           HERO GRADIENTS - DUAL THEME
-           ================================================================= */
-        
-        /* Dark mode gradient */
+        /* Gradient Backgrounds */
         .dark .hero-gradient {
             background: linear-gradient(180deg, #0B1118 0%, #1A2B4A 50%, #112240 100%);
-            position: relative;
         }
-        
-        /* Light mode gradient */
         .hero-gradient {
             background: linear-gradient(180deg, #0F1C3A 0%, #FDFBF7 50%, #FFE8E0 100%);
-            position: relative;
         }
         
-        /* Papyrus texture overlay */
-        .hero-gradient::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: 
-                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.05"/></svg>');
-            opacity: 0.08;
-            pointer-events: none;
-        }
-        
-        /* =================================================================
-           PATH ANIMATIONS - DUAL THEME
-           ================================================================= */
-        
-        /* Moonlit path (dark mode) */
+        /* Path Animations */
         @keyframes pathGlowMoon {
             0%, 100% { filter: drop-shadow(0 0 20px rgba(192, 197, 217, 0.5)); }
             50% { filter: drop-shadow(0 0 35px rgba(232, 236, 244, 0.8)); }
         }
-        
-        /* Golden path (light mode) */
         @keyframes pathGlowGold {
             0%, 100% { filter: drop-shadow(0 0 20px rgba(212, 160, 23, 0.6)); }
             50% { filter: drop-shadow(0 0 40px rgba(212, 160, 23, 0.9)); }
         }
-        
         @keyframes pathDraw {
             from { stroke-dashoffset: 2000; }
             to { stroke-dashoffset: 0; }
         }
-        
-        .dark .path-glow {
-            animation: pathGlowMoon 4s ease-in-out infinite;
-        }
-        
-        .path-glow {
-            animation: pathGlowGold 4s ease-in-out infinite;
-        }
-        
+        .dark .path-glow { animation: pathGlowMoon 4s ease-in-out infinite; }
+        .path-glow { animation: pathGlowGold 4s ease-in-out infinite; }
         .path-line {
             stroke-dasharray: 2000;
             stroke-dashoffset: 2000;
             animation: pathDraw 3s ease-out forwards;
         }
         
-        /* Cross glow animations */
+        /* Cross Glow */
         @keyframes crossGlowMoon {
             0%, 100% { opacity: 0.8; filter: drop-shadow(0 0 18px rgba(232, 236, 244, 0.7)); }
             50% { opacity: 1; filter: drop-shadow(0 0 35px rgba(232, 236, 244, 1)); }
         }
-        
         @keyframes crossGlowGold {
             0%, 100% { opacity: 0.7; filter: drop-shadow(0 0 15px rgba(212, 160, 23, 0.8)); }
             50% { opacity: 1; filter: drop-shadow(0 0 30px rgba(212, 160, 23, 1)); }
         }
+        .dark .cross-glow { animation: crossGlowMoon 3s ease-in-out infinite; }
+        .cross-glow { animation: crossGlowGold 3s ease-in-out infinite; }
         
-        .dark .cross-glow {
-            animation: crossGlowMoon 3s ease-in-out infinite;
+        /* Loading Animation */
+        @keyframes pulse-gentle {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.8; }
         }
+        .loading-pulse { animation: pulse-gentle 2s ease-in-out infinite; }
         
-        .cross-glow {
-            animation: crossGlowGold 3s ease-in-out infinite;
-        }
-        
-        /* =================================================================
-           INPUT STYLING - DUAL THEME
-           ================================================================= */
-        
-        .parchment-input {
-            background: rgba(253, 251, 247, 0.95);
-            box-shadow: 
-                0 4px 6px rgba(15, 28, 58, 0.1),
-                0 10px 25px rgba(15, 28, 58, 0.08),
-                inset 0 1px 0 rgba(212, 160, 23, 0.1);
-            transition: all 0.3s ease;
-        }
-        
-        .dark .parchment-input {
-            background: rgba(17, 34, 64, 0.95);
-            box-shadow: 
-                0 4px 6px rgba(0, 0, 0, 0.3),
-                0 10px 25px rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 rgba(192, 197, 217, 0.1);
-            color: #F5F5F0;
-        }
-        
-        .parchment-input::placeholder {
-            color: rgba(93, 117, 85, 0.6);
-        }
-        
-        .dark .parchment-input::placeholder {
-            color: rgba(155, 164, 184, 0.6);
-        }
-        
-        .parchment-input:focus {
-            outline: none;
-            box-shadow: 
-                0 6px 12px rgba(15, 28, 58, 0.12),
-                0 15px 35px rgba(15, 28, 58, 0.1),
-                inset 0 0 0 2px rgba(212, 160, 23, 0.3),
-                0 0 25px rgba(212, 160, 23, 0.2);
-        }
-        
-        .dark .parchment-input:focus {
-            box-shadow: 
-                0 6px 12px rgba(0, 0, 0, 0.4),
-                0 15px 35px rgba(0, 0, 0, 0.3),
-                inset 0 0 0 2px rgba(192, 197, 217, 0.4),
-                0 0 25px rgba(192, 197, 217, 0.3);
-        }
-        
-        /* =================================================================
-           ORIGINAL LANGUAGE - WORD STYLING
-           ================================================================= */
-        
+        /* Strong's Word Styling */
         .strongs-word {
-            position: relative;
-            display: inline;
             cursor: help;
             border-bottom: 2px dotted var(--accent);
             padding: 0 2px;
             transition: all 0.2s ease;
         }
-        
         .strongs-word:hover {
             background: rgba(212, 160, 23, 0.15);
             border-bottom-style: solid;
         }
-        
         .dark .strongs-word:hover {
             background: rgba(192, 197, 217, 0.15);
         }
+        .original-text { font-size: 2.5rem; font-weight: bold; }
         
-        .original-text {
-            font-size: 2.5rem;
-            font-weight: bold;
-            line-height: 1.2;
-        }
-        
-        /* =================================================================
-           ANIMATIONS
-           ================================================================= */
-        
-        @keyframes cardEntrance {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .scripture-card {
-            animation: cardEntrance 0.8s ease-out forwards;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .spinner {
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 1; }
-        }
-        
-        .typing-dot {
-            animation: pulse 1.4s ease-in-out infinite;
-        }
-        
-        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-        
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        
-        .modal-content {
-            animation: modalFadeIn 0.3s ease-out forwards;
-        }
-        
+        /* Daily Verse Shimmer */
         @keyframes shimmer {
             0% { background-position: -200% 0; }
             100% { background-position: 200% 0; }
         }
-        
         .daily-verse-shimmer {
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
             background-size: 200% 100%;
             animation: shimmer 3s ease-in-out infinite;
         }
         
-        /* =================================================================
-           UTILITY CLASSES
-           ================================================================= */
-        
-        .logo-spacing {
-            letter-spacing: 0.15em;
+        /* Modal Animation */
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
-        
-        .small-caps {
-            font-variant: small-caps;
-            letter-spacing: 0.08em;
-        }
-        
-        /* Mobile path adjustments */
-        @media (max-width: 768px) {
-            .path-svg {
-                width: 120px !important;
-                height: 70vh !important;
-            }
-        }
-        
-        /* Perspective cards styling */
-        .perspective-card {
-            border-left: 4px solid;
-        }
-        
-        .perspective-protestant { border-left-color: #9b59b6; }
-        .perspective-catholic { border-left-color: #e74c3c; }
-        .perspective-orthodox { border-left-color: #3498db; }
+        .modal-content { animation: modalFadeIn 0.3s ease-out forwards; }
     </style>
 </head>
+
 <body class="font-inter antialiased transition-colors duration-300" 
       :class="darkMode ? 'bg-[#0B1118]' : 'bg-[#FDFBF7]'" 
-      x-data="bibleApp()">
+      x-data="gospelPathApp()">
     
-    <!-- ================================================================= 
-         DAILY VERSE WIDGET - NEW FEATURE!
-         Shows an inspirational verse that changes daily
-         ================================================================= -->
+    <!-- ==================== DAILY VERSE WIDGET ==================== -->
     <div x-show="!hasSearched" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 transform -translate-y-4"
+         x-transition:enter-end="opacity-100 transform translate-y-0"
          class="fixed top-4 left-1/2 transform -translate-x-1/2 z-40 w-11/12 max-w-xl">
         <div class="rounded-xl p-4 backdrop-blur-md border transition-colors relative overflow-hidden"
              :class="darkMode 
@@ -327,32 +163,26 @@
                    x-text="dailyVerse.text"></p>
                 <p class="font-inter text-xs mt-2 transition-colors"
                    :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#5D7555]'"
-                   x-text="dailyVerse.reference"></p>
+                   x-text="'— ' + dailyVerse.reference"></p>
             </div>
         </div>
     </div>
     
-    <!-- ================================================================= 
-         NAVIGATION BAR - Fixed at top
-         ================================================================= -->
+    <!-- ==================== NAVIGATION ==================== -->
     <nav x-show="showNav" 
-         x-transition:enter="transition ease-out duration-500"
-         x-transition:enter-start="opacity-0 -translate-y-full"
-         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition
          class="fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b transition-colors"
          :class="darkMode 
              ? 'bg-[#0B1118]/95 border-[#C0C5D9]/20' 
              : 'bg-[#FDFBF7]/95 border-[#D4A017]/30'">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
             <!-- Logo -->
-            <a href="#" @click.prevent="resetView()" class="flex items-center gap-3 group">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all group-hover:scale-110"
-                     :class="darkMode 
-                         ? 'border-[#C0C5D9] bg-[#C0C5D9]/10' 
-                         : 'border-[#D4A017] bg-[#D4A017]/10'">
+            <a href="#" @click.prevent="resetToHome()" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 group-hover:scale-110"
+                     :class="darkMode ? 'border-[#C0C5D9] bg-[#C0C5D9]/10' : 'border-[#D4A017] bg-[#D4A017]/10'">
                     <span class="text-xl">✝</span>
                 </div>
-                <span class="font-playfair text-xl logo-spacing transition-colors"
+                <span class="font-playfair text-xl transition-colors"
                       :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'">
                     GospelPath
                 </span>
@@ -362,178 +192,134 @@
             <div class="flex items-center gap-3">
                 <!-- Translation Selector -->
                 <select x-model="selectedTranslation"
-                        class="rounded-lg px-3 py-2 font-inter text-sm border transition-colors cursor-pointer"
+                        class="rounded-lg px-3 py-2 font-inter text-sm border cursor-pointer transition-colors"
                         :class="darkMode 
                             ? 'bg-[#112240] text-[#F5F5F0] border-[#C0C5D9]/30' 
                             : 'bg-white text-[#0F1C3A] border-[#D4A017]/30'">
                     <option value="ESV">ESV</option>
                     <option value="NIV">NIV</option>
                     <option value="KJV">KJV</option>
-                    <option value="NKJV">NKJV</option>
                     <option value="NASB">NASB</option>
                     <option value="NLT">NLT</option>
-                    <option value="CSB">CSB</option>
-                    <option value="MSG">MSG</option>
-                    <option value="AMP">AMP</option>
-                    <option value="NRSV">NRSV</option>
-                    <option value="Tyndale">Tyndale</option>
                 </select>
                 
                 <!-- Comparative Mode Toggle -->
                 <button @click="comparativeMode = !comparativeMode"
-                        class="w-10 h-10 rounded-lg flex items-center justify-center border transition-all"
+                        class="px-3 py-2 rounded-lg font-inter text-sm border transition-all"
                         :class="comparativeMode 
-                            ? (darkMode ? 'bg-[#C0C5D9] text-[#0B1118] border-[#C0C5D9]' : 'bg-[#D4A017] text-white border-[#D4A017]')
-                            : (darkMode ? 'bg-[#112240] text-[#C0C5D9] border-[#C0C5D9]/30 hover:border-[#C0C5D9]' : 'bg-white text-[#D4A017] border-[#D4A017]/30 hover:border-[#D4A017]')"
-                        :title="comparativeMode ? 'Comparative Mode ON' : 'Click for Multiple Perspectives'">
-                    🕊️
+                            ? (darkMode ? 'bg-[#C0C5D9] text-[#0B1118]' : 'bg-[#D4A017] text-white')
+                            : (darkMode ? 'bg-[#112240] text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-white text-[#D4A017] border-[#D4A017]/30')">
+                    <span x-text="comparativeMode ? '🕊️ Comparative' : '📖 Standard'"></span>
                 </button>
                 
                 <!-- Theme Toggle -->
-                <button @click="darkMode = !darkMode; localStorage.setItem('darkMode', darkMode)"
-                        class="w-10 h-10 rounded-lg flex items-center justify-center border transition-all"
+                <button @click="darkMode = !darkMode"
+                        class="w-10 h-10 rounded-lg flex items-center justify-center border transition-all hover:scale-105"
                         :class="darkMode 
-                            ? 'bg-[#112240] text-[#C0C5D9] border-[#C0C5D9]/30 hover:border-[#C0C5D9]' 
-                            : 'bg-white text-[#D4A017] border-[#D4A017]/30 hover:border-[#D4A017]'"
-                        :title="darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+                            ? 'bg-[#112240] text-[#C0C5D9] border-[#C0C5D9]/30' 
+                            : 'bg-white text-[#D4A017] border-[#D4A017]/30'">
                     <span x-text="darkMode ? '☀️' : '🌙'"></span>
                 </button>
             </div>
         </div>
     </nav>
     
-    <!-- ================================================================= 
-         HERO SECTION - Landing page with path animation
-         ================================================================= -->
-    <section x-show="!hasSearched" class="hero-gradient min-h-screen flex flex-col items-center justify-center px-4 relative overflow-hidden">
-        <!-- Animated Path with Cross -->
+    <!-- ==================== HERO SECTION ==================== -->
+    <section x-show="!hasSearched" class="hero-gradient min-h-screen flex flex-col items-center justify-center px-4 relative">
+        <!-- Animated Path -->
         <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <svg class="path-svg w-48 sm:w-64 h-[80vh] path-glow" viewBox="0 0 200 600" fill="none">
-                <!-- Winding path -->
+            <svg class="w-48 h-[80vh] path-glow" viewBox="0 0 200 600" fill="none">
                 <path class="path-line" 
                       d="M100 600 Q 60 500, 100 450 Q 140 400, 100 350 Q 60 300, 100 250 Q 140 200, 100 150 Q 80 100, 100 50"
                       :stroke="darkMode ? '#C0C5D9' : '#D4A017'"
                       stroke-width="4"
                       stroke-linecap="round"
                       fill="none"/>
-                
-                <!-- Cross at the end of the path -->
                 <g class="cross-glow" transform="translate(85, 10)">
-                    <rect x="10" y="0" width="10" height="40" rx="2" 
-                          :fill="darkMode ? '#E8ECF4' : '#D4A017'"/>
-                    <rect x="0" y="10" width="30" height="10" rx="2" 
-                          :fill="darkMode ? '#E8ECF4' : '#D4A017'"/>
+                    <rect x="10" y="0" width="10" height="40" rx="2" :fill="darkMode ? '#E8ECF4' : '#D4A017'"/>
+                    <rect x="0" y="10" width="30" height="10" rx="2" :fill="darkMode ? '#E8ECF4' : '#D4A017'"/>
                 </g>
             </svg>
         </div>
         
-        <!-- Main Content -->
+        <!-- Hero Content -->
         <div class="relative z-10 text-center max-w-3xl mx-auto pt-20">
-            <!-- Logo -->
             <div class="mb-8 flex justify-center">
-                <div class="w-20 h-20 rounded-full flex items-center justify-center border-3 transition-colors"
-                     :class="darkMode 
-                         ? 'border-[#C0C5D9] bg-[#C0C5D9]/10' 
-                         : 'border-[#D4A017] bg-[#D4A017]/10'">
+                <div class="w-20 h-20 rounded-full flex items-center justify-center border-3"
+                     :class="darkMode ? 'border-[#C0C5D9] bg-[#C0C5D9]/10' : 'border-[#D4A017] bg-[#D4A017]/10'">
                     <span class="text-4xl">✝</span>
                 </div>
             </div>
             
-            <!-- Title -->
-            <h1 class="font-playfair text-4xl sm:text-5xl md:text-6xl font-bold mb-4 logo-spacing transition-colors"
+            <h1 class="font-playfair text-5xl md:text-6xl font-bold mb-4 transition-colors"
                 :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#F5F5F0]'">
                 GospelPath
             </h1>
             
-            <!-- Subtitle -->
-            <p class="font-lora text-lg sm:text-xl mb-12 transition-colors"
+            <p class="font-lora text-xl md:text-2xl mb-12 transition-colors"
                :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#FFE8E0]'">
                 Your AI-Powered Journey Through Scripture
             </p>
             
-            <!-- Search Input -->
+            <!-- Search Box -->
             <div class="w-full max-w-xl mx-auto mb-6">
                 <input 
                     type="text"
                     x-model="userQuery"
                     @keydown.enter="handleSearch()"
-                    placeholder="Ask about any verse, topic, or question... (or type a verse like 'John 3:16')"
-                    class="parchment-input w-full rounded-2xl px-6 py-5 font-lora text-lg border-2 transition-all"
+                    placeholder="Try: 'John 3:16' or 'What does the Bible say about grace?'"
+                    class="w-full rounded-2xl px-6 py-5 font-lora text-lg border-2 transition-all focus:outline-none focus:ring-4"
                     :class="darkMode 
-                        ? 'border-[#C0C5D9]/30 text-[#F5F5F0]' 
-                        : 'border-[#D4A017]/30 text-[#0F1C3A]'"
+                        ? 'bg-[#112240] border-[#C0C5D9]/30 text-[#F5F5F0] placeholder-[#9BA4B8] focus:border-[#C0C5D9] focus:ring-[#C0C5D9]/20' 
+                        : 'bg-white border-[#D4A017]/30 text-[#0F1C3A] placeholder-[#5D7555] focus:border-[#D4A017] focus:ring-[#D4A017]/20'"
                 />
             </div>
             
-            <!-- Search Button -->
             <button 
                 @click="handleSearch()"
-                :disabled="!userQuery || loading"
-                class="font-inter font-semibold text-lg px-10 py-4 rounded-xl transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                class="font-inter font-semibold text-lg px-10 py-4 rounded-xl transition-all hover:scale-105 hover:shadow-lg"
                 :class="darkMode 
                     ? 'bg-[#C0C5D9] text-[#0B1118] hover:bg-[#E8ECF4]' 
                     : 'bg-[#D4A017] text-[#0F1C3A] hover:bg-[#FFB627]'">
-                <span x-show="!loading">Begin Your Journey</span>
-                <span x-show="loading" class="flex items-center gap-2">
-                    <svg class="w-5 h-5 spinner" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Seeking...
-                </span>
+                Begin Your Journey
             </button>
             
-            <!-- Comparative Mode Hint -->
-            <p x-show="comparativeMode" 
-               class="mt-4 font-inter text-sm transition-colors"
-               :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#FFE8E0]'">
-                🕊️ Comparative Mode: See Protestant, Catholic & Orthodox perspectives
-            </p>
-            
-            <!-- Scripture Quote -->
-            <p class="mt-16 font-lora text-sm italic transition-colors max-w-md mx-auto"
+            <!-- Tagline -->
+            <p class="mt-16 font-lora text-sm italic transition-colors"
                :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#FFE8E0]/80'">
-                "Your word is a lamp to my feet and a light to my path."
-                <span class="block mt-1 not-italic">— Psalm 119:105</span>
+                "Your word is a lamp to my feet and a light to my path." — Psalm 119:105
             </p>
         </div>
     </section>
     
-    <!-- ================================================================= 
-         RESULTS SECTION - Shows after search
-         ================================================================= -->
-    <section x-show="hasSearched" class="min-h-screen pt-24 pb-12 px-4 transition-colors"
+    <!-- ==================== RESULTS SECTION ==================== -->
+    <section x-show="hasSearched" 
+             x-transition
+             class="min-h-screen pt-24 pb-20 px-4 transition-colors"
              :class="darkMode ? 'bg-[#0B1118]' : 'bg-[#FDFBF7]'">
         <div class="max-w-4xl mx-auto">
             
-            <!-- Error Message -->
-            <div x-show="errorMessage" 
-                 class="mb-8 p-6 rounded-xl border-2 border-red-500/50 bg-red-500/10">
-                <p class="font-inter text-red-400" x-text="errorMessage"></p>
-            </div>
-            
             <!-- Loading State -->
-            <div x-show="loading" class="scripture-card rounded-2xl p-8 border transition-colors text-center"
-                 :class="darkMode 
-                     ? 'bg-[#112240]/80 border-[#C0C5D9]/30' 
-                     : 'bg-white/80 border-[#D4A017]/30'">
-                <div class="flex items-center justify-center gap-2 mb-4">
-                    <span class="typing-dot w-3 h-3 rounded-full transition-colors"
-                          :class="darkMode ? 'bg-[#C0C5D9]' : 'bg-[#D4A017]'"></span>
-                    <span class="typing-dot w-3 h-3 rounded-full transition-colors"
-                          :class="darkMode ? 'bg-[#C0C5D9]' : 'bg-[#D4A017]'"></span>
-                    <span class="typing-dot w-3 h-3 rounded-full transition-colors"
-                          :class="darkMode ? 'bg-[#C0C5D9]' : 'bg-[#D4A017]'"></span>
+            <div x-show="loading" class="text-center py-20">
+                <div class="loading-pulse">
+                    <span class="text-6xl">✝</span>
                 </div>
-                <p class="font-lora italic transition-colors"
-                   :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#5D7555]'">
+                <p class="mt-6 font-lora text-lg transition-colors"
+                   :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#5D7555]'">
                     Searching the Scriptures...
                 </p>
             </div>
             
-            <!-- Verse Lookup Result (Quick Display) -->
+            <!-- Error Message -->
+            <div x-show="errorMessage && !loading" 
+                 class="rounded-xl p-6 mb-8 border"
+                 :class="darkMode ? 'bg-red-900/20 border-red-500/30 text-red-300' : 'bg-red-50 border-red-200 text-red-700'">
+                <p class="font-inter" x-text="errorMessage"></p>
+            </div>
+            
+            <!-- Verse Lookup Result -->
             <div x-show="verseLookupResult && !loading" 
-                 class="scripture-card mb-8 rounded-2xl p-8 border transition-colors"
+                 class="mb-8 rounded-2xl p-8 border transition-colors"
                  :class="darkMode 
                      ? 'bg-gradient-to-br from-[#112240] to-[#1A2B4A] border-[#C0C5D9]/40' 
                      : 'bg-gradient-to-br from-white to-[#FFE8E0] border-[#D4A017]/40'">
@@ -541,14 +327,14 @@
                     <span class="text-2xl">📖</span>
                     <h3 class="font-playfair text-xl transition-colors"
                         :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'"
-                        x-text="verseLookupResult?.reference || ''"></h3>
+                        x-text="verseLookupResult ? verseLookupResult.reference : ''"></h3>
                     <span class="font-inter text-xs px-2 py-1 rounded transition-colors"
                           :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#D4A017]/20 text-[#D4A017]'"
                           x-text="selectedTranslation"></span>
                 </div>
                 <p class="font-lora text-xl leading-relaxed italic transition-colors"
                    :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#0F1C3A]'"
-                   x-text="verseLookupResult?.text || ''"></p>
+                   x-text="verseLookupResult ? verseLookupResult.text : ''"></p>
                 <p class="mt-4 font-inter text-sm transition-colors"
                    :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#5D7555]'">
                     💡 <span class="cursor-pointer underline" @click="askAboutVerse()">Ask AI to explain this verse</span>
@@ -557,7 +343,6 @@
             
             <!-- Comparative Perspectives View -->
             <div x-show="perspectiveResponse && !loading" class="space-y-6 mb-8">
-                <!-- Header -->
                 <div class="flex items-center gap-3 mb-6">
                     <span class="text-2xl">🕊️</span>
                     <h2 class="font-playfair text-2xl transition-colors"
@@ -566,70 +351,63 @@
                     </h2>
                 </div>
                 
-                <!-- Common Ground Card -->
-                <div x-show="perspectiveResponse?.common" 
-                     class="scripture-card rounded-2xl p-6 border-2 transition-colors"
+                <!-- Common Ground -->
+                <div class="rounded-xl p-6 border transition-colors"
                      :class="darkMode 
-                         ? 'bg-[#112240]/80 border-[#C0C5D9]/50' 
-                         : 'bg-white/90 border-[#D4A017]/50'">
+                         ? 'bg-[#112240]/80 border-[#C0C5D9]/30' 
+                         : 'bg-white/80 border-[#D4A017]/30'">
                     <h3 class="font-playfair text-lg mb-3 flex items-center gap-2 transition-colors"
                         :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'">
                         <span>🤝</span> Common Ground
                     </h3>
                     <div class="font-lora leading-relaxed transition-colors"
                          :class="darkMode ? 'text-[#F5F5F0]/90' : 'text-[#0F1C3A]/90'"
-                         x-html="formatResponse(perspectiveResponse?.common || '')"></div>
+                         x-html="formatResponse(perspectiveResponse ? perspectiveResponse.common : '')"></div>
                 </div>
                 
                 <!-- Three Perspectives Grid -->
                 <div class="grid md:grid-cols-3 gap-4">
-                    <!-- Protestant -->
-                    <div x-show="perspectiveResponse?.protestant"
-                         class="scripture-card rounded-xl p-5 border perspective-card perspective-protestant transition-colors"
-                         :class="darkMode 
-                             ? 'bg-[#112240]/70 border-[#9b59b6]/30' 
-                             : 'bg-white/80 border-[#9b59b6]/30'">
-                        <h4 class="font-playfair text-base mb-3 text-[#9b59b6] flex items-center gap-2">
-                            <span>⛪</span> Protestant
-                        </h4>
-                        <div class="font-lora text-sm leading-relaxed transition-colors"
-                             :class="darkMode ? 'text-[#F5F5F0]/85' : 'text-[#0F1C3A]/85'"
-                             x-html="formatResponse(perspectiveResponse?.protestant || '')"></div>
-                    </div>
+                    <template x-if="perspectiveResponse && perspectiveResponse.protestant">
+                        <div class="rounded-xl p-5 border transition-colors"
+                             :class="darkMode ? 'bg-[#112240]/70 border-[#9b59b6]/30' : 'bg-white/80 border-[#9b59b6]/30'">
+                            <h4 class="font-playfair text-base mb-3 text-[#9b59b6] flex items-center gap-2">
+                                <span>⛪</span> Protestant
+                            </h4>
+                            <div class="font-lora text-sm leading-relaxed transition-colors"
+                                 :class="darkMode ? 'text-[#F5F5F0]/85' : 'text-[#0F1C3A]/85'"
+                                 x-html="formatResponse(perspectiveResponse.protestant)"></div>
+                        </div>
+                    </template>
                     
-                    <!-- Catholic -->
-                    <div x-show="perspectiveResponse?.catholic"
-                         class="scripture-card rounded-xl p-5 border perspective-card perspective-catholic transition-colors"
-                         :class="darkMode 
-                             ? 'bg-[#112240]/70 border-[#e74c3c]/30' 
-                             : 'bg-white/80 border-[#e74c3c]/30'">
-                        <h4 class="font-playfair text-base mb-3 text-[#e74c3c] flex items-center gap-2">
-                            <span>⛪</span> Catholic
-                        </h4>
-                        <div class="font-lora text-sm leading-relaxed transition-colors"
-                             :class="darkMode ? 'text-[#F5F5F0]/85' : 'text-[#0F1C3A]/85'"
-                             x-html="formatResponse(perspectiveResponse?.catholic || '')"></div>
-                    </div>
+                    <template x-if="perspectiveResponse && perspectiveResponse.catholic">
+                        <div class="rounded-xl p-5 border transition-colors"
+                             :class="darkMode ? 'bg-[#112240]/70 border-[#e74c3c]/30' : 'bg-white/80 border-[#e74c3c]/30'">
+                            <h4 class="font-playfair text-base mb-3 text-[#e74c3c] flex items-center gap-2">
+                                <span>⛪</span> Catholic
+                            </h4>
+                            <div class="font-lora text-sm leading-relaxed transition-colors"
+                                 :class="darkMode ? 'text-[#F5F5F0]/85' : 'text-[#0F1C3A]/85'"
+                                 x-html="formatResponse(perspectiveResponse.catholic)"></div>
+                        </div>
+                    </template>
                     
-                    <!-- Orthodox -->
-                    <div x-show="perspectiveResponse?.orthodox"
-                         class="scripture-card rounded-xl p-5 border perspective-card perspective-orthodox transition-colors"
-                         :class="darkMode 
-                             ? 'bg-[#112240]/70 border-[#3498db]/30' 
-                             : 'bg-white/80 border-[#3498db]/30'">
-                        <h4 class="font-playfair text-base mb-3 text-[#3498db] flex items-center gap-2">
-                            <span>⛪</span> Orthodox
-                        </h4>
-                        <div class="font-lora text-sm leading-relaxed transition-colors"
-                             :class="darkMode ? 'text-[#F5F5F0]/85' : 'text-[#0F1C3A]/85'"
-                             x-html="formatResponse(perspectiveResponse?.orthodox || '')"></div>
-                    </div>
+                    <template x-if="perspectiveResponse && perspectiveResponse.orthodox">
+                        <div class="rounded-xl p-5 border transition-colors"
+                             :class="darkMode ? 'bg-[#112240]/70 border-[#3498db]/30' : 'bg-white/80 border-[#3498db]/30'">
+                            <h4 class="font-playfair text-base mb-3 text-[#3498db] flex items-center gap-2">
+                                <span>⛪</span> Orthodox
+                            </h4>
+                            <div class="font-lora text-sm leading-relaxed transition-colors"
+                                 :class="darkMode ? 'text-[#F5F5F0]/85' : 'text-[#0F1C3A]/85'"
+                                 x-html="formatResponse(perspectiveResponse.orthodox)"></div>
+                        </div>
+                    </template>
                 </div>
             </div>
             
-            <!-- Regular Response (Non-Comparative) -->
-            <div x-show="aiResponse && !perspectiveResponse && !loading && !verseLookupResult" 
-                 class="scripture-card rounded-2xl p-8 border transition-colors mb-8"
+            <!-- Regular AI Response -->
+            <div x-show="aiResponse && !comparativeMode && !loading && !verseLookupResult" 
+                 class="rounded-2xl p-8 border mb-8 transition-colors"
                  :class="darkMode 
                      ? 'bg-[#112240]/80 border-[#C0C5D9]/30' 
                      : 'bg-white/80 border-[#D4A017]/30'">
@@ -638,364 +416,180 @@
                      x-html="formatResponse(aiResponse)"></div>
             </div>
             
-            <!-- Conversation History -->
-            <div x-show="conversationHistory.length > 2 && !loading" class="space-y-6 mb-8">
-                <template x-for="(msg, index) in conversationHistory.slice(2)" :key="index">
-                    <div class="rounded-xl p-6 border transition-colors"
-                         :class="msg.role === 'user' 
-                             ? (darkMode ? 'bg-[#1A2B4A]/50 border-[#C0C5D9]/20' : 'bg-[#FFE8E0]/50 border-[#D4A017]/20')
-                             : (darkMode ? 'bg-[#112240]/95 border-[#C0C5D9]/40' : 'bg-[#FDFBF7]/98 border-[#D4A017]')">
-                        <div x-show="msg.role === 'user'" class="flex items-center gap-2 mb-3">
-                            <span class="text-lg">👤</span>
-                            <span class="font-inter text-sm font-semibold transition-colors"
-                                  :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#D4A017]'">You asked:</span>
-                        </div>
-                        <div x-show="msg.role === 'assistant'" class="flex items-center gap-2 mb-3">
-                            <span class="text-lg">✨</span>
-                            <span class="font-inter text-sm font-semibold transition-colors"
-                                  :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#D4A017]'">AI Response:</span>
-                        </div>
-                        <div class="font-lora text-base leading-relaxed transition-colors"
-                             :class="darkMode ? 'text-[#F5F5F0]/90' : 'text-[#0F1C3A]/90'"
-                             x-html="formatResponse(msg.content)"></div>
-                    </div>
-                </template>
-            </div>
-            
-            <!-- Action Buttons -->
-            <div x-show="aiResponse && !loading" class="flex flex-wrap gap-3 mb-8">
-                <!-- Copy Conversation -->
-                <button @click="copyConversation()"
-                        class="flex items-center gap-2 px-4 py-2 rounded-lg font-inter text-sm border transition-colors"
-                        :class="darkMode 
-                            ? 'bg-[#112240] text-[#C0C5D9] border-[#C0C5D9]/30 hover:border-[#C0C5D9]' 
-                            : 'bg-white text-[#D4A017] border-[#D4A017]/30 hover:border-[#D4A017]'">
-                    <span>📋</span>
-                    <span x-text="copyStatus"></span>
-                </button>
-                
-                <!-- New Question -->
-                <button @click="resetView()"
-                        class="flex items-center gap-2 px-4 py-2 rounded-lg font-inter text-sm border transition-colors"
-                        :class="darkMode 
-                            ? 'bg-[#112240] text-[#C0C5D9] border-[#C0C5D9]/30 hover:border-[#C0C5D9]' 
-                            : 'bg-white text-[#D4A017] border-[#D4A017]/30 hover:border-[#D4A017]'">
-                    <span>🔄</span>
-                    <span>New Question</span>
-                </button>
-            </div>
-            
             <!-- Follow-up Question -->
-            <div x-show="aiResponse && !loading"
-                 class="rounded-lg p-6 border transition-colors"
-                 :class="darkMode 
-                     ? 'bg-[#112240]/60 border-[#C0C5D9]/30' 
-                     : 'bg-white/60 border-[#D4A017]/30'">
-                <label class="font-inter text-sm mb-3 block transition-colors"
-                       :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#5D7555]'">Ask a follow-up question:</label>
+            <div x-show="(aiResponse || perspectiveResponse) && !loading" 
+                 class="mb-8">
                 <div class="flex gap-3">
                     <input 
                         type="text"
                         x-model="followUpQuery"
                         @keydown.enter="askFollowUp()"
-                        placeholder="Continue the conversation..."
-                        class="flex-1 rounded-lg px-4 py-3 font-lora border transition-colors focus:outline-none"
+                        placeholder="Ask a follow-up question..."
+                        class="flex-1 rounded-xl px-5 py-4 font-lora border-2 transition-all focus:outline-none focus:ring-4"
                         :class="darkMode 
-                            ? 'bg-[#0B1118] text-[#F5F5F0] border-[#C0C5D9]/30 focus:border-[#C0C5D9]' 
-                            : 'bg-white text-[#0F1C3A] border-[#D4A017]/30 focus:border-[#D4A017]'"
+                            ? 'bg-[#112240] border-[#C0C5D9]/30 text-[#F5F5F0] placeholder-[#9BA4B8] focus:border-[#C0C5D9] focus:ring-[#C0C5D9]/20' 
+                            : 'bg-white border-[#D4A017]/30 text-[#0F1C3A] placeholder-[#5D7555] focus:border-[#D4A017] focus:ring-[#D4A017]/20'"
                     />
                     <button 
                         @click="askFollowUp()"
-                        :disabled="!followUpQuery || loading"
-                        class="px-6 py-3 font-inter font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="px-6 py-4 rounded-xl font-inter font-semibold transition-all hover:scale-105"
                         :class="darkMode 
                             ? 'bg-[#C0C5D9] text-[#0B1118] hover:bg-[#E8ECF4]' 
                             : 'bg-[#D4A017] text-[#0F1C3A] hover:bg-[#FFB627]'">
-                        Send
+                        Ask
                     </button>
                 </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div x-show="(aiResponse || perspectiveResponse || verseLookupResult) && !loading" 
+                 class="flex flex-wrap gap-3">
+                <button @click="copyConversation()"
+                        class="flex items-center gap-2 px-4 py-2 rounded-lg font-inter text-sm border transition-all hover:scale-105"
+                        :class="darkMode 
+                            ? 'bg-[#112240] text-[#C0C5D9] border-[#C0C5D9]/30 hover:bg-[#1A2B4A]' 
+                            : 'bg-white text-[#D4A017] border-[#D4A017]/30 hover:bg-[#FFE8E0]'">
+                    <span x-text="copied ? '✓ Copied!' : '📋 Copy'"></span>
+                </button>
+                
+                <button @click="resetToHome()"
+                        class="flex items-center gap-2 px-4 py-2 rounded-lg font-inter text-sm border transition-all hover:scale-105"
+                        :class="darkMode 
+                            ? 'bg-[#112240] text-[#C0C5D9] border-[#C0C5D9]/30 hover:bg-[#1A2B4A]' 
+                            : 'bg-white text-[#D4A017] border-[#D4A017]/30 hover:bg-[#FFE8E0]'">
+                    <span>🏠</span> New Search
+                </button>
             </div>
         </div>
     </section>
     
-    <!-- ================================================================= 
-         ORIGINAL LANGUAGE MODAL
-         Click a highlighted word to see Hebrew/Greek details
-         ================================================================= -->
+    <!-- ==================== ORIGINAL LANGUAGE MODAL ==================== -->
     <div x-show="showingLanguageModal" 
-         x-transition
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
          @click.self="showingLanguageModal = false"
          class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
-        <div class="modal-content rounded-2xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto transition-colors"
+        <div class="modal-content rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto"
              :class="darkMode ? 'bg-[#112240]' : 'bg-[#FDFBF7]'">
             
-            <!-- Header -->
             <div class="flex justify-between items-start mb-6">
-                <div class="flex-1">
-                    <h2 class="font-playfair original-text transition-colors mb-2"
+                <div>
+                    <h2 class="font-playfair original-text mb-2"
                         :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'"
-                        x-text="currentStrongsData?.lemma || ''"></h2>
-                    <p class="font-inter text-sm transition-colors"
+                        x-text="currentStrongsData ? currentStrongsData.lemma : ''"></h2>
+                    <p class="font-inter text-sm"
                        :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#5D7555]'">
-                        <span class="font-semibold" x-text="currentStrongsData?.translit || ''"></span>
+                        <span class="font-semibold" x-text="currentStrongsData ? currentStrongsData.translit : ''"></span>
                         <span class="mx-2">•</span>
-                        <span class="italic" x-text="currentStrongsData?.pronunciation || ''"></span>
+                        <span class="italic" x-text="currentStrongsData ? currentStrongsData.pronunciation : ''"></span>
                         <span class="mx-2">•</span>
-                        <span class="small-caps" x-text="currentStrongsNum || ''"></span>
+                        <span x-text="currentStrongsNum"></span>
                     </p>
                 </div>
                 <button @click="showingLanguageModal = false" 
-                        class="ml-4 w-10 h-10 rounded-full transition-colors flex items-center justify-center text-2xl"
+                        class="text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-colors"
                         :class="darkMode ? 'hover:bg-[#C0C5D9]/10 text-[#C0C5D9]' : 'hover:bg-[#D4A017]/10 text-[#D4A017]'">
                     ×
                 </button>
             </div>
             
-            <!-- Part of Speech -->
             <div class="mb-6">
-                <span class="inline-block px-3 py-1 rounded-full text-xs font-inter font-semibold transition-colors"
+                <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold"
                       :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#D4A017]/20 text-[#D4A017]'"
-                      x-text="currentStrongsData?.partOfSpeech || ''"></span>
+                      x-text="currentStrongsData ? currentStrongsData.partOfSpeech : ''"></span>
             </div>
             
-            <!-- Definition -->
-            <div class="mb-6 pb-6 border-b transition-colors"
+            <div class="mb-6 pb-6 border-b"
                  :class="darkMode ? 'border-[#C0C5D9]/20' : 'border-[#D4A017]/20'">
-                <h3 class="font-playfair text-lg mb-3 transition-colors"
+                <h3 class="font-playfair text-lg mb-3"
                     :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'">Definition</h3>
-                <p class="font-lora text-base leading-relaxed transition-colors mb-3"
+                <p class="font-lora text-base mb-3"
                    :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#0F1C3A]'"
-                   x-text="currentStrongsData?.definition || ''"></p>
-                <p class="font-lora text-sm leading-relaxed transition-colors"
+                   x-text="currentStrongsData ? currentStrongsData.definition : ''"></p>
+                <p class="font-lora text-sm"
                    :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#5D7555]'"
-                   x-text="currentStrongsData?.longDefinition || ''"></p>
+                   x-text="currentStrongsData ? currentStrongsData.longDefinition : ''"></p>
             </div>
             
-            <!-- Usage -->
-            <div class="mb-6 pb-6 border-b transition-colors"
+            <div class="mb-6 pb-6 border-b"
                  :class="darkMode ? 'border-[#C0C5D9]/20' : 'border-[#D4A017]/20'">
-                <h3 class="font-playfair text-lg mb-2 transition-colors"
+                <h3 class="font-playfair text-lg mb-2"
                     :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'">Biblical Usage</h3>
-                <p class="font-inter text-sm transition-colors"
+                <p class="font-inter text-sm"
                    :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#5D7555]'"
-                   x-text="currentStrongsData?.usage || ''"></p>
+                   x-text="currentStrongsData ? currentStrongsData.usage : ''"></p>
             </div>
             
-            <!-- AI Insight -->
-            <div class="rounded-lg p-6 transition-colors"
+            <!-- AI Explanation -->
+            <div class="rounded-lg p-6"
                  :class="darkMode 
                      ? 'bg-gradient-to-br from-[#C0C5D9]/10 to-[#9BA4B8]/10' 
                      : 'bg-gradient-to-br from-[#D4A017]/10 to-[#5D7555]/10'">
-                <h3 class="font-playfair text-lg mb-4 flex items-center gap-2 transition-colors"
+                <h3 class="font-playfair text-lg mb-4 flex items-center gap-2"
                     :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'">
                     <span>✨</span> AI Insight
                 </h3>
-                
-                <!-- Loading -->
-                <div x-show="loadingLanguageExplanation" class="flex items-center justify-center py-8">
-                    <div class="w-8 h-8 border-4 rounded-full spinner"
-                         :class="darkMode 
-                             ? 'border-[#C0C5D9]/30 border-t-[#C0C5D9]' 
-                             : 'border-[#D4A017]/30 border-t-[#D4A017]'"></div>
+                <div x-show="loadingLanguageExplanation" class="flex items-center gap-2">
+                    <div class="loading-pulse">💭</div>
+                    <span class="font-inter text-sm" :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#5D7555]'">
+                        Exploring the depths of this word...
+                    </span>
                 </div>
-                
-                <!-- Content -->
-                <div x-show="!loadingLanguageExplanation" 
-                     class="font-lora text-base leading-relaxed transition-colors"
-                     :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#0F1C3A]'"
-                     x-html="formatResponse(languageAIExplanation)"></div>
+                <p x-show="!loadingLanguageExplanation"
+                   class="font-lora text-base leading-relaxed"
+                   :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#0F1C3A]'"
+                   x-text="languageAIExplanation"></p>
             </div>
             
-            <!-- Close Button -->
-            <div class="mt-6">
-                <button @click="showingLanguageModal = false"
-                        class="w-full py-3 rounded-lg font-inter font-semibold transition-colors"
-                        :class="darkMode 
-                            ? 'bg-[#C0C5D9] text-[#0B1118] hover:bg-[#E8ECF4]' 
-                            : 'bg-[#D4A017] text-[#0F1C3A] hover:bg-[#FFB627]'">
-                    Got It
-                </button>
-            </div>
+            <button @click="showingLanguageModal = false"
+                    class="w-full mt-6 py-3 rounded-lg font-inter font-semibold transition-all hover:scale-[1.02]"
+                    :class="darkMode 
+                        ? 'bg-[#C0C5D9] text-[#0B1118] hover:bg-[#E8ECF4]' 
+                        : 'bg-[#D4A017] text-[#0F1C3A] hover:bg-[#FFB627]'">
+                Got It
+            </button>
         </div>
     </div>
     
+    <!-- ==================== JAVASCRIPT ==================== -->
     <script>
-        // =============================================================================
-        // MAIN APPLICATION LOGIC
-        // =============================================================================
-        function bibleApp() {
+        function gospelPathApp() {
             return {
-                // =============================================================================
-                // STRONG'S CONCORDANCE DATABASE
-                // Hebrew and Greek words with full definitions
-                // =============================================================================
-                STRONGS_DATABASE: {
-                    "H430": {
-                        lemma: "אֱלֹהִים",
-                        translit: "elohim",
-                        pronunciation: "el-o-heem'",
-                        partOfSpeech: "noun masculine plural",
-                        definition: "God, gods, judges, angels",
-                        longDefinition: "Plural form of 'eloah'. Used to denote the one true God (with singular verbs), but also gods of the nations, judges, or divine beings. The plural form with singular verb is sometimes seen as a hint of the Trinity or a plural of majesty.",
-                        usage: "Used 2,606 times in the Hebrew Bible",
-                        english: ["God", "god", "gods"]
-                    },
-                    "H1254": {
-                        lemma: "בָּרָא",
-                        translit: "bara",
-                        pronunciation: "baw-raw'",
-                        partOfSpeech: "verb",
-                        definition: "to create, shape, form",
-                        longDefinition: "A unique verb used ONLY for divine creation - never for human making. Implies bringing something into existence that didn't exist before. Only God 'bara's.",
-                        usage: "Used 54 times in the Hebrew Bible, always with God as subject",
-                        english: ["create", "created", "creating"]
-                    },
-                    "H7225": {
-                        lemma: "רֵאשִׁית",
-                        translit: "reshith",
-                        pronunciation: "ray-sheeth'",
-                        partOfSpeech: "noun feminine",
-                        definition: "beginning, first, chief",
-                        longDefinition: "The beginning, first, or chief. Often refers to the first in time, rank, or importance. 'Bereshith' (with prefix 'be') means 'in the beginning'.",
-                        usage: "Used 51 times in the Hebrew Bible",
-                        english: ["beginning", "first"]
-                    },
-                    "H3068": {
-                        lemma: "יְהֹוָה",
-                        translit: "YHWH",
-                        pronunciation: "yeh-ho-vaw'",
-                        partOfSpeech: "proper noun",
-                        definition: "Yahweh, Jehovah, the LORD",
-                        longDefinition: "The personal name of God revealed to Moses (Exodus 3:14). The tetragrammaton. Means 'I AM' - emphasizing God's eternal, self-existent nature.",
-                        usage: "Used 6,519 times in the Hebrew Bible",
-                        english: ["LORD", "Lord", "Yahweh", "Jehovah"]
-                    },
-                    "H157": {
-                        lemma: "אָהַב",
-                        translit: "ahab",
-                        pronunciation: "aw-hab'",
-                        partOfSpeech: "verb",
-                        definition: "to love, like, be fond of",
-                        longDefinition: "The primary Hebrew word for love. Can express human love (romantic, familial, friendship) or divine love for His people.",
-                        usage: "Used 217 times in the Hebrew Bible",
-                        english: ["love", "loved", "loves"]
-                    },
-                    "H2617": {
-                        lemma: "חֶסֶד",
-                        translit: "chesed",
-                        pronunciation: "kheh'-sed",
-                        partOfSpeech: "noun masculine",
-                        definition: "lovingkindness, mercy, steadfast love",
-                        longDefinition: "One of the most important OT words - God's covenant loyalty and steadfast love. More than emotion; it's committed, faithful love that keeps covenant.",
-                        usage: "Used 248 times in the Hebrew Bible",
-                        english: ["mercy", "lovingkindness", "steadfast"]
-                    },
-                    "H7307": {
-                        lemma: "רוּחַ",
-                        translit: "ruach",
-                        pronunciation: "roo'-akh",
-                        partOfSpeech: "noun feminine",
-                        definition: "spirit, wind, breath",
-                        longDefinition: "Spirit, wind, or breath. Can refer to the Holy Spirit, human spirit, wind, or breath of life. Connection between breath/wind and spirit reflects ancient understanding of life force.",
-                        usage: "Used 378 times in the Hebrew Bible",
-                        english: ["spirit", "Spirit", "wind", "breath"]
-                    },
-                    "G26": {
-                        lemma: "ἀγάπη",
-                        translit: "agapē",
-                        pronunciation: "ag-ah'-pay",
-                        partOfSpeech: "noun feminine",
-                        definition: "love, charity, affection",
-                        longDefinition: "The highest form of love in Greek - selfless, sacrificial, unconditional. This is the love God has for humanity (John 3:16). Distinct from eros (romantic), philia (friendship), and storge (familial).",
-                        usage: "Used 116 times in the New Testament",
-                        english: ["love", "charity"]
-                    },
-                    "G25": {
-                        lemma: "ἀγαπάω",
-                        translit: "agapaō",
-                        pronunciation: "ag-ap-ah'-o",
-                        partOfSpeech: "verb",
-                        definition: "to love, welcome, entertain",
-                        longDefinition: "The verb form of agapē - to love with selfless, sacrificial love. Jesus commands this love toward enemies and one another.",
-                        usage: "Used 143 times in the New Testament",
-                        english: ["loved", "loves", "loving"]
-                    },
-                    "G2316": {
-                        lemma: "θεός",
-                        translit: "theos",
-                        pronunciation: "theh'-os",
-                        partOfSpeech: "noun masculine",
-                        definition: "God, god, deity",
-                        longDefinition: "The Greek word for God. Used overwhelmingly for the one true God in the NT, but occasionally for false gods.",
-                        usage: "Used 1,343 times in the New Testament",
-                        english: ["God", "god"]
-                    },
-                    "G3056": {
-                        lemma: "λόγος",
-                        translit: "logos",
-                        pronunciation: "log'-os",
-                        partOfSpeech: "noun masculine",
-                        definition: "word, speech, message, reason",
-                        longDefinition: "A rich Greek term meaning word, speech, reason, or divine logic. In John 1:1, Jesus is called the Logos - the divine Word/Reason incarnate.",
-                        usage: "Used 330 times in the New Testament",
-                        english: ["word", "Word", "words"]
-                    },
-                    "G4102": {
-                        lemma: "πίστις",
-                        translit: "pistis",
-                        pronunciation: "pis'-tis",
-                        partOfSpeech: "noun feminine",
-                        definition: "faith, belief, trust, confidence",
-                        longDefinition: "Faith, trust, or belief - particularly in God or Christ. More than intellectual assent; implies trust and commitment.",
-                        usage: "Used 244 times in the New Testament",
-                        english: ["faith", "belief", "trust"]
-                    },
-                    "G5485": {
-                        lemma: "χάρις",
-                        translit: "charis",
-                        pronunciation: "khar'-ece",
-                        partOfSpeech: "noun feminine",
-                        definition: "grace, favor, kindness, gift",
-                        longDefinition: "Unmerited favor, grace, or a gift freely given. Central to Christian theology - salvation by grace.",
-                        usage: "Used 156 times in the New Testament",
-                        english: ["grace", "favor", "thanks"]
-                    },
-                    "G2424": {
-                        lemma: "Ἰησοῦς",
-                        translit: "Iēsous",
-                        pronunciation: "ee-ay-sooce'",
-                        partOfSpeech: "proper noun",
-                        definition: "Jesus, Joshua",
-                        longDefinition: "Greek form of Hebrew Yeshua/Joshua, meaning 'Yahweh saves'. The name given to the Messiah, emphasizing His role as Savior.",
-                        usage: "Used 983 times in the New Testament",
-                        english: ["Jesus"]
-                    },
-                    "G4151": {
-                        lemma: "πνεῦμα",
-                        translit: "pneuma",
-                        pronunciation: "pnyoo'-mah",
-                        partOfSpeech: "noun neuter",
-                        definition: "spirit, breath, wind, Spirit",
-                        longDefinition: "Spirit, breath, or wind. Can refer to the Holy Spirit, human spirit, angels, demons, or wind. Related to the verb 'to breathe'.",
-                        usage: "Used 385 times in the New Testament",
-                        english: ["Spirit", "spirit", "breath"]
-                    },
-                    "G1411": {
-                        lemma: "δύναμις",
-                        translit: "dynamis",
-                        pronunciation: "doo'-nam-is",
-                        partOfSpeech: "noun feminine",
-                        definition: "power, strength, ability, miracle",
-                        longDefinition: "Power, might, strength, or miraculous power. Root of English 'dynamic' and 'dynamite'.",
-                        usage: "Used 120 times in the New Testament",
-                        english: ["power", "powers", "miracle", "strength"]
-                    }
-                },
+                // ===========================================
+                // STATE
+                // ===========================================
+                userQuery: '',
+                followUpQuery: '',
+                aiResponse: '',
+                errorMessage: '',
+                loading: false,
+                hasSearched: false,
+                showNav: false,
+                selectedTranslation: 'ESV',
+                comparativeMode: false,
+                perspectiveResponse: null,
+                verseLookupResult: null,
+                copied: false,
+                conversationHistory: [],
+                apiEndpoint: '/api/chat',
                 
-                // =============================================================================
-                // DAILY VERSE DATABASE
-                // Curated inspirational verses that rotate daily
-                // =============================================================================
+                // Daily Verse
+                dailyVerse: { text: '', reference: '' },
+                
+                // Original Language
+                showingLanguageModal: false,
+                currentStrongsNum: null,
+                currentStrongsData: null,
+                languageAIExplanation: '',
+                loadingLanguageExplanation: false,
+                
+                // ===========================================
+                // DAILY VERSES DATABASE
+                // ===========================================
                 DAILY_VERSES: [
                     { text: "For I know the plans I have for you, declares the LORD, plans for welfare and not for evil, to give you a future and a hope.", reference: "Jeremiah 29:11" },
                     { text: "Trust in the LORD with all your heart, and do not lean on your own understanding. In all your ways acknowledge him, and he will make straight your paths.", reference: "Proverbs 3:5-6" },
@@ -1006,154 +600,248 @@
                     { text: "The steadfast love of the LORD never ceases; his mercies never come to an end; they are new every morning; great is your faithfulness.", reference: "Lamentations 3:22-23" },
                     { text: "Fear not, for I am with you; be not dismayed, for I am your God; I will strengthen you, I will help you, I will uphold you with my righteous right hand.", reference: "Isaiah 41:10" },
                     { text: "Come to me, all who labor and are heavy laden, and I will give you rest.", reference: "Matthew 11:28" },
-                    { text: "But those who hope in the LORD will renew their strength. They will soar on wings like eagles; they will run and not grow weary, they will walk and not be faint.", reference: "Isaiah 40:31" },
+                    { text: "But they who wait for the LORD shall renew their strength; they shall mount up with wings like eagles; they shall run and not be weary; they shall walk and not faint.", reference: "Isaiah 40:31" },
                     { text: "For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life.", reference: "John 3:16" },
                     { text: "The LORD bless you and keep you; the LORD make his face to shine upon you and be gracious to you.", reference: "Numbers 6:24-25" },
                     { text: "Your word is a lamp to my feet and a light to my path.", reference: "Psalm 119:105" },
                     { text: "Have I not commanded you? Be strong and courageous. Do not be frightened, and do not be dismayed, for the LORD your God is with you wherever you go.", reference: "Joshua 1:9" }
                 ],
                 
-                // =============================================================================
-                // STATE MANAGEMENT
-                // =============================================================================
-                showNav: false,
-                hasSearched: false,
-                loading: false,
-                userQuery: '',
-                followUpQuery: '',
-                aiResponse: '',
-                errorMessage: '',
-                selectedTranslation: 'NIV',
-                conversationHistory: [],
-                
-                // Theme System
-                darkMode: localStorage.getItem('darkMode') === 'false' ? false : true,
-                
-                // Comparative Perspectives
-                comparativeMode: false,
-                perspectiveResponse: null,
-                
-                // Copy Conversation
-                copyStatus: 'Copy Study',
-                
-                // Original Language
-                showingLanguageModal: false,
-                currentStrongsNum: null,
-                currentStrongsData: null,
-                languageAIExplanation: '',
-                loadingLanguageExplanation: false,
-                
-                // Verse Lookup
-                verseLookupResult: null,
-                
-                // Daily Verse
-                dailyVerse: { text: '', reference: '' },
-                
-                // API Endpoint
-                apiEndpoint: '/api/chat',
-                
-                // =============================================================================
-                // INITIALIZATION
-                // =============================================================================
-                init() {
-                    // Auto-show navigation
-                    setTimeout(() => {
-                        if (!this.hasSearched) this.showNav = true;
-                    }, 8000);
-                    
-                    // Load theme preference
-                    const savedTheme = localStorage.getItem('darkMode');
-                    if (savedTheme !== null) {
-                        this.darkMode = savedTheme === 'true';
-                    }
-                    
-                    // Load daily verse
-                    this.loadDailyVerse();
-                },
-                
-                // =============================================================================
-                // DAILY VERSE - NEW FEATURE!
-                // Shows a different verse each day
-                // =============================================================================
-                loadDailyVerse() {
-                    // Get day of year to determine which verse to show
-                    const now = new Date();
-                    const start = new Date(now.getFullYear(), 0, 0);
-                    const diff = now - start;
-                    const oneDay = 1000 * 60 * 60 * 24;
-                    const dayOfYear = Math.floor(diff / oneDay);
-                    
-                    // Use day of year to pick a verse (cycles through all verses)
-                    const verseIndex = dayOfYear % this.DAILY_VERSES.length;
-                    this.dailyVerse = this.DAILY_VERSES[verseIndex];
-                },
-                
-                // =============================================================================
-                // VERSE LOOKUP - NEW FEATURE!
-                // Detects verse references like "John 3:16" and shows them instantly
-                // =============================================================================
-                detectVerseReference(query) {
-                    // Regex to match verse references like "John 3:16", "Genesis 1:1-3", "Ps 23:1"
-                    const versePattern = /^(1|2|3)?\s*([A-Za-z]+)\s*(\d+):(\d+)(-\d+)?$/i;
-                    const match = query.trim().match(versePattern);
-                    
-                    if (match) {
-                        const bookNum = match[1] || '';
-                        const book = match[2];
-                        const chapter = match[3];
-                        const verse = match[4];
-                        const endVerse = match[5] || '';
-                        
-                        return {
-                            isVerse: true,
-                            reference: `${bookNum} ${book} ${chapter}:${verse}${endVerse}`.trim(),
-                            book: bookNum ? `${bookNum} ${book}` : book,
-                            chapter,
-                            verse,
-                            endVerse
-                        };
-                    }
-                    
-                    return { isVerse: false };
-                },
-                
-                // Simple verse database for common verses (instant lookup)
+                // ===========================================
+                // VERSE LOOKUP DATABASE
+                // ===========================================
                 VERSE_DATABASE: {
                     "john 3:16": "For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life.",
+                    "john 1:1": "In the beginning was the Word, and the Word was with God, and the Word was God.",
                     "genesis 1:1": "In the beginning, God created the heavens and the earth.",
                     "psalm 23:1": "The LORD is my shepherd; I shall not want.",
+                    "psalm 119:105": "Your word is a lamp to my feet and a light to my path.",
                     "romans 8:28": "And we know that for those who love God all things work together for good, for those who are called according to his purpose.",
+                    "romans 3:23": "For all have sinned and fall short of the glory of God.",
+                    "romans 6:23": "For the wages of sin is death, but the free gift of God is eternal life in Christ Jesus our Lord.",
                     "philippians 4:13": "I can do all things through him who strengthens me.",
                     "jeremiah 29:11": "For I know the plans I have for you, declares the LORD, plans for welfare and not for evil, to give you a future and a hope.",
                     "proverbs 3:5": "Trust in the LORD with all your heart, and do not lean on your own understanding.",
                     "proverbs 3:5-6": "Trust in the LORD with all your heart, and do not lean on your own understanding. In all your ways acknowledge him, and he will make straight your paths.",
                     "isaiah 41:10": "Fear not, for I am with you; be not dismayed, for I am your God; I will strengthen you, I will help you, I will uphold you with my righteous right hand.",
                     "matthew 11:28": "Come to me, all who labor and are heavy laden, and I will give you rest.",
-                    "john 1:1": "In the beginning was the Word, and the Word was with God, and the Word was God.",
                     "ephesians 2:8": "For by grace you have been saved through faith. And this is not your own doing; it is the gift of God.",
                     "ephesians 2:8-9": "For by grace you have been saved through faith. And this is not your own doing; it is the gift of God, not a result of works, so that no one may boast.",
-                    "romans 3:23": "For all have sinned and fall short of the glory of God.",
-                    "romans 6:23": "For the wages of sin is death, but the free gift of God is eternal life in Christ Jesus our Lord.",
                     "hebrews 11:1": "Now faith is the assurance of things hoped for, the conviction of things not seen.",
-                    "psalm 119:105": "Your word is a lamp to my feet and a light to my path.",
                     "joshua 1:9": "Have I not commanded you? Be strong and courageous. Do not be frightened, and do not be dismayed, for the LORD your God is with you wherever you go."
                 },
                 
-                async lookupVerse(verseInfo) {
-                    const key = verseInfo.reference.toLowerCase();
-                    
-                    // Check local database first (instant)
-                    if (this.VERSE_DATABASE[key]) {
+                // ===========================================
+                // STRONG'S CONCORDANCE DATABASE
+                // ===========================================
+                STRONGS_DATABASE: {
+                    "H430": {
+                        lemma: "אֱלֹהִים",
+                        translit: "elohim",
+                        pronunciation: "el-o-heem'",
+                        partOfSpeech: "noun masculine plural",
+                        definition: "God, gods, judges, angels",
+                        longDefinition: "Plural form of 'eloah'. Used to denote the one true God (with singular verbs). The plural form may hint at the fullness and majesty of God.",
+                        usage: "Used 2,606 times in the Hebrew Bible",
+                        english: ["God", "god", "gods"]
+                    },
+                    "H1254": {
+                        lemma: "בָּרָא",
+                        translit: "bara",
+                        pronunciation: "baw-raw'",
+                        partOfSpeech: "verb",
+                        definition: "to create, shape, form",
+                        longDefinition: "A unique verb used ONLY for divine creation - never for human making. Emphasizes creating something new and wonderful.",
+                        usage: "Used 54 times, always with God as subject",
+                        english: ["create", "created", "creates", "creating"]
+                    },
+                    "H7225": {
+                        lemma: "רֵאשִׁית",
+                        translit: "reshith",
+                        pronunciation: "ray-sheeth'",
+                        partOfSpeech: "noun feminine",
+                        definition: "beginning, first, chief",
+                        longDefinition: "The first in time, place, order, or rank. Refers to the absolute beginning of creation.",
+                        usage: "Used 51 times in the Hebrew Bible",
+                        english: ["beginning", "first"]
+                    },
+                    "H3068": {
+                        lemma: "יְהֹוָה",
+                        translit: "YHWH",
+                        pronunciation: "yeh-ho-vaw'",
+                        partOfSpeech: "proper noun",
+                        definition: "the LORD, Yahweh",
+                        longDefinition: "The personal covenant name of God, often rendered 'LORD' in English Bibles. Related to 'I AM WHO I AM.'",
+                        usage: "Used 6,519 times - most frequent name for God",
+                        english: ["LORD", "Lord"]
+                    },
+                    "H157": {
+                        lemma: "אָהַב",
+                        translit: "ahab",
+                        pronunciation: "aw-hab'",
+                        partOfSpeech: "verb",
+                        definition: "to love",
+                        longDefinition: "Expresses deep affection, desire, and commitment. Used for human love, divine love, and love for things.",
+                        usage: "Used 247 times in the Hebrew Bible",
+                        english: ["love", "loved", "loves"]
+                    },
+                    "H2617": {
+                        lemma: "חֶסֶד",
+                        translit: "chesed",
+                        pronunciation: "kheh'-sed",
+                        partOfSpeech: "noun masculine",
+                        definition: "lovingkindness, mercy, steadfast love",
+                        longDefinition: "Covenant faithfulness and loyal love. One of the most theologically rich words - untranslatable with a single English word.",
+                        usage: "Used 248 times, often describing God's character",
+                        english: ["mercy", "kindness", "lovingkindness", "steadfast"]
+                    },
+                    "H7307": {
+                        lemma: "רוּחַ",
+                        translit: "ruach",
+                        pronunciation: "roo'-akh",
+                        partOfSpeech: "noun feminine",
+                        definition: "spirit, wind, breath",
+                        longDefinition: "Can refer to wind, breath, or spirit (human or divine). The Spirit of God (Ruach Elohim) moved over the waters in Genesis 1:2.",
+                        usage: "Used 378 times in the Hebrew Bible",
+                        english: ["Spirit", "spirit", "wind", "breath"]
+                    },
+                    "G26": {
+                        lemma: "ἀγάπη",
+                        translit: "agape",
+                        pronunciation: "ag-ah'-pay",
+                        partOfSpeech: "noun feminine",
+                        definition: "love, charity, affection",
+                        longDefinition: "The highest form of love - selfless, sacrificial, unconditional. This is the love God has for humanity and calls us to show others.",
+                        usage: "Used 116 times in the New Testament",
+                        english: ["love", "charity"]
+                    },
+                    "G25": {
+                        lemma: "ἀγαπάω",
+                        translit: "agapao",
+                        pronunciation: "ag-ap-ah'-o",
+                        partOfSpeech: "verb",
+                        definition: "to love",
+                        longDefinition: "The verb form of agapē. To love unconditionally, with purpose and commitment rather than just emotion.",
+                        usage: "Used 143 times in the New Testament",
+                        english: ["love", "loved", "loves"]
+                    },
+                    "G2316": {
+                        lemma: "θεός",
+                        translit: "theos",
+                        pronunciation: "theh'-os",
+                        partOfSpeech: "noun masculine",
+                        definition: "God, a deity",
+                        longDefinition: "The supreme Divinity. Used throughout the New Testament to refer to the one true God.",
+                        usage: "Used 1,317 times in the New Testament",
+                        english: ["God", "god"]
+                    },
+                    "G3056": {
+                        lemma: "λόγος",
+                        translit: "logos",
+                        pronunciation: "log'-os",
+                        partOfSpeech: "noun masculine",
+                        definition: "word, speech, reason",
+                        longDefinition: "More than just 'word' - implies the full expression of thought. In John 1:1, refers to Christ as the divine Word and self-expression of God.",
+                        usage: "Used 330 times in the New Testament",
+                        english: ["Word", "word", "words"]
+                    },
+                    "G4102": {
+                        lemma: "πίστις",
+                        translit: "pistis",
+                        pronunciation: "pis'-tis",
+                        partOfSpeech: "noun feminine",
+                        definition: "faith, belief, trust",
+                        longDefinition: "More than intellectual assent - implies trust, confidence, and faithful commitment. Central to Christian theology.",
+                        usage: "Used 244 times in the New Testament",
+                        english: ["faith", "belief", "trust"]
+                    },
+                    "G5485": {
+                        lemma: "χάρις",
+                        translit: "charis",
+                        pronunciation: "khar'-ece",
+                        partOfSpeech: "noun feminine",
+                        definition: "grace, favor, kindness",
+                        longDefinition: "Unmerited favor freely given. The foundation of salvation - we are saved by grace through faith, not by works.",
+                        usage: "Used 156 times in the New Testament",
+                        english: ["grace", "favor", "thanks"]
+                    },
+                    "G2424": {
+                        lemma: "Ἰησοῦς",
+                        translit: "Iesous",
+                        pronunciation: "ee-ay-sooce'",
+                        partOfSpeech: "proper noun",
+                        definition: "Jesus",
+                        longDefinition: "Greek form of Hebrew 'Yeshua' (Joshua), meaning 'Yahweh saves' or 'Yahweh is salvation.'",
+                        usage: "Used 975 times in the New Testament",
+                        english: ["Jesus"]
+                    },
+                    "G4151": {
+                        lemma: "πνεῦμα",
+                        translit: "pneuma",
+                        pronunciation: "pnyoo'-mah",
+                        partOfSpeech: "noun neuter",
+                        definition: "spirit, breath, wind",
+                        longDefinition: "Like Hebrew ruach, can mean wind, breath, or spirit. The Holy Spirit (Pneuma Hagion) is the third person of the Trinity.",
+                        usage: "Used 385 times in the New Testament",
+                        english: ["Spirit", "spirit", "Ghost"]
+                    },
+                    "G1411": {
+                        lemma: "δύναμις",
+                        translit: "dynamis",
+                        pronunciation: "doo'-nam-is",
+                        partOfSpeech: "noun feminine",
+                        definition: "power, might, strength",
+                        longDefinition: "Inherent power or ability. Root of English 'dynamite' and 'dynamic.' Often describes God's miraculous power.",
+                        usage: "Used 120 times in the New Testament",
+                        english: ["power", "might", "strength", "miracle"]
+                    }
+                },
+                
+                // ===========================================
+                // INITIALIZATION
+                // ===========================================
+                init() {
+                    this.loadDailyVerse();
+                },
+                
+                loadDailyVerse() {
+                    const now = new Date();
+                    const start = new Date(now.getFullYear(), 0, 0);
+                    const diff = now - start;
+                    const oneDay = 1000 * 60 * 60 * 24;
+                    const dayOfYear = Math.floor(diff / oneDay);
+                    const verseIndex = dayOfYear % this.DAILY_VERSES.length;
+                    this.dailyVerse = this.DAILY_VERSES[verseIndex];
+                },
+                
+                // ===========================================
+                // VERSE DETECTION
+                // ===========================================
+                detectVerseReference(query) {
+                    const pattern = /^(1|2|3|I|II|III)?\s*([A-Za-z]+)\s*(\d+):(\d+)(-\d+)?$/i;
+                    const match = query.trim().match(pattern);
+                    if (match) {
+                        return {
+                            book: (match[1] ? match[1] + ' ' : '') + match[2],
+                            chapter: match[3],
+                            verse: match[4],
+                            range: match[5] || ''
+                        };
+                    }
+                    return null;
+                },
+                
+                lookupVerse(query) {
+                    const normalizedQuery = query.toLowerCase().trim();
+                    if (this.VERSE_DATABASE[normalizedQuery]) {
                         this.verseLookupResult = {
-                            reference: verseInfo.reference,
-                            text: this.VERSE_DATABASE[key]
+                            reference: query,
+                            text: this.VERSE_DATABASE[normalizedQuery]
                         };
                         this.hasSearched = true;
-                        this.loading = false;
+                        this.showNav = true;
                         return true;
                     }
-                    
-                    // If not in local DB, ask AI
                     return false;
                 },
                 
@@ -1165,20 +853,17 @@
                     }
                 },
                 
-                // =============================================================================
+                // ===========================================
                 // MAIN SEARCH HANDLER
-                // =============================================================================
+                // ===========================================
                 async handleSearch() {
                     if (!this.userQuery.trim()) return;
                     
-                    // Check if it's a verse lookup
+                    // Check for verse lookup first
                     const verseInfo = this.detectVerseReference(this.userQuery);
-                    if (verseInfo.isVerse) {
-                        this.hasSearched = true;
-                        this.loading = true;
-                        const found = await this.lookupVerse(verseInfo);
+                    if (verseInfo) {
+                        const found = this.lookupVerse(this.userQuery);
                         if (found) return;
-                        // If not found locally, continue to AI
                     }
                     
                     this.hasSearched = true;
@@ -1191,41 +876,32 @@
                     let systemPrompt = '';
                     
                     if (this.comparativeMode) {
-                        systemPrompt = `You are a knowledgeable and reverent Bible study assistant with deep understanding of Christian traditions.
+                        systemPrompt = `You are a knowledgeable Bible study assistant. Provide perspectives from Protestant, Catholic, and Orthodox traditions.
 
-When answering, provide perspectives from:
-1. Protestant tradition (Reformed/Evangelical)
-2. Catholic tradition (Roman Catholic)
-3. Orthodox tradition (Eastern Orthodox)
-4. Common ground (what all agree on)
-
-Format your response as JSON with this structure:
+Format your response as JSON:
 {
-  "protestant": "Protestant perspective here...",
-  "catholic": "Catholic perspective here...",
-  "orthodox": "Orthodox perspective here...",
+  "protestant": "Protestant perspective...",
+  "catholic": "Catholic perspective...",
+  "orthodox": "Orthodox perspective...",
   "common": "What all traditions agree on..."
 }
 
-Use the ${this.selectedTranslation} translation when referencing verses. Be respectful and accurate to each tradition's theology.`;
+Use the ${this.selectedTranslation} translation. Be respectful and accurate.`;
                     } else {
-                        systemPrompt = `You are a knowledgeable and reverent Bible study assistant. Help users understand Scripture with accuracy, context, and spiritual insight. When referencing verses, use the ${this.selectedTranslation} translation when possible. Provide thoughtful explanations that honor the text and help users grow in their faith. Format your responses with clear paragraphs.`;
+                        systemPrompt = `You are a knowledgeable and reverent Bible study assistant. Help users understand Scripture with accuracy and spiritual insight. Use the ${this.selectedTranslation} translation when referencing verses. Provide thoughtful explanations that honor the text.`;
                     }
                     
-                    this.conversationHistory = [{
-                        role: 'system',
-                        content: systemPrompt
-                    }, {
-                        role: 'user',
-                        content: this.userQuery
-                    }];
+                    this.conversationHistory = [
+                        { role: 'system', content: systemPrompt },
+                        { role: 'user', content: this.userQuery }
+                    ];
                     
                     await this.callBackendAPI();
                 },
                 
-                // =============================================================================
-                // FOLLOW-UP QUESTION HANDLER
-                // =============================================================================
+                // ===========================================
+                // FOLLOW-UP HANDLER
+                // ===========================================
                 async askFollowUp() {
                     if (!this.followUpQuery.trim()) return;
                     
@@ -1240,40 +916,25 @@ Use the ${this.selectedTranslation} translation when referencing verses. Be resp
                     });
                     
                     this.followUpQuery = '';
-                    
                     await this.callBackendAPI();
                 },
                 
-                // =============================================================================
+                // ===========================================
                 // BACKEND API CALL
-                // =============================================================================
+                // ===========================================
                 async callBackendAPI() {
                     try {
-                        // Debug: log what we're sending
-                        console.log('Sending to API:', {
-                            endpoint: this.apiEndpoint,
-                            messageCount: this.conversationHistory.length,
-                            messages: this.conversationHistory
-                        });
-                        
                         const response = await fetch(this.apiEndpoint, {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
+                            headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
                                 messages: this.conversationHistory,
                                 selectedTranslation: this.selectedTranslation
                             })
                         });
                         
-                        // Debug: log raw response
-                        console.log('Response status:', response.status);
-                        
                         const data = await response.json();
-                        console.log('Full response data:', JSON.stringify(data, null, 2));
-                        console.log('data.message:', data.message);
-                        console.log('data.choices:', data.choices);
+                        console.log('API Response:', data);
                         
                         if (!response.ok) {
                             throw new Error(data.error || 'API request failed');
@@ -1282,14 +943,12 @@ Use the ${this.selectedTranslation} translation when referencing verses. Be resp
                         // Handle different response formats
                         let assistantMessage;
                         
-                        // Format 1: Direct message (from some Vercel setups)
+                        // Format 1: Direct message property (Vercel AI SDK format)
                         if (data.message && typeof data.message === 'string') {
-                            console.log('Using data.message format');
                             assistantMessage = data.message;
                         }
                         // Format 2: Standard OpenAI/Groq format
                         else if (data.choices && data.choices[0] && data.choices[0].message) {
-                            console.log('Using data.choices format');
                             assistantMessage = data.choices[0].message.content;
                         }
                         // Error case
@@ -1318,18 +977,17 @@ Use the ${this.selectedTranslation} translation when referencing verses. Be resp
                         this.loading = false;
                         
                     } catch (error) {
-                        console.error('Error calling backend API:', error);
+                        console.error('API Error:', error);
                         this.errorMessage = `Error: ${error.message}. Please try again.`;
                         this.loading = false;
                     }
                 },
                 
-                // =============================================================================
-                // ORIGINAL LANGUAGE FUNCTIONS - NEW FEATURE!
-                // =============================================================================
+                // ===========================================
+                // ORIGINAL LANGUAGE FUNCTIONS
+                // ===========================================
                 findStrongsForWord(word) {
                     word = word.toLowerCase().trim();
-                    
                     for (const [strongsNum, data] of Object.entries(this.STRONGS_DATABASE)) {
                         if (data.english) {
                             for (const englishWord of data.english) {
@@ -1339,177 +997,109 @@ Use the ${this.selectedTranslation} translation when referencing verses. Be resp
                             }
                         }
                     }
-                    
                     return null;
                 },
                 
-                async showOriginalLanguage(strongsNum) {
-                    const strongsData = this.STRONGS_DATABASE[strongsNum];
-                    
-                    if (!strongsData) {
-                        console.error('Strongs number not found:', strongsNum);
-                        return;
-                    }
-                    
-                    this.showingLanguageModal = true;
+                showOriginalLanguage(strongsNum) {
                     this.currentStrongsNum = strongsNum;
-                    this.currentStrongsData = strongsData;
+                    this.currentStrongsData = this.STRONGS_DATABASE[strongsNum];
+                    this.showingLanguageModal = true;
                     this.languageAIExplanation = '';
-                    this.loadingLanguageExplanation = true;
-                    
-                    await this.getLanguageAIExplanation(strongsNum, strongsData);
+                    this.getLanguageAIExplanation(strongsNum);
                 },
                 
-                async getLanguageAIExplanation(strongsNum, strongsData) {
+                async getLanguageAIExplanation(strongsNum) {
+                    this.loadingLanguageExplanation = true;
+                    const data = this.STRONGS_DATABASE[strongsNum];
+                    if (!data) return;
+                    
+                    const language = strongsNum.startsWith('H') ? 'Hebrew' : 'Greek';
+                    
                     try {
-                        const isHebrew = strongsNum.startsWith('H');
-                        const prompt = `I'm studying the ${isHebrew ? 'Hebrew' : 'Greek'} word "${strongsData.lemma}" (${strongsData.translit}, Strong's ${strongsNum}).
-
-Strong's Definition: "${strongsData.definition}"
-
-Context: ${strongsData.longDefinition}
-
-Please explain in 150-200 words:
-1. What nuances does this word carry that are lost in English translation?
-2. How does understanding the original language enrich our reading of Scripture?
-3. Any cultural or historical context that matters?
-
-Write in an accessible, reverent tone for someone doing personal Bible study.`;
-
+                        const prompt = `Explain the ${language} word "${data.lemma}" (${data.translit}, ${strongsNum}) meaning "${data.definition}" in 2-3 sentences. What nuances does it carry that English translations miss? Be concise and insightful.`;
+                        
                         const response = await fetch(this.apiEndpoint, {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
+                            headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
                                 messages: [
-                                    { 
-                                        role: 'system', 
-                                        content: 'You are a biblical language expert who helps people understand Hebrew and Greek words in Scripture. Be accessible, reverent, and insightful. Keep responses focused and concise.' 
-                                    },
-                                    { 
-                                        role: 'user', 
-                                        content: prompt 
-                                    }
+                                    { role: 'system', content: 'You are a biblical language expert. Be concise and insightful.' },
+                                    { role: 'user', content: prompt }
                                 ],
                                 selectedTranslation: this.selectedTranslation
                             })
                         });
                         
-                        if (!response.ok) {
-                            throw new Error('Failed to get AI explanation');
-                        }
+                        if (!response.ok) throw new Error('Failed to get AI explanation');
                         
-                        const data = await response.json();
+                        const result = await response.json();
                         
                         // Handle different response formats
-                        let explanation;
-                        if (data.message && typeof data.message === 'string') {
-                            explanation = data.message;
-                        } else if (data.choices && data.choices[0] && data.choices[0].message) {
-                            explanation = data.choices[0].message.content;
+                        if (result.message && typeof result.message === 'string') {
+                            this.languageAIExplanation = result.message;
+                        } else if (result.choices && result.choices[0] && result.choices[0].message) {
+                            this.languageAIExplanation = result.choices[0].message.content;
                         } else {
-                            throw new Error('Invalid response from server');
+                            throw new Error('Invalid response format');
                         }
                         
-                        this.languageAIExplanation = explanation;
                         this.loadingLanguageExplanation = false;
                         
                     } catch (error) {
                         console.error('Error getting AI explanation:', error);
-                        this.languageAIExplanation = 'Unable to load AI explanation. Please try again.';
+                        this.languageAIExplanation = 'Unable to load AI explanation.';
                         this.loadingLanguageExplanation = false;
                     }
                 },
                 
-                // =============================================================================
-                // COPY CONVERSATION FEATURE
-                // =============================================================================
-                copyConversation() {
-                    let conversationText = `GospelPath Study Session\n`;
-                    conversationText += `Translation: ${this.selectedTranslation}\n`;
-                    conversationText += `Date: ${new Date().toLocaleDateString()}\n`;
-                    conversationText += `\n${'='.repeat(50)}\n\n`;
-                    
-                    this.conversationHistory.forEach((msg, index) => {
-                        if (msg.role === 'system') return;
-                        
-                        if (msg.role === 'user') {
-                            conversationText += `QUESTION:\n${msg.content}\n\n`;
-                        } else if (msg.role === 'assistant') {
-                            conversationText += `RESPONSE:\n${msg.content}\n\n`;
-                            conversationText += `${'-'.repeat(50)}\n\n`;
-                        }
-                    });
-                    
-                    navigator.clipboard.writeText(conversationText).then(() => {
-                        this.copyStatus = 'Copied! ✓';
-                        setTimeout(() => {
-                            this.copyStatus = 'Copy Study';
-                        }, 2000);
-                    }).catch(err => {
-                        console.error('Failed to copy:', err);
-                        this.copyStatus = 'Failed ✗';
-                        setTimeout(() => {
-                            this.copyStatus = 'Copy Study';
-                        }, 2000);
-                    });
-                },
-                
-                // =============================================================================
-                // RESPONSE FORMATTING WITH STRONG'S HIGHLIGHTING
-                // =============================================================================
                 formatResponse(text) {
                     if (!text) return '';
                     
-                    // Split into paragraphs
-                    let paragraphs = text.split('\n\n');
+                    // Split into words while preserving punctuation
+                    let words = text.split(/\b/);
+                    let result = words.map(word => {
+                        if (!/[a-zA-Z]/.test(word)) return word;
+                        
+                        let cleanWord = word.replace(/[.,;:!?"'()]/g, '');
+                        let strongsNum = this.findStrongsForWord(cleanWord);
+                        
+                        if (strongsNum) {
+                            const data = this.STRONGS_DATABASE[strongsNum];
+                            return `<span class="strongs-word" onclick="document.querySelector('[x-data]').__x.$data.showOriginalLanguage('${strongsNum}')" title="${data.translit}">${word}</span>`;
+                        }
+                        return word;
+                    }).join('');
                     
-                    return paragraphs.map(paragraph => {
-                        // Split into words while preserving punctuation
-                        let words = paragraph.split(/\b/);
-                        
-                        // Process each word
-                        let enhanced = words.map(word => {
-                            // Skip whitespace and punctuation
-                            if (!word.trim() || !/[a-zA-Z]/.test(word)) {
-                                return word;
-                            }
-                            
-                            // Clean word for lookup
-                            let cleanWord = word.replace(/[.,;:!?"'()]/g, '');
-                            let strongsNum = this.findStrongsForWord(cleanWord);
-                            
-                            if (strongsNum) {
-                                // Make it clickable!
-                                return `<span class="strongs-word" 
-                                              data-strongs="${strongsNum}"
-                                              onclick="document.querySelector('[x-data]').__x.$data.showOriginalLanguage('${strongsNum}')"
-                                              title="${this.STRONGS_DATABASE[strongsNum].translit}">
-                                          ${word}
-                                        </span>`;
-                            }
-                            
-                            return word;
-                        }).join('');
-                        
-                        return `<p class="mb-4">${enhanced}</p>`;
-                    }).join('')
-                      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-                      .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+                    // Convert newlines to paragraphs
+                    return result.split('\n\n').map(p => `<p class="mb-4">${p}</p>`).join('');
                 },
                 
-                // =============================================================================
-                // RESET VIEW
-                // =============================================================================
-                resetView() {
+                // ===========================================
+                // UTILITY FUNCTIONS
+                // ===========================================
+                copyConversation() {
+                    let text = `GospelPath Study Session\nTranslation: ${this.selectedTranslation}\n\n`;
+                    this.conversationHistory.forEach(msg => {
+                        if (msg.role !== 'system') {
+                            text += `${msg.role === 'user' ? 'You' : 'GospelPath'}: ${msg.content}\n\n`;
+                        }
+                    });
+                    
+                    navigator.clipboard.writeText(text).then(() => {
+                        this.copied = true;
+                        setTimeout(() => this.copied = false, 2000);
+                    });
+                },
+                
+                resetToHome() {
                     this.hasSearched = false;
                     this.userQuery = '';
                     this.aiResponse = '';
                     this.errorMessage = '';
-                    this.conversationHistory = [];
                     this.perspectiveResponse = null;
                     this.verseLookupResult = null;
+                    this.conversationHistory = [];
+                    this.showNav = false;
                 }
             }
         }
