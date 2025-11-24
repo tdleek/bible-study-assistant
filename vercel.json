@@ -3,6 +3,18 @@
     "api/chat.js": {
       "memory": 1024,
       "maxDuration": 30
+    },
+    "api/verse.js": {
+      "memory": 512,
+      "maxDuration": 10
+    },
+    "api/interlinear.js": {
+      "memory": 512,
+      "maxDuration": 10
+    },
+    "api/test.js": {
+      "memory": 256,
+      "maxDuration": 5
     }
   },
   "rewrites": [
