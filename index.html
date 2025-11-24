@@ -1249,6 +1249,13 @@ Use the ${this.selectedTranslation} translation when referencing verses. Be resp
                 // =============================================================================
                 async callBackendAPI() {
                     try {
+                        // Debug: log what we're sending
+                        console.log('Sending to API:', {
+                            endpoint: this.apiEndpoint,
+                            messageCount: this.conversationHistory.length,
+                            messages: this.conversationHistory
+                        });
+                        
                         const response = await fetch(this.apiEndpoint, {
                             method: 'POST',
                             headers: {
@@ -1260,9 +1267,14 @@ Use the ${this.selectedTranslation} translation when referencing verses. Be resp
                             })
                         });
                         
+                        // Debug: log raw response
+                        console.log('Response status:', response.status);
+                        
+                        const data = await response.json();
+                        console.log('Response data:', data);
+                        
                         if (!response.ok) {
-                            const errorData = await response.json();
-                            throw new Error(errorData.error || 'API request failed');
+                            throw new Error(data.error || 'API request failed');
                         }
                         
                         const data = await response.json();

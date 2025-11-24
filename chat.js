@@ -16,33 +16,23 @@ export default async function handler(req, res) {
   // =============================================================================
   // CORS HEADERS - Allow your frontend to talk to this API
   // =============================================================================
-  // CORS = Cross-Origin Resource Sharing
-  // Without this, browsers block requests from your frontend to your backend
-  res.setHeader('Access-Control-Allow-Origin', '*'); // In production, change * to your domain
+  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Handle preflight OPTIONS request
-  // Browsers send this before the real request to check permissions
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
-  // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    // =============================================================================
-    // GET API KEY FROM ENVIRONMENT VARIABLES
-    // =============================================================================
-    // process.env reads from Vercel's environment variables (set in dashboard)
-    // This is SECRET - never exposed to users, never committed to Git
     const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
     if (!GROQ_API_KEY) {
-      console.error('GROQ_API_KEY not found in environment variables');
+      console.error('GROQ_API_KEY not found');
       return res.status(500).json({ 
         error: 'Server configuration error - API key not set' 
       });
@@ -51,11 +41,18 @@ export default async function handler(req, res) {
     // =============================================================================
     // GET DATA FROM USER'S REQUEST
     // =============================================================================
-    // The frontend sends us: messages, selectedTranslation
-    const { messages, selectedTranslation } = req.body;
+    const { messages, selectedTranslation } = req.body || {};
+    
+    // Debug logging
+    console.log('Request body:', JSON.stringify(req.body));
+    console.log('Messages received:', messages ? messages.length : 'none');
 
-    if (!messages || !Array.isArray(messages)) {
-      return res.status(400).json({ error: 'Messages array required' });
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      return res.status(400).json({ 
+        error: 'Messages array required',
+        received: typeof req.body,
+        body: req.body
+      });
     }
 
     // =============================================================================
