@@ -1703,8 +1703,11 @@
                     return null;
                 },
                 
-                lookupVerse(query) {
+                // Lookup verse - tries local DB first, then fetches from API
+                async lookupVerse(query) {
                     const normalizedQuery = query.toLowerCase().trim();
+                    
+                    // 1. Check local database first (instant)
                     if (this.VERSE_DATABASE[normalizedQuery]) {
                         this.verseLookupResult = {
                             reference: query,
@@ -1714,6 +1717,28 @@
                         this.showNav = true;
                         return true;
                     }
+                    
+                    // 2. Try to fetch from verse API (works for ANY verse)
+                    try {
+                        this.loading = true;
+                        const response = await fetch(`/api/verse?ref=${encodeURIComponent(query)}&translation=${this.selectedTranslation}`);
+                        const data = await response.json();
+                        
+                        if (data.text) {
+                            this.verseLookupResult = {
+                                reference: data.reference,
+                                text: data.text
+                            };
+                            this.hasSearched = true;
+                            this.showNav = true;
+                            this.loading = false;
+                            return true;
+                        }
+                    } catch (error) {
+                        console.log('Verse API fetch failed, falling back to AI:', error);
+                    }
+                    
+                    this.loading = false;
                     return false;
                 },
                 
@@ -1824,7 +1849,7 @@
                     // Check for verse lookup first
                     const verseInfo = this.detectVerseReference(this.userQuery);
                     if (verseInfo) {
-                        const found = this.lookupVerse(this.userQuery);
+                        const found = await this.lookupVerse(this.userQuery);
                         if (found) return;
                     }
                     
