@@ -365,7 +365,7 @@
                     
                     <!-- Word-by-Word Grid -->
                     <div class="flex flex-wrap gap-4 justify-center">
-                        <template x-for="word in getInterlinearData()?.words || []" :key="word.original">
+                        <template x-for="(word, index) in getInterlinearData()?.words || []" :key="index">
                             <div class="text-center p-3 rounded-lg transition-colors cursor-pointer hover:scale-105"
                                  :class="darkMode ? 'bg-[#1A2332]/50 hover:bg-[#C0C5D9]/10' : 'bg-white/50 hover:bg-[#D4A017]/10'"
                                  @click="word.strongs && STRONGS_DATABASE[word.strongs] && showOriginalLanguage(word.strongs)">
