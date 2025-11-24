@@ -323,18 +323,91 @@
                  :class="darkMode 
                      ? 'bg-gradient-to-br from-[#112240] to-[#1A2B4A] border-[#C0C5D9]/40' 
                      : 'bg-gradient-to-br from-white to-[#FFE8E0] border-[#D4A017]/40'">
-                <div class="flex items-center gap-3 mb-4">
-                    <span class="text-2xl">📖</span>
-                    <h3 class="font-playfair text-xl transition-colors"
-                        :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'"
-                        x-text="verseLookupResult ? verseLookupResult.reference : ''"></h3>
-                    <span class="font-inter text-xs px-2 py-1 rounded transition-colors"
-                          :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#D4A017]/20 text-[#D4A017]'"
-                          x-text="selectedTranslation"></span>
+                
+                <!-- Header with Toggle -->
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">📖</span>
+                        <h3 class="font-playfair text-xl transition-colors"
+                            :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'"
+                            x-text="verseLookupResult ? verseLookupResult.reference : ''"></h3>
+                        <span class="font-inter text-xs px-2 py-1 rounded transition-colors"
+                              :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#D4A017]/20 text-[#D4A017]'"
+                              x-text="selectedTranslation"></span>
+                    </div>
+                    
+                    <!-- Interlinear Toggle Button -->
+                    <button x-show="hasInterlinear()"
+                            @click="showInterlinear = !showInterlinear"
+                            class="flex items-center gap-2 px-3 py-2 rounded-lg font-inter text-sm border transition-all hover:scale-105"
+                            :class="showInterlinear 
+                                ? (darkMode ? 'bg-[#C0C5D9] text-[#0B1118]' : 'bg-[#D4A017] text-white')
+                                : (darkMode ? 'bg-[#112240] text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-white text-[#D4A017] border-[#D4A017]/30')">
+                        <span>📜</span>
+                        <span x-text="showInterlinear ? 'Hide Original' : 'Show Hebrew/Greek'"></span>
+                    </button>
                 </div>
-                <p class="font-lora text-xl leading-relaxed italic transition-colors"
+                
+                <!-- English Text (always shown) -->
+                <p x-show="!showInterlinear"
+                   class="font-lora text-xl leading-relaxed italic transition-colors"
                    :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#0F1C3A]'"
                    x-text="verseLookupResult ? verseLookupResult.text : ''"></p>
+                
+                <!-- Interlinear View -->
+                <div x-show="showInterlinear && hasInterlinear()" 
+                     class="space-y-4">
+                    
+                    <!-- Language Badge -->
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold"
+                              :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#D4A017]/20 text-[#D4A017]'"
+                              x-text="getInterlinearData()?.language + ' Interlinear'"></span>
+                    </div>
+                    
+                    <!-- Word-by-Word Grid -->
+                    <div class="flex flex-wrap gap-4 justify-center">
+                        <template x-for="word in getInterlinearData()?.words || []" :key="word.original">
+                            <div class="text-center p-3 rounded-lg transition-colors cursor-pointer hover:scale-105"
+                                 :class="darkMode ? 'bg-[#0B1118]/50 hover:bg-[#C0C5D9]/10' : 'bg-white/50 hover:bg-[#D4A017]/10'"
+                                 @click="word.strongs && STRONGS_DATABASE[word.strongs] && showOriginalLanguage(word.strongs)">
+                                <!-- Original Script -->
+                                <p class="text-2xl font-bold mb-1 transition-colors"
+                                   :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'"
+                                   x-text="word.original"></p>
+                                <!-- Transliteration -->
+                                <p class="text-xs italic mb-1 transition-colors"
+                                   :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#D4A017]'"
+                                   x-text="word.translit"></p>
+                                <!-- English -->
+                                <p class="text-sm font-medium transition-colors"
+                                   :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#5D7555]'"
+                                   x-text="word.english"></p>
+                                <!-- Strong's Number -->
+                                <p class="text-xs mt-1 transition-colors"
+                                   :class="darkMode ? 'text-[#9BA4B8]/60' : 'text-[#5D7555]/60'"
+                                   x-text="word.strongs"></p>
+                            </div>
+                        </template>
+                    </div>
+                    
+                    <!-- Full English below -->
+                    <div class="mt-6 pt-4 border-t"
+                         :class="darkMode ? 'border-[#C0C5D9]/20' : 'border-[#D4A017]/20'">
+                        <p class="font-lora text-base leading-relaxed italic transition-colors text-center"
+                           :class="darkMode ? 'text-[#F5F5F0]/70' : 'text-[#0F1C3A]/70'"
+                           x-text="verseLookupResult ? verseLookupResult.text : ''"></p>
+                    </div>
+                </div>
+                
+                <!-- No Interlinear Available Message -->
+                <div x-show="showInterlinear && !hasInterlinear()"
+                     class="p-4 rounded-lg text-center"
+                     :class="darkMode ? 'bg-[#0B1118]/50 text-[#9BA4B8]' : 'bg-white/50 text-[#5D7555]'">
+                    <p class="font-inter text-sm">Interlinear data not yet available for this verse.</p>
+                    <p class="font-inter text-xs mt-1">Try: Genesis 1:1, John 3:16, John 1:1, Psalm 23:1, Romans 8:28, Philippians 4:13, Jeremiah 29:11, or Proverbs 3:5-6</p>
+                </div>
+                
                 <p class="mt-4 font-inter text-sm transition-colors"
                    :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#5D7555]'">
                     💡 <span class="cursor-pointer underline" @click="askAboutVerse()">Ask AI to explain this verse</span>
@@ -586,6 +659,137 @@
                 currentStrongsData: null,
                 languageAIExplanation: '',
                 loadingLanguageExplanation: false,
+                
+                // Interlinear Mode
+                showInterlinear: false,
+                
+                // ===========================================
+                // INTERLINEAR DATABASE (Hebrew/Greek word-by-word)
+                // ===========================================
+                INTERLINEAR_DATABASE: {
+                    "genesis 1:1": {
+                        language: "Hebrew",
+                        words: [
+                            { original: "בְּרֵאשִׁית", translit: "bereshit", english: "In the beginning", strongs: "H7225" },
+                            { original: "בָּרָא", translit: "bara", english: "created", strongs: "H1254" },
+                            { original: "אֱלֹהִים", translit: "elohim", english: "God", strongs: "H430" },
+                            { original: "אֵת", translit: "et", english: "(direct object)", strongs: "H853" },
+                            { original: "הַשָּׁמַיִם", translit: "hashamayim", english: "the heavens", strongs: "H8064" },
+                            { original: "וְאֵת", translit: "ve'et", english: "and", strongs: "H853" },
+                            { original: "הָאָרֶץ", translit: "ha'aretz", english: "the earth", strongs: "H776" }
+                        ]
+                    },
+                    "john 3:16": {
+                        language: "Greek",
+                        words: [
+                            { original: "Οὕτως", translit: "houtos", english: "For thus", strongs: "G3779" },
+                            { original: "γὰρ", translit: "gar", english: "for", strongs: "G1063" },
+                            { original: "ἠγάπησεν", translit: "egapesen", english: "loved", strongs: "G25" },
+                            { original: "ὁ θεὸς", translit: "ho theos", english: "God", strongs: "G2316" },
+                            { original: "τὸν κόσμον", translit: "ton kosmon", english: "the world", strongs: "G2889" },
+                            { original: "ὥστε", translit: "hoste", english: "that", strongs: "G5620" },
+                            { original: "τὸν υἱὸν", translit: "ton huion", english: "the Son", strongs: "G5207" },
+                            { original: "τὸν μονογενῆ", translit: "ton monogene", english: "the only begotten", strongs: "G3439" },
+                            { original: "ἔδωκεν", translit: "edoken", english: "He gave", strongs: "G1325" },
+                            { original: "ἵνα", translit: "hina", english: "so that", strongs: "G2443" },
+                            { original: "πᾶς", translit: "pas", english: "everyone", strongs: "G3956" },
+                            { original: "ὁ πιστεύων", translit: "ho pisteuon", english: "who believes", strongs: "G4100" },
+                            { original: "εἰς αὐτὸν", translit: "eis auton", english: "in Him", strongs: "G1519" },
+                            { original: "μὴ ἀπόληται", translit: "me apoletai", english: "should not perish", strongs: "G622" },
+                            { original: "ἀλλ'", translit: "all", english: "but", strongs: "G235" },
+                            { original: "ἔχῃ", translit: "eche", english: "have", strongs: "G2192" },
+                            { original: "ζωὴν αἰώνιον", translit: "zoen aionion", english: "eternal life", strongs: "G166" }
+                        ]
+                    },
+                    "john 1:1": {
+                        language: "Greek",
+                        words: [
+                            { original: "Ἐν", translit: "en", english: "In", strongs: "G1722" },
+                            { original: "ἀρχῇ", translit: "arche", english: "the beginning", strongs: "G746" },
+                            { original: "ἦν", translit: "en", english: "was", strongs: "G1510" },
+                            { original: "ὁ λόγος", translit: "ho logos", english: "the Word", strongs: "G3056" },
+                            { original: "καὶ", translit: "kai", english: "and", strongs: "G2532" },
+                            { original: "ὁ λόγος", translit: "ho logos", english: "the Word", strongs: "G3056" },
+                            { original: "ἦν", translit: "en", english: "was", strongs: "G1510" },
+                            { original: "πρὸς", translit: "pros", english: "with", strongs: "G4314" },
+                            { original: "τὸν θεόν", translit: "ton theon", english: "God", strongs: "G2316" },
+                            { original: "καὶ", translit: "kai", english: "and", strongs: "G2532" },
+                            { original: "θεὸς", translit: "theos", english: "God", strongs: "G2316" },
+                            { original: "ἦν", translit: "en", english: "was", strongs: "G1510" },
+                            { original: "ὁ λόγος", translit: "ho logos", english: "the Word", strongs: "G3056" }
+                        ]
+                    },
+                    "psalm 23:1": {
+                        language: "Hebrew",
+                        words: [
+                            { original: "יְהוָה", translit: "YHWH", english: "The LORD", strongs: "H3068" },
+                            { original: "רֹעִי", translit: "ro'i", english: "is my shepherd", strongs: "H7462" },
+                            { original: "לֹא", translit: "lo", english: "not", strongs: "H3808" },
+                            { original: "אֶחְסָר", translit: "echsar", english: "I shall want", strongs: "H2637" }
+                        ]
+                    },
+                    "romans 8:28": {
+                        language: "Greek",
+                        words: [
+                            { original: "οἴδαμεν", translit: "oidamen", english: "we know", strongs: "G1492" },
+                            { original: "δὲ", translit: "de", english: "and", strongs: "G1161" },
+                            { original: "ὅτι", translit: "hoti", english: "that", strongs: "G3754" },
+                            { original: "τοῖς ἀγαπῶσιν", translit: "tois agaposin", english: "to those who love", strongs: "G25" },
+                            { original: "τὸν θεὸν", translit: "ton theon", english: "God", strongs: "G2316" },
+                            { original: "πάντα", translit: "panta", english: "all things", strongs: "G3956" },
+                            { original: "συνεργεῖ", translit: "synergei", english: "work together", strongs: "G4903" },
+                            { original: "εἰς ἀγαθόν", translit: "eis agathon", english: "for good", strongs: "G18" }
+                        ]
+                    },
+                    "philippians 4:13": {
+                        language: "Greek",
+                        words: [
+                            { original: "πάντα", translit: "panta", english: "all things", strongs: "G3956" },
+                            { original: "ἰσχύω", translit: "ischyo", english: "I can do", strongs: "G2480" },
+                            { original: "ἐν", translit: "en", english: "through", strongs: "G1722" },
+                            { original: "τῷ", translit: "to", english: "the one", strongs: "G3588" },
+                            { original: "ἐνδυναμοῦντί", translit: "endynamounti", english: "who strengthens", strongs: "G1743" },
+                            { original: "με", translit: "me", english: "me", strongs: "G1473" }
+                        ]
+                    },
+                    "jeremiah 29:11": {
+                        language: "Hebrew",
+                        words: [
+                            { original: "כִּי", translit: "ki", english: "For", strongs: "H3588" },
+                            { original: "אָנֹכִי", translit: "anoki", english: "I", strongs: "H595" },
+                            { original: "יָדַעְתִּי", translit: "yadati", english: "know", strongs: "H3045" },
+                            { original: "אֶת־הַמַּחֲשָׁבֹת", translit: "et-hamachashavot", english: "the plans", strongs: "H4284" },
+                            { original: "אֲשֶׁר", translit: "asher", english: "that", strongs: "H834" },
+                            { original: "אָנֹכִי", translit: "anoki", english: "I", strongs: "H595" },
+                            { original: "חֹשֵׁב", translit: "choshev", english: "am planning", strongs: "H2803" },
+                            { original: "עֲלֵיכֶם", translit: "aleychem", english: "for you", strongs: "H5921" },
+                            { original: "נְאֻם־יְהוָה", translit: "ne'um-YHWH", english: "declares the LORD", strongs: "H3068" },
+                            { original: "מַחְשְׁבֹות", translit: "machshevot", english: "plans", strongs: "H4284" },
+                            { original: "שָׁלֹום", translit: "shalom", english: "of peace/welfare", strongs: "H7965" },
+                            { original: "וְלֹא", translit: "velo", english: "and not", strongs: "H3808" },
+                            { original: "לְרָעָה", translit: "lera'ah", english: "for evil", strongs: "H7451" },
+                            { original: "לָתֵת", translit: "latet", english: "to give", strongs: "H5414" },
+                            { original: "לָכֶם", translit: "lachem", english: "to you", strongs: "H5921" },
+                            { original: "אַחֲרִית", translit: "acharit", english: "a future", strongs: "H319" },
+                            { original: "וְתִקְוָה", translit: "vetikvah", english: "and a hope", strongs: "H8615" }
+                        ]
+                    },
+                    "proverbs 3:5-6": {
+                        language: "Hebrew",
+                        words: [
+                            { original: "בְּטַח", translit: "betach", english: "Trust", strongs: "H982" },
+                            { original: "אֶל־יְהוָה", translit: "el-YHWH", english: "in the LORD", strongs: "H3068" },
+                            { original: "בְּכָל־לִבֶּךָ", translit: "bechol-libbecha", english: "with all your heart", strongs: "H3820" },
+                            { original: "וְאֶל־בִּינָתְךָ", translit: "ve'el-binatecha", english: "and on your understanding", strongs: "H998" },
+                            { original: "אַל־תִּשָּׁעֵן", translit: "al-tisha'en", english: "do not lean", strongs: "H8172" },
+                            { original: "בְּכָל־דְּרָכֶיךָ", translit: "bechol-deracheycha", english: "In all your ways", strongs: "H1870" },
+                            { original: "דָעֵהוּ", translit: "da'ehu", english: "acknowledge Him", strongs: "H3045" },
+                            { original: "וְהוּא", translit: "vehu", english: "and He", strongs: "H1931" },
+                            { original: "יְיַשֵּׁר", translit: "yeyasher", english: "will make straight", strongs: "H3474" },
+                            { original: "אֹרְחֹתֶיךָ", translit: "orchoteycha", english: "your paths", strongs: "H734" }
+                        ]
+                    }
+                },
                 
                 // ===========================================
                 // DAILY VERSES DATABASE
@@ -849,8 +1053,24 @@
                     if (this.verseLookupResult) {
                         this.userQuery = `Explain ${this.verseLookupResult.reference}: "${this.verseLookupResult.text}"`;
                         this.verseLookupResult = null;
+                        this.showInterlinear = false;
                         this.handleSearch();
                     }
+                },
+                
+                // ===========================================
+                // INTERLINEAR FUNCTIONS
+                // ===========================================
+                hasInterlinear() {
+                    if (!this.verseLookupResult) return false;
+                    const key = this.verseLookupResult.reference.toLowerCase().trim();
+                    return !!this.INTERLINEAR_DATABASE[key];
+                },
+                
+                getInterlinearData() {
+                    if (!this.verseLookupResult) return null;
+                    const key = this.verseLookupResult.reference.toLowerCase().trim();
+                    return this.INTERLINEAR_DATABASE[key] || null;
                 },
                 
                 // ===========================================
@@ -1065,7 +1285,7 @@ Use the ${this.selectedTranslation} translation. Be respectful and accurate.`;
                         
                         if (strongsNum) {
                             const data = this.STRONGS_DATABASE[strongsNum];
-                            return `<span class="strongs-word" onclick="document.querySelector('[x-data]').__x.$data.showOriginalLanguage('${strongsNum}')" title="${data.translit}">${word}</span>`;
+                            return `<span class="strongs-word" onclick="window.showStrongsWord('${strongsNum}')" title="${data.translit}">${word}</span>`;
                         }
                         return word;
                     }).join('');
@@ -1100,9 +1320,18 @@ Use the ${this.selectedTranslation} translation. Be respectful and accurate.`;
                     this.verseLookupResult = null;
                     this.conversationHistory = [];
                     this.showNav = false;
+                    this.showInterlinear = false;
                 }
             }
         }
+        
+        // Global function for Strong's word clicks (called from dynamically generated HTML)
+        window.showStrongsWord = function(strongsNum) {
+            const app = document.querySelector('[x-data]');
+            if (app && app._x_dataStack && app._x_dataStack[0]) {
+                app._x_dataStack[0].showOriginalLanguage(strongsNum);
+            }
+        };
     </script>
 </body>
 </html>
