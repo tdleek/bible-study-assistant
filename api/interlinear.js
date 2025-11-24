@@ -201,55 +201,48 @@ function parseInterlinearText(html, language) {
   
   // ========================================
   // APPROACH 2: HTML tag patterns
-  // Format: word<S>H1234</S> or word<n>G5678</n>
+  // Format: word<S>1696</S> (numbers only, no H/G prefix)
   // ========================================
-  const tagPatterns = [
-    /<[sS]>([HG]\d+)<\/[sS]>/g,              // <s>H1234</s> or <S>G5678</S>
-    /<n>([HG]\d+)<\/n>/gi,                    // <n>H1234</n>
-    /<sup[^>]*>([HG]\d+)<\/sup>/gi,           // <sup>H1234</sup>
-    /<a[^>]*>([HG]?\d+)<\/a>/gi               // <a href="...">1234</a>
-  ];
   
-  for (const pattern of tagPatterns) {
-    const tagMatches = [...html.matchAll(pattern)];
+  // Try <S>number</S> pattern first (most common in Bolls WLCa/TISCH)
+  const strongsTagPattern = /<[sS]>(\d+)<\/[sS]>/g;
+  const tagMatches = [...html.matchAll(strongsTagPattern)];
+  
+  if (tagMatches.length > 0) {
+    console.log(`📌 Found ${tagMatches.length} Strong's tags`);
     
-    if (tagMatches.length > 0) {
-      console.log('📌 Using HTML tag pattern');
+    // Split by the FULL tag (not just the pattern) to get segments
+    const splitPattern = /<[sS]>\d+<\/[sS]>/g;
+    const segments = html.split(splitPattern);
+    
+    for (let i = 0; i < tagMatches.length; i++) {
+      let strongsNum = tagMatches[i][1];
+      // Add H or G prefix
+      strongsNum = (language === 'Hebrew' ? 'H' : 'G') + strongsNum;
       
-      // Split by tags to get segments before each Strong's number
-      const segments = html.split(pattern);
+      const segment = segments[i] || '';
       
-      for (let i = 0; i < tagMatches.length; i++) {
-        let strongsNum = tagMatches[i][1];
-        // Normalize: add H or G prefix if missing
-        if (/^\d+$/.test(strongsNum)) {
-          strongsNum = (language === 'Hebrew' ? 'H' : 'G') + strongsNum;
-        }
-        
-        const segment = segments[i] || '';
-        
-        // Extract the Hebrew/Greek word from the segment
-        let originalWord = '';
-        if (language === 'Hebrew') {
-          const hebrewMatch = segment.match(/[\u0590-\u05FF\uFB1D-\uFB4F]+/g);
-          if (hebrewMatch) originalWord = hebrewMatch[hebrewMatch.length - 1];
-        } else {
-          const greekMatch = segment.match(/[\u0370-\u03FF\u1F00-\u1FFF]+/g);
-          if (greekMatch) originalWord = greekMatch[greekMatch.length - 1];
-        }
-        
-        if (originalWord) {
-          words.push({
-            original: originalWord,
-            translit: transliterate(originalWord, language),
-            english: '',
-            strongs: strongsNum.toUpperCase()
-          });
-        }
+      // Extract the Hebrew/Greek word from the segment (last word before the tag)
+      let originalWord = '';
+      if (language === 'Hebrew') {
+        const hebrewMatch = segment.match(/[\u0590-\u05FF\uFB1D-\uFB4F]+/g);
+        if (hebrewMatch) originalWord = hebrewMatch[hebrewMatch.length - 1];
+      } else {
+        const greekMatch = segment.match(/[\u0370-\u03FF\u1F00-\u1FFF]+/g);
+        if (greekMatch) originalWord = greekMatch[greekMatch.length - 1];
       }
       
-      if (words.length > 0) return words;
+      if (originalWord) {
+        words.push({
+          original: originalWord,
+          translit: transliterate(originalWord, language),
+          english: '',
+          strongs: strongsNum
+        });
+      }
     }
+    
+    if (words.length > 0) return words;
   }
   
   // ========================================
