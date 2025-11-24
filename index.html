@@ -398,12 +398,34 @@
                     </div>
                 </div>
                 
-                <!-- No Interlinear Available Message -->
+                <!-- No Interlinear Available Message - With Fetch Option -->
                 <div x-show="showInterlinear && !hasInterlinear()"
                      class="p-4 rounded-lg text-center"
                      :class="darkMode ? 'bg-[#1A2332]/50 text-[#9BA4B8]' : 'bg-white/50 text-[#6B5D4A]'">
-                    <p class="font-inter text-sm">Interlinear data not yet available for this verse.</p>
-                    <p class="font-inter text-xs mt-1">Try: Genesis 1:1, John 3:16, John 1:1, Psalm 23:1, Romans 8:28, Philippians 4:13, Jeremiah 29:11, or Proverbs 3:5-6</p>
+                    
+                    <!-- Loading State -->
+                    <div x-show="loadingInterlinear" class="py-4">
+                        <div class="animate-spin rounded-full h-8 w-8 border-2 mx-auto"
+                             :class="darkMode ? 'border-[#C0C5D9] border-t-transparent' : 'border-[#D4A017] border-t-transparent'"></div>
+                        <p class="font-inter text-sm mt-2">Fetching interlinear data...</p>
+                    </div>
+                    
+                    <!-- Error State -->
+                    <div x-show="!loadingInterlinear && interlinearError" class="py-2">
+                        <p class="font-inter text-sm" x-text="interlinearError"></p>
+                        <p class="font-inter text-xs mt-2">Popular verses: Genesis 1:1, John 3:16, Psalm 23:1, Romans 8:28</p>
+                    </div>
+                    
+                    <!-- Fetch Button -->
+                    <div x-show="!loadingInterlinear && !interlinearError">
+                        <p class="font-inter text-sm mb-3">Interlinear data not pre-loaded for this verse.</p>
+                        <button @click="fetchInterlinear()"
+                                class="px-4 py-2 rounded-lg font-inter text-sm font-semibold transition-all hover:scale-105"
+                                :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9] hover:bg-[#C0C5D9]/30' : 'bg-[#D4A017]/20 text-[#D4A017] hover:bg-[#D4A017]/30'">
+                            📜 Fetch Hebrew/Greek from API
+                        </button>
+                        <p class="font-inter text-xs mt-3 opacity-70">Or try pre-loaded verses: Genesis 1:1-3, John 1:1, John 3:16, Psalm 23:1-3, Romans 8:28</p>
+                    </div>
                 </div>
                 
                 <p class="mt-4 font-inter text-sm transition-colors"
@@ -1333,6 +1355,7 @@
                 // ===========================================
                 init() {
                     this.loadDailyVerse();
+                    this.loadInterlinearCache();
                 },
                 
                 loadDailyVerse() {
@@ -1388,16 +1411,90 @@
                 // ===========================================
                 // INTERLINEAR FUNCTIONS
                 // ===========================================
+                interlinearCache: {},  // Cache for API-fetched interlinear data
+                loadingInterlinear: false,
+                interlinearError: '',
+                
                 hasInterlinear() {
                     if (!this.verseLookupResult) return false;
                     const key = this.verseLookupResult.reference.toLowerCase().trim();
-                    return !!this.INTERLINEAR_DATABASE[key];
+                    // Check both local database and cache
+                    return !!(this.INTERLINEAR_DATABASE[key] || this.interlinearCache[key]);
+                },
+                
+                // Check if interlinear could potentially be fetched from API
+                canFetchInterlinear() {
+                    if (!this.verseLookupResult) return false;
+                    const key = this.verseLookupResult.reference.toLowerCase().trim();
+                    // Can fetch if not already in local DB or cache
+                    return !this.INTERLINEAR_DATABASE[key] && !this.interlinearCache[key];
                 },
                 
                 getInterlinearData() {
                     if (!this.verseLookupResult) return null;
                     const key = this.verseLookupResult.reference.toLowerCase().trim();
-                    return this.INTERLINEAR_DATABASE[key] || null;
+                    // Check local database first, then cache
+                    return this.INTERLINEAR_DATABASE[key] || this.interlinearCache[key] || null;
+                },
+                
+                // Fetch interlinear data from API
+                async fetchInterlinear() {
+                    if (!this.verseLookupResult || this.loadingInterlinear) return;
+                    
+                    const ref = this.verseLookupResult.reference;
+                    const key = ref.toLowerCase().trim();
+                    
+                    // Don't fetch if we already have it
+                    if (this.INTERLINEAR_DATABASE[key] || this.interlinearCache[key]) {
+                        return;
+                    }
+                    
+                    this.loadingInterlinear = true;
+                    this.interlinearError = '';
+                    
+                    try {
+                        // Call the interlinear API
+                        const apiUrl = 'https://bible-study-assistant-git-main-troy994719s-projects.vercel.app/api/interlinear';
+                        const response = await fetch(`${apiUrl}?ref=${encodeURIComponent(ref)}`);
+                        const data = await response.json();
+                        
+                        if (data.words && data.words.length > 0) {
+                            // Store in cache
+                            this.interlinearCache[key] = {
+                                language: data.language,
+                                words: data.words,
+                                fullText: data.fullText || ''
+                            };
+                            // Also store in localStorage for persistence
+                            try {
+                                const cached = JSON.parse(localStorage.getItem('interlinearCache') || '{}');
+                                cached[key] = this.interlinearCache[key];
+                                // Limit cache size to 100 verses
+                                const keys = Object.keys(cached);
+                                if (keys.length > 100) {
+                                    delete cached[keys[0]];
+                                }
+                                localStorage.setItem('interlinearCache', JSON.stringify(cached));
+                            } catch (e) { /* localStorage might be full */ }
+                        } else if (data.available === false) {
+                            this.interlinearError = data.message || 'Interlinear data not available for this verse.';
+                        }
+                    } catch (error) {
+                        console.error('Interlinear fetch error:', error);
+                        this.interlinearError = 'Failed to fetch interlinear data. Please try again.';
+                    } finally {
+                        this.loadingInterlinear = false;
+                    }
+                },
+                
+                // Load cached interlinear data from localStorage on init
+                loadInterlinearCache() {
+                    try {
+                        const cached = localStorage.getItem('interlinearCache');
+                        if (cached) {
+                            this.interlinearCache = JSON.parse(cached);
+                        }
+                    } catch (e) { /* ignore parse errors */ }
                 },
                 
                 // ===========================================
