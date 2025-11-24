@@ -1790,25 +1790,33 @@
                 
                 // Fetch interlinear data from API
                 async fetchInterlinear() {
-                    if (!this.verseLookupResult || this.loadingInterlinear) return;
-                    
-                    const ref = this.verseLookupResult.reference;
-                    const key = ref.toLowerCase().trim();
-                    
-                    // Don't fetch if we already have it
-                    if (this.INTERLINEAR_DATABASE[key] || this.interlinearCache[key]) {
+                    if (!this.verseLookupResult || this.loadingInterlinear) {
+                        console.log('fetchInterlinear: Skipped - no verse or already loading');
                         return;
                     }
-                    
+
+                    const ref = this.verseLookupResult.reference;
+                    const key = ref.toLowerCase().trim();
+
+                    // Don't fetch if we already have it
+                    if (this.INTERLINEAR_DATABASE[key] || this.interlinearCache[key]) {
+                        console.log('fetchInterlinear: Data already exists for', ref);
+                        return;
+                    }
+
+                    console.log('fetchInterlinear: Fetching data for', ref);
                     this.loadingInterlinear = true;
                     this.interlinearError = '';
-                    
+
                     try {
                         // Call the interlinear API
                         const apiUrl = '/api/interlinear';
-                        const response = await fetch(`${apiUrl}?ref=${encodeURIComponent(ref)}`);
+                        const url = `${apiUrl}?ref=${encodeURIComponent(ref)}`;
+                        console.log('fetchInterlinear: Calling', url);
+                        const response = await fetch(url);
                         const data = await response.json();
-                        
+                        console.log('fetchInterlinear: Response data:', data);
+
                         if (data.words && data.words.length > 0) {
                             // Store in cache
                             this.interlinearCache[key] = {
@@ -1816,6 +1824,7 @@
                                 words: data.words,
                                 fullText: data.fullText || ''
                             };
+                            console.log('fetchInterlinear: Stored', data.words.length, 'words in cache');
                             // Also store in localStorage for persistence
                             try {
                                 const cached = JSON.parse(localStorage.getItem('interlinearCache') || '{}');
@@ -1829,6 +1838,9 @@
                             } catch (e) { /* localStorage might be full */ }
                         } else if (data.available === false) {
                             this.interlinearError = data.message || 'Interlinear data not available for this verse.';
+                            console.log('fetchInterlinear: Data not available');
+                        } else {
+                            console.log('fetchInterlinear: Unexpected response format');
                         }
                     } catch (error) {
                         console.error('Interlinear fetch error:', error);
