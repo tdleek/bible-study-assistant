@@ -89,6 +89,16 @@ export default async function handler(req, res) {
     // SEND RESPONSE BACK TO USER
     // =============================================================================
     const data = await groqResponse.json();
+    
+    // Validate response has expected structure
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error('Unexpected Groq response structure:', JSON.stringify(data));
+      return res.status(500).json({
+        error: 'Unexpected response from AI service',
+        details: data
+      });
+    }
+    
     return res.status(200).json(data);
 
   } catch (error) {

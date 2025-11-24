@@ -1266,6 +1266,13 @@ Use the ${this.selectedTranslation} translation when referencing verses. Be resp
                         }
                         
                         const data = await response.json();
+                        
+                        // Validate response structure
+                        if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+                            console.error('Invalid API response:', data);
+                            throw new Error(data.error || 'Invalid response from server. Check API key configuration.');
+                        }
+                        
                         const assistantMessage = data.choices[0].message.content;
                         
                         if (this.comparativeMode) {
@@ -1371,6 +1378,12 @@ Write in an accessible, reverent tone for someone doing personal Bible study.`;
                         }
                         
                         const data = await response.json();
+                        
+                        // Validate response
+                        if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+                            throw new Error('Invalid response from server');
+                        }
+                        
                         this.languageAIExplanation = data.choices[0].message.content;
                         this.loadingLanguageExplanation = false;
                         
