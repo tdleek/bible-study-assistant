@@ -1769,7 +1769,7 @@
                     
                     try {
                         // Call the interlinear API
-                        const apiUrl = 'https://bible-study-assistant-git-main-troy994719s-projects.vercel.app/api/interlinear';
+                        const apiUrl = '/api/interlinear';
                         const response = await fetch(`${apiUrl}?ref=${encodeURIComponent(ref)}`);
                         const data = await response.json();
                         
