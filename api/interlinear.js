@@ -2,9 +2,10 @@
  * GospelPath Interlinear API Endpoint
  * 
  * Fetches word-by-word Hebrew/Greek interlinear data for any Bible verse.
- * Uses Bolls.life API for full Bible coverage.
+ * Uses Bolls.life API with WLCa (Hebrew) and TISCH (Greek) translations.
  * 
  * Usage: /api/interlinear?ref=Genesis%201:1
+ * Debug: /api/interlinear?ref=Mark%201:1&debug=true
  */
 
 // Book name to number mapping
@@ -85,131 +86,192 @@ function parseReference(ref) {
   return { bookNum, chapter, verseStart, bookName: match[1] };
 }
 
-// Simple transliteration
-function transliterate(text, language) {
+// Simple transliteration for Hebrew
+function transliterateHebrew(text) {
   if (!text) return '';
-  
-  if (language === 'Hebrew') {
-    const map = {'א':"'", 'ב':'v', 'ג':'g', 'ד':'d', 'ה':'h', 'ו':'v', 'ז':'z', 
-      'ח':'ch', 'ט':'t', 'י':'y', 'כ':'k', 'ך':'k', 'ל':'l', 'מ':'m', 'ם':'m',
-      'נ':'n', 'ן':'n', 'ס':'s', 'ע':"'", 'פ':'f', 'ף':'f', 'צ':'ts', 'ץ':'ts',
-      'ק':'q', 'ר':'r', 'ש':'sh', 'ת':'t'};
-    let clean = text.replace(/[\u0591-\u05C7]/g, '');
-    return clean.split('').map(c => map[c] || c).join('');
-  } else {
-    const map = {'α':'a', 'β':'b', 'γ':'g', 'δ':'d', 'ε':'e', 'ζ':'z', 'η':'e',
-      'θ':'th', 'ι':'i', 'κ':'k', 'λ':'l', 'μ':'m', 'ν':'n', 'ξ':'x', 'ο':'o',
-      'π':'p', 'ρ':'r', 'σ':'s', 'ς':'s', 'τ':'t', 'υ':'u', 'φ':'ph', 'χ':'ch',
-      'ψ':'ps', 'ω':'o'};
-    return text.toLowerCase().split('').map(c => map[c] || c).join('');
-  }
+  const map = {
+    'א': "'", 'ב': 'v', 'ג': 'g', 'ד': 'd', 'ה': 'h', 'ו': 'v', 'ז': 'z',
+    'ח': 'ch', 'ט': 't', 'י': 'y', 'כ': 'k', 'ך': 'k', 'ל': 'l', 'מ': 'm', 'ם': 'm',
+    'נ': 'n', 'ן': 'n', 'ס': 's', 'ע': "'", 'פ': 'f', 'ף': 'f', 'צ': 'ts', 'ץ': 'ts',
+    'ק': 'q', 'ר': 'r', 'ש': 'sh', 'ת': 't'
+  };
+  // Remove vowel points and accents
+  let clean = text.replace(/[\u0591-\u05C7]/g, '');
+  return clean.split('').map(c => map[c] || c).join('');
+}
+
+// Simple transliteration for Greek
+function transliterateGreek(text) {
+  if (!text) return '';
+  const map = {
+    'α': 'a', 'β': 'b', 'γ': 'g', 'δ': 'd', 'ε': 'e', 'ζ': 'z', 'η': 'e',
+    'θ': 'th', 'ι': 'i', 'κ': 'k', 'λ': 'l', 'μ': 'm', 'ν': 'n', 'ξ': 'x', 'ο': 'o',
+    'π': 'p', 'ρ': 'r', 'σ': 's', 'ς': 's', 'τ': 't', 'υ': 'u', 'φ': 'ph', 'χ': 'ch',
+    'ψ': 'ps', 'ω': 'o',
+    // Extended Greek characters
+    'ά': 'a', 'έ': 'e', 'ή': 'e', 'ί': 'i', 'ό': 'o', 'ύ': 'u', 'ώ': 'o',
+    'ἀ': 'a', 'ἁ': 'ha', 'ἐ': 'e', 'ἑ': 'he', 'ἠ': 'e', 'ἡ': 'he',
+    'ἰ': 'i', 'ἱ': 'hi', 'ὀ': 'o', 'ὁ': 'ho', 'ὐ': 'u', 'ὑ': 'hu',
+    'ὠ': 'o', 'ὡ': 'ho'
+  };
+  return text.toLowerCase().split('').map(c => map[c] || c).join('');
+}
+
+function transliterate(text, language) {
+  return language === 'Hebrew' ? transliterateHebrew(text) : transliterateGreek(text);
 }
 
 // Fetch chapter from Bolls.life and extract verse
 async function fetchFromBolls(bookNum, chapter, verse, language) {
   try {
-    // Bolls.life translations with Strong's numbers:
-    // OHB = Open Hebrew Bible (with Strong's)
-    // OGNT = Open Greek New Testament (with Strong's)
-    const translation = language === 'Hebrew' ? 'OHB' : 'OGNT';
+    // Bolls.life translations WITH Strong's numbers:
+    // WLCa = Westminster Leningrad Codex (with vowels, accents and Strong's numbers) - Hebrew
+    // TISCH = Tischendorf's Greek NT 8th ed (With Strong's numbers) - Greek
+    const translation = language === 'Hebrew' ? 'WLCa' : 'TISCH';
     
     // Fetch the whole chapter
     const url = `https://bolls.life/get-chapter/${translation}/${bookNum}/${chapter}/`;
-    console.log('Fetching:', url);
+    console.log('🔍 Fetching from Bolls:', url);
     
     const response = await fetch(url);
     
     if (!response.ok) {
-      console.log(`Bolls returned ${response.status}`);
+      console.log(`❌ Bolls returned HTTP ${response.status}`);
       return null;
     }
     
     const chapterData = await response.json();
+    console.log(`📖 Got ${chapterData.length} verses in chapter`);
     
     // Find the specific verse
     const verseData = chapterData.find(v => v.verse === verse);
     
     if (!verseData || !verseData.text) {
-      console.log('Verse not found in chapter data');
+      console.log('❌ Verse not found in chapter data');
       return null;
     }
     
+    console.log('📝 Raw verse text:', verseData.text.substring(0, 200) + '...');
+    
     // Parse the interlinear text
     const words = parseInterlinearText(verseData.text, language);
+    console.log(`✅ Parsed ${words.length} words`);
     
     return {
       words,
+      rawText: verseData.text, // Include for debugging
       fullText: verseData.text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
     };
     
   } catch (error) {
-    console.error('Bolls fetch error:', error.message);
+    console.error('❌ Bolls fetch error:', error.message);
     return null;
   }
 }
 
 // Parse interlinear text with Strong's numbers
+// Handles multiple formats from different Bible data sources
 function parseInterlinearText(html, language) {
   const words = [];
   
-  // The Bolls OHB/OGNT format typically has Strong's numbers in tags
-  // Pattern: original_word<S>H1234</S> or <n>G5678</n>
+  // STRATEGY: Try multiple parsing approaches
   
-  // First, let's find all Strong's number patterns
-  const strongsPattern = /<[nNsS]>([HG]\d+)<\/[nNsS]>/g;
-  const allStrongs = [...html.matchAll(strongsPattern)];
+  // ========================================
+  // APPROACH 1: Direct word+Strong's pattern
+  // Format: בראשׁיתH7225 or βιβλοςG976
+  // ========================================
+  const directPattern = language === 'Hebrew'
+    ? /([\u0590-\u05FF\uFB1D-\uFB4F]+)(H\d+)/gi
+    : /([\u0370-\u03FF\u1F00-\u1FFF]+)(G\d+)/gi;
   
-  if (allStrongs.length > 0) {
-    // Split by Strong's tags to get word segments
-    const segments = html.split(/<[nNsS]>[HG]\d+<\/[nNsS]>/);
-    
-    for (let i = 0; i < allStrongs.length; i++) {
-      const strongsNum = allStrongs[i][1];
-      const segment = segments[i] || '';
-      
-      // Extract Hebrew/Greek word from segment
-      let originalWord = '';
-      
-      if (language === 'Hebrew') {
-        // Hebrew Unicode range
-        const hebrewMatch = segment.match(/[\u0590-\u05FF\uFB1D-\uFB4F]+/g);
-        if (hebrewMatch) {
-          originalWord = hebrewMatch[hebrewMatch.length - 1]; // Last Hebrew word before Strong's
-        }
-      } else {
-        // Greek Unicode range
-        const greekMatch = segment.match(/[\u0370-\u03FF\u1F00-\u1FFF]+/g);
-        if (greekMatch) {
-          originalWord = greekMatch[greekMatch.length - 1]; // Last Greek word before Strong's
-        }
-      }
-      
-      if (originalWord) {
-        words.push({
-          original: originalWord,
-          translit: transliterate(originalWord, language),
-          english: '', // Will be filled by Strong's lookup
-          strongs: strongsNum.toUpperCase()
-        });
-      }
-    }
-  } else {
-    // Fallback: just extract original language words without Strong's
-    const pattern = language === 'Hebrew' 
-      ? /[\u0590-\u05FF\uFB1D-\uFB4F]+/g
-      : /[\u0370-\u03FF\u1F00-\u1FFF]+/g;
-    
-    const matches = html.match(pattern);
-    if (matches) {
-      matches.forEach(word => {
-        words.push({
-          original: word,
-          translit: transliterate(word, language),
-          english: '',
-          strongs: ''
-        });
+  let directMatches = [...html.matchAll(directPattern)];
+  
+  if (directMatches.length > 0) {
+    console.log('📌 Using direct word+Strong pattern');
+    for (const match of directMatches) {
+      words.push({
+        original: match[1],
+        translit: transliterate(match[1], language),
+        english: '',
+        strongs: match[2].toUpperCase()
       });
     }
+    return words;
+  }
+  
+  // ========================================
+  // APPROACH 2: HTML tag patterns
+  // Format: word<S>H1234</S> or word<n>G5678</n>
+  // ========================================
+  const tagPatterns = [
+    /<[sS]>([HG]\d+)<\/[sS]>/g,              // <s>H1234</s> or <S>G5678</S>
+    /<n>([HG]\d+)<\/n>/gi,                    // <n>H1234</n>
+    /<sup[^>]*>([HG]\d+)<\/sup>/gi,           // <sup>H1234</sup>
+    /<a[^>]*>([HG]?\d+)<\/a>/gi               // <a href="...">1234</a>
+  ];
+  
+  for (const pattern of tagPatterns) {
+    const tagMatches = [...html.matchAll(pattern)];
+    
+    if (tagMatches.length > 0) {
+      console.log('📌 Using HTML tag pattern');
+      
+      // Split by tags to get segments before each Strong's number
+      const segments = html.split(pattern);
+      
+      for (let i = 0; i < tagMatches.length; i++) {
+        let strongsNum = tagMatches[i][1];
+        // Normalize: add H or G prefix if missing
+        if (/^\d+$/.test(strongsNum)) {
+          strongsNum = (language === 'Hebrew' ? 'H' : 'G') + strongsNum;
+        }
+        
+        const segment = segments[i] || '';
+        
+        // Extract the Hebrew/Greek word from the segment
+        let originalWord = '';
+        if (language === 'Hebrew') {
+          const hebrewMatch = segment.match(/[\u0590-\u05FF\uFB1D-\uFB4F]+/g);
+          if (hebrewMatch) originalWord = hebrewMatch[hebrewMatch.length - 1];
+        } else {
+          const greekMatch = segment.match(/[\u0370-\u03FF\u1F00-\u1FFF]+/g);
+          if (greekMatch) originalWord = greekMatch[greekMatch.length - 1];
+        }
+        
+        if (originalWord) {
+          words.push({
+            original: originalWord,
+            translit: transliterate(originalWord, language),
+            english: '',
+            strongs: strongsNum.toUpperCase()
+          });
+        }
+      }
+      
+      if (words.length > 0) return words;
+    }
+  }
+  
+  // ========================================
+  // APPROACH 3: Fallback - just extract words
+  // No Strong's numbers available
+  // ========================================
+  console.log('📌 Fallback: extracting words without Strong\'s');
+  
+  const wordPattern = language === 'Hebrew' 
+    ? /[\u0590-\u05FF\uFB1D-\uFB4F]+/g
+    : /[\u0370-\u03FF\u1F00-\u1FFF]+/g;
+  
+  const wordMatches = html.match(wordPattern);
+  if (wordMatches) {
+    wordMatches.forEach(word => {
+      words.push({
+        original: word,
+        translit: transliterate(word, language),
+        english: '',
+        strongs: ''
+      });
+    });
   }
   
   return words;
@@ -223,19 +285,24 @@ async function enrichWithStrongs(words) {
     const word = enriched[i];
     if (word.strongs && !word.english) {
       try {
-        const url = `https://bolls.life/dictionary-definition/BDBT/${word.strongs}`;
+        const url = `https://bolls.life/dictionary-definition/BDBT/${word.strongs}/`;
         const response = await fetch(url);
         
         if (response.ok) {
           const data = await response.json();
           if (data && data[0]) {
-            // Get first definition, clean it up
-            const def = data[0].definition || data[0].short_definition || '';
-            word.english = def.split(/[,;]/)[0].trim().substring(0, 30);
+            // Get short definition, clean it up
+            const def = data[0].short_definition || data[0].definition || '';
+            // Take first part, clean HTML, limit length
+            word.english = def
+              .replace(/<[^>]*>/g, '')
+              .split(/[,;]/)[0]
+              .trim()
+              .substring(0, 25);
           }
         }
       } catch (e) {
-        // Skip failed lookups
+        // Skip failed lookups silently
       }
     }
   }
@@ -281,6 +348,19 @@ const PRELOADED = {
     ],
     fullText: 'The LORD is my shepherd; I shall not want.'
   },
+  'Mark 1:1': {
+    language: 'Greek',
+    words: [
+      { original: 'Ἀρχὴ', translit: 'arche', english: 'beginning', strongs: 'G746' },
+      { original: 'τοῦ', translit: 'tou', english: 'of the', strongs: 'G3588' },
+      { original: 'εὐαγγελίου', translit: 'euangeliou', english: 'gospel', strongs: 'G2098' },
+      { original: 'Ἰησοῦ', translit: 'Iesou', english: 'of Jesus', strongs: 'G2424' },
+      { original: 'Χριστοῦ', translit: 'Christou', english: 'Christ', strongs: 'G5547' },
+      { original: 'υἱοῦ', translit: 'huiou', english: 'Son', strongs: 'G5207' },
+      { original: 'Θεοῦ', translit: 'Theou', english: 'of God', strongs: 'G2316' }
+    ],
+    fullText: 'The beginning of the gospel of Jesus Christ, the Son of God.'
+  },
   'Romans 8:28': {
     language: 'Greek',
     words: [
@@ -307,23 +387,37 @@ export default async function handler(req, res) {
   }
   
   try {
-    const { ref } = req.query;
+    const { ref, debug } = req.query;
     
     if (!ref) {
-      return res.status(400).json({ error: 'Missing ref parameter. Use ?ref=Genesis%201:1' });
+      return res.status(400).json({ 
+        error: 'Missing ref parameter', 
+        usage: '/api/interlinear?ref=Genesis%201:1',
+        examples: ['Genesis 1:1', 'John 3:16', 'Psalm 23:1', 'Mark 1:1']
+      });
     }
     
     const parsed = parseReference(ref);
     if (!parsed) {
-      return res.status(400).json({ error: 'Invalid reference format' });
+      return res.status(400).json({ 
+        error: 'Invalid reference format',
+        received: ref,
+        expected: 'Book Chapter:Verse (e.g., Genesis 1:1, John 3:16)'
+      });
     }
     
     const bookName = BOOK_NAMES[parsed.bookNum];
     const referenceKey = `${bookName} ${parsed.chapter}:${parsed.verseStart}`;
     const language = getLanguage(parsed.bookNum);
     
+    console.log(`\n========== INTERLINEAR REQUEST ==========`);
+    console.log(`Reference: ${referenceKey}`);
+    console.log(`Language: ${language}`);
+    console.log(`Book #: ${parsed.bookNum}, Chapter: ${parsed.chapter}, Verse: ${parsed.verseStart}`);
+    
     // Check preloaded first
     if (PRELOADED[referenceKey]) {
+      console.log('✅ Returning preloaded data');
       return res.status(200).json({
         reference: referenceKey,
         source: 'preloaded',
@@ -332,32 +426,50 @@ export default async function handler(req, res) {
     }
     
     // Fetch from Bolls.life API
+    console.log('🌐 Fetching from Bolls.life API...');
     const data = await fetchFromBolls(parsed.bookNum, parsed.chapter, parsed.verseStart, language);
     
     if (data && data.words && data.words.length > 0) {
       // Enrich with Strong's definitions
+      console.log('📚 Enriching with Strong\'s definitions...');
       const enrichedWords = await enrichWithStrongs(data.words);
       
-      return res.status(200).json({
+      const response = {
         reference: referenceKey,
         source: 'bolls',
         language: language,
         words: enrichedWords,
         fullText: data.fullText
-      });
+      };
+      
+      // Include raw text in debug mode
+      if (debug === 'true') {
+        response.debug = {
+          rawText: data.rawText,
+          wordsBeforeEnrich: data.words
+        };
+      }
+      
+      console.log('✅ Returning API data');
+      return res.status(200).json(response);
     }
     
-    // Fallback
+    // Fallback - API didn't return usable data
+    console.log('⚠️ No data from API, returning fallback');
     return res.status(200).json({
       reference: referenceKey,
       source: 'api',
       language: language,
       available: false,
-      message: `Interlinear not available for ${referenceKey}. Try Genesis 1:1, John 3:16, Psalm 23:1`
+      message: `Interlinear data not available for ${referenceKey}. Try: Genesis 1:1, John 3:16, Psalm 23:1, Mark 1:1`,
+      debug: debug === 'true' ? { rawData: data } : undefined
     });
     
   } catch (error) {
-    console.error('API error:', error);
-    return res.status(500).json({ error: 'Server error', message: error.message });
+    console.error('❌ API error:', error);
+    return res.status(500).json({ 
+      error: 'Server error', 
+      message: error.message 
+    });
   }
 }
