@@ -1271,9 +1271,7 @@ Use the ${this.selectedTranslation} translation when referencing verses. Be resp
                         console.log('Response status:', response.status);
                         
                         const data = await response.json();
-                        console.log('Full response data:', JSON.stringify(data, null, 2));
-                        console.log('data.message:', data.message);
-                        console.log('data.choices:', data.choices);
+                        console.log('Response data:', data);
                         
                         if (!response.ok) {
                             throw new Error(data.error || 'API request failed');
@@ -1284,12 +1282,10 @@ Use the ${this.selectedTranslation} translation when referencing verses. Be resp
                         
                         // Format 1: Direct message (from some Vercel setups)
                         if (data.message && typeof data.message === 'string') {
-                            console.log('Using data.message format');
                             assistantMessage = data.message;
                         }
                         // Format 2: Standard OpenAI/Groq format
                         else if (data.choices && data.choices[0] && data.choices[0].message) {
-                            console.log('Using data.choices format');
                             assistantMessage = data.choices[0].message.content;
                         }
                         // Error case
