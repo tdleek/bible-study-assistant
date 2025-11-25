@@ -401,7 +401,7 @@
                         </button>
 
                         <!-- Interlinear Toggle Button -->
-                        <button @click="showInterlinear = !showInterlinear"
+                        <button @click="showInterlinear = !showInterlinear; if(showInterlinear && !hasInterlinear()) fetchInterlinear()"
                                 class="flex items-center gap-2 px-3 py-2 rounded-lg font-inter text-sm border transition-all hover:scale-105"
                                 :class="showInterlinear
                                     ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-[#D4A017] text-white')
@@ -498,7 +498,7 @@
                         <template x-for="(word, index) in getInterlinearData()?.words || []" :key="index">
                             <div class="text-center p-3 rounded-lg transition-colors cursor-pointer hover:scale-105"
                                  :class="darkMode ? 'bg-[#1A2332]/50 hover:bg-[#C0C5D9]/10' : 'bg-white/50 hover:bg-[#D4A017]/10'"
-                                 @click="word.strongs && STRONGS_DATABASE[word.strongs] && showOriginalLanguage(word.strongs)">
+                                 @click="word.strongs && showOriginalLanguage(word.strongs)">
                                 <!-- Original Script -->
                                 <p class="text-2xl font-bold mb-1 transition-colors"
                                    :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'"
@@ -733,8 +733,17 @@
          class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
         <div class="modal-content rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto"
              :class="darkMode ? 'bg-[#243044]' : 'bg-[#FDFBF7]'">
-            
-            <div class="flex justify-between items-start mb-6">
+
+            <!-- Loading State for Strong's Data -->
+            <div x-show="!currentStrongsData && loadingLanguageExplanation" class="text-center py-8">
+                <div class="animate-spin rounded-full h-8 w-8 border-2 mx-auto mb-4"
+                     :class="darkMode ? 'border-[#C0C5D9] border-t-transparent' : 'border-[#D4A017] border-t-transparent'"></div>
+                <p class="font-inter text-sm" :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#6B5D4A]'">
+                    Loading definition for <span x-text="currentStrongsNum"></span>...
+                </p>
+            </div>
+
+            <div x-show="currentStrongsData" class="flex justify-between items-start mb-6">
                 <div>
                     <h2 class="font-playfair original-text mb-2"
                         :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'"
@@ -754,14 +763,14 @@
                     ×
                 </button>
             </div>
-            
-            <div class="mb-6">
+
+            <div x-show="currentStrongsData" class="mb-6">
                 <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold"
                       :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#D4A017]/20 text-[#D4A017]'"
                       x-text="currentStrongsData ? currentStrongsData.partOfSpeech : ''"></span>
             </div>
-            
-            <div class="mb-6 pb-6 border-b"
+
+            <div x-show="currentStrongsData" class="mb-6 pb-6 border-b"
                  :class="darkMode ? 'border-[#C0C5D9]/20' : 'border-[#D4A017]/20'">
                 <h3 class="font-playfair text-lg mb-3"
                     :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'">Definition</h3>
@@ -772,8 +781,8 @@
                    :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#6B5D4A]'"
                    x-text="currentStrongsData ? currentStrongsData.longDefinition : ''"></p>
             </div>
-            
-            <div class="mb-6 pb-6 border-b"
+
+            <div x-show="currentStrongsData" class="mb-6 pb-6 border-b"
                  :class="darkMode ? 'border-[#C0C5D9]/20' : 'border-[#D4A017]/20'">
                 <h3 class="font-playfair text-lg mb-2"
                     :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'">Biblical Usage</h3>
@@ -781,9 +790,9 @@
                    :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#6B5D4A]'"
                    x-text="currentStrongsData ? currentStrongsData.usage : ''"></p>
             </div>
-            
+
             <!-- AI Explanation -->
-            <div class="rounded-lg p-6"
+            <div x-show="currentStrongsData" class="rounded-lg p-6"
                  :class="darkMode 
                      ? 'bg-gradient-to-br from-[#C0C5D9]/10 to-[#9BA4B8]/10' 
                      : 'bg-gradient-to-br from-[#D4A017]/10 to-[#6B5D4A]/10'">
@@ -2311,12 +2320,56 @@ Each perspective should be 2-3 sentences. Use the ${this.selectedTranslation} tr
                     return null;
                 },
                 
-                showOriginalLanguage(strongsNum) {
+                async showOriginalLanguage(strongsNum) {
                     this.currentStrongsNum = strongsNum;
-                    this.currentStrongsData = this.STRONGS_DATABASE[strongsNum];
+                    this.currentStrongsData = null;  // Clear previous data
                     this.showingLanguageModal = true;
                     this.languageAIExplanation = '';
-                    this.getLanguageAIExplanation(strongsNum);
+                    this.loadingLanguageExplanation = true;
+
+                    // Check local database first
+                    if (this.STRONGS_DATABASE[strongsNum]) {
+                        this.currentStrongsData = this.STRONGS_DATABASE[strongsNum];
+                        this.getLanguageAIExplanation(strongsNum);
+                        return;
+                    }
+
+                    // Fetch from API
+                    try {
+                        const response = await fetch(`/api/strongs?num=${encodeURIComponent(strongsNum)}`);
+                        const data = await response.json();
+
+                        if (data && !data.error) {
+                            this.currentStrongsData = data;
+                            // Cache it locally for future use
+                            this.STRONGS_DATABASE[strongsNum] = data;
+                            this.getLanguageAIExplanation(strongsNum);
+                        } else {
+                            // Show minimal info if API fails
+                            this.currentStrongsData = {
+                                lemma: '',
+                                translit: '',
+                                pronunciation: '',
+                                partOfSpeech: strongsNum.startsWith('H') ? 'Hebrew' : 'Greek',
+                                definition: 'Definition not available',
+                                longDefinition: `Strong's ${strongsNum} - definition not found in database.`,
+                                usage: ''
+                            };
+                            this.loadingLanguageExplanation = false;
+                        }
+                    } catch (error) {
+                        console.error('Error fetching Strong\'s data:', error);
+                        this.currentStrongsData = {
+                            lemma: '',
+                            translit: '',
+                            pronunciation: '',
+                            partOfSpeech: strongsNum.startsWith('H') ? 'Hebrew' : 'Greek',
+                            definition: 'Unable to load definition',
+                            longDefinition: 'Please try again later.',
+                            usage: ''
+                        };
+                        this.loadingLanguageExplanation = false;
+                    }
                 },
                 
                 async getLanguageAIExplanation(strongsNum) {
