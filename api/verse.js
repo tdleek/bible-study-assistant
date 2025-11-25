@@ -151,7 +151,10 @@ export default async function handler(req, res) {
       const verseData = chapterData.find(verse => verse.verse === v);
       if (verseData && verseData.text) {
         // Clean HTML tags from text
-        const cleanText = verseData.text.replace(/<[^>]*>/g, '').trim();
+        let cleanText = verseData.text.replace(/<[^>]*>/g, '').trim();
+        // Remove Strong's numbers appended to words (e.g., "thief2812" -> "thief")
+        // Matches word followed by numbers, preserving punctuation
+        cleanText = cleanText.replace(/([a-zA-Z]+)(\d+)(?=[,.:;!?\s]|$)/g, '$1');
         verseText += (verseText ? ' ' : '') + cleanText;
       }
     }
