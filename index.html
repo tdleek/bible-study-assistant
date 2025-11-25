@@ -287,18 +287,37 @@
 
             <!-- Mode Toggles on Home Screen -->
             <div class="flex flex-col items-center gap-3 mb-6">
-                <!-- Translation Compare Toggle -->
-                <div class="flex items-center gap-3">
+                <!-- Toggle Buttons Row -->
+                <div class="flex flex-wrap justify-center gap-2">
+                    <!-- Translation Compare Toggle -->
                     <button @click="translationCompareMode = !translationCompareMode"
                             class="px-4 py-2 rounded-xl font-inter text-sm font-medium border-2 transition-all hover:scale-105"
                             :class="translationCompareMode
                                 ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332] border-[#C0C5D9]' : 'bg-[#D4A017] text-white border-[#D4A017]')
-                                : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/50' : 'bg-transparent text-[#D4A017] border-[#D4A017]/50')">
-                        <span x-text="translationCompareMode ? '📚 Compare Translations ON' : '📚 Compare Translations'"></span>
+                                : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/50' : 'bg-transparent text-[#D4A017] border-[#D4A017]/50')"
+                            title="See verse in multiple translations side-by-side">
+                        <span x-text="translationCompareMode ? '📚 Compare ON' : '📚 Compare'"></span>
                     </button>
-                    <span class="text-xs transition-colors"
-                          :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#FFE8E0]/90'"
-                          x-show="!translationCompareMode">See verse in ESV, NIV, KJV side-by-side</span>
+
+                    <!-- Theological Perspectives Toggle -->
+                    <button @click="comparativeMode = !comparativeMode"
+                            class="px-4 py-2 rounded-xl font-inter text-sm font-medium border-2 transition-all hover:scale-105"
+                            :class="comparativeMode
+                                ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332] border-[#C0C5D9]' : 'bg-[#D4A017] text-white border-[#D4A017]')
+                                : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/50' : 'bg-transparent text-[#D4A017] border-[#D4A017]/50')"
+                            title="Protestant, Catholic & Orthodox perspectives">
+                        <span x-text="comparativeMode ? '⛪ Theology ON' : '⛪ Theology'"></span>
+                    </button>
+
+                    <!-- Hebrew/Greek Interlinear Toggle -->
+                    <button @click="autoShowInterlinear = !autoShowInterlinear"
+                            class="px-4 py-2 rounded-xl font-inter text-sm font-medium border-2 transition-all hover:scale-105"
+                            :class="autoShowInterlinear
+                                ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332] border-[#C0C5D9]' : 'bg-[#D4A017] text-white border-[#D4A017]')
+                                : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/50' : 'bg-transparent text-[#D4A017] border-[#D4A017]/50')"
+                            title="Word-by-word original Hebrew/Greek">
+                        <span x-text="autoShowInterlinear ? '📜 Hebrew/Greek ON' : '📜 Hebrew/Greek'"></span>
+                    </button>
                 </div>
 
                 <!-- Translation Selector (shows when compare mode is on) -->
@@ -311,34 +330,6 @@
                                     : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-transparent text-[#FFE8E0] border-[#FFE8E0]/30')"
                                 x-text="trans"></button>
                     </template>
-                </div>
-
-                <!-- Theological Perspectives Toggle -->
-                <div class="flex items-center gap-3">
-                    <button @click="comparativeMode = !comparativeMode"
-                            class="px-4 py-2 rounded-xl font-inter text-sm font-medium border-2 transition-all hover:scale-105"
-                            :class="comparativeMode
-                                ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332] border-[#C0C5D9]' : 'bg-[#D4A017] text-white border-[#D4A017]')
-                                : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/50' : 'bg-transparent text-[#D4A017] border-[#D4A017]/50')">
-                        <span x-text="comparativeMode ? '⛪ Theological Views ON' : '⛪ Theological Views'"></span>
-                    </button>
-                    <span class="text-xs transition-colors"
-                          :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#FFE8E0]/90'"
-                          x-show="!comparativeMode">Protestant, Catholic & Orthodox</span>
-                </div>
-
-                <!-- Hebrew/Greek Interlinear Toggle -->
-                <div class="flex items-center gap-3">
-                    <button @click="autoShowInterlinear = !autoShowInterlinear"
-                            class="px-4 py-2 rounded-xl font-inter text-sm font-medium border-2 transition-all hover:scale-105"
-                            :class="autoShowInterlinear
-                                ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332] border-[#C0C5D9]' : 'bg-[#D4A017] text-white border-[#D4A017]')
-                                : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/50' : 'bg-transparent text-[#D4A017] border-[#D4A017]/50')">
-                        <span x-text="autoShowInterlinear ? '📜 Hebrew/Greek ON' : '📜 Hebrew/Greek'"></span>
-                    </button>
-                    <span class="text-xs transition-colors"
-                          :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#FFE8E0]/90'"
-                          x-show="!autoShowInterlinear">Word-by-word original language</span>
                 </div>
             </div>
 
