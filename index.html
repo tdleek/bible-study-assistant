@@ -202,15 +202,26 @@
                     <option value="NLT">NLT</option>
                 </select>
                 
-                <!-- Comparative Mode Toggle -->
-                <button @click="comparativeMode = !comparativeMode"
+                <!-- Translation Compare Toggle -->
+                <button @click="translationCompareMode = !translationCompareMode; if(verseLookupResult && translationCompareMode) fetchTranslationComparison(verseLookupResult.reference)"
                         class="px-3 py-2 rounded-lg font-inter text-sm border transition-all"
-                        :class="comparativeMode 
+                        :class="translationCompareMode
                             ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-[#D4A017] text-white')
-                            : (darkMode ? 'bg-[#243044] text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-white text-[#D4A017] border-[#D4A017]/30')">
-                    <span x-text="comparativeMode ? '🕊️ Comparative' : '📖 Standard'"></span>
+                            : (darkMode ? 'bg-[#243044] text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-white text-[#D4A017] border-[#D4A017]/30')"
+                        title="Compare translations side-by-side">
+                    <span x-text="translationCompareMode ? '📚 Comparing' : '📚 Compare'"></span>
                 </button>
-                
+
+                <!-- Theological Perspectives Toggle -->
+                <button @click="comparativeMode = !comparativeMode; if(comparativeMode && userQuery) handleSearch()"
+                        class="px-3 py-2 rounded-lg font-inter text-sm border transition-all"
+                        :class="comparativeMode
+                            ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-[#D4A017] text-white')
+                            : (darkMode ? 'bg-[#243044] text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-white text-[#D4A017] border-[#D4A017]/30')"
+                        title="Protestant, Catholic, Orthodox perspectives">
+                    <span x-text="comparativeMode ? '⛪ Views ON' : '⛪ Views'"></span>
+                </button>
+
                 <!-- Theme Toggle -->
                 <button @click="darkMode = !darkMode"
                         class="w-10 h-10 rounded-lg flex items-center justify-center border transition-all hover:scale-105"
