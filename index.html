@@ -608,7 +608,7 @@
                     </div>
                 </div>
 
-                <div class="grid gap-4" :class="translationCompareResults.length <= 2 ? 'md:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-3'">
+                <div class="grid gap-4" :class="(translationCompareResults?.length || 0) <= 2 ? 'md:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-3'">
                     <template x-for="result in translationCompareResults" :key="result.translation">
                         <div class="rounded-xl p-5 border transition-colors"
                              :class="darkMode
@@ -1907,7 +1907,8 @@
                 // VERSE DETECTION
                 // ===========================================
                 detectVerseReference(query) {
-                    const pattern = /^(1|2|3|I|II|III)?\s*([A-Za-z]+)\s*(\d+):(\d+)(-\d+)?$/i;
+                    // Accept colon, space, or period between chapter and verse (e.g., "John 3:16", "john 3 16", "John 3.16")
+                    const pattern = /^(1|2|3|I|II|III)?\s*([A-Za-z]+)\s*(\d+)[\s:.](\d+)(-\d+)?$/i;
                     const match = query.trim().match(pattern);
                     if (match) {
                         return {
