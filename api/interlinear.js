@@ -288,6 +288,28 @@ const HEBREW_GLOSS_CACHE = {
   'H83':   { gloss: 'wing', translit: 'ever' },            // אֵבֶר - wing
   'H5404': { gloss: 'eagle', translit: 'nesher' },         // נֶשֶׁר - eagle
   'H428':  { gloss: 'these', translit: 'elleh' },          // אֵלֶּה - these
+
+  // ==================== ADDITIONAL IMPORTANT WORDS ====================
+  'H8615': { gloss: 'hope', translit: 'tiqvah' },           // תִּקְוָה - hope (also: cord, but primarily "hope")
+  'H319':  { gloss: 'future', translit: 'acharit' },        // אַחֲרִית - end, latter part, future
+  'H3478': { gloss: 'Israel', translit: 'Yisrael' },        // יִשְׂרָאֵל - Israel
+  'H3063': { gloss: 'Judah', translit: 'Yehudah' },         // יְהוּדָה - Judah
+  'H4872': { gloss: 'Moses', translit: 'Mosheh' },          // מֹשֶׁה - Moses
+  'H1732': { gloss: 'David', translit: 'David' },           // דָּוִד - David
+  'H85':   { gloss: 'Abraham', translit: 'Avraham' },       // אַבְרָהָם - Abraham
+  'H3290': { gloss: 'Jacob', translit: 'Yaakov' },          // יַעֲקֹב - Jacob
+  'H3327': { gloss: 'Isaac', translit: 'Yitschaq' },        // יִצְחָק - Isaac
+  'H4899': { gloss: 'Messiah/anointed', translit: 'mashiach' }, // מָשִׁיחַ - Messiah, anointed one
+  'H5769': { gloss: 'everlasting', translit: 'olam' },      // עוֹלָם - eternity, everlasting
+  'H3519': { gloss: 'glory', translit: 'kavod' },           // כָּבוֹד - glory, honor
+  'H2580': { gloss: 'grace/favor', translit: 'chen' },      // חֵן - grace, favor
+  'H7522': { gloss: 'favor/will', translit: 'ratson' },     // רָצוֹן - favor, will, pleasure
+  'H4725': { gloss: 'place', translit: 'maqom' },           // מָקוֹם - place
+  'H6256': { gloss: 'time', translit: 'et' },               // עֵת - time
+  'H1242': { gloss: 'morning', translit: 'boqer' },         // בֹּקֶר - morning
+  'H6153': { gloss: 'evening', translit: 'erev' },          // עֶרֶב - evening
+  'H8141': { gloss: 'year', translit: 'shanah' },           // שָׁנָה - year
+  'H2320': { gloss: 'month', translit: 'chodesh' },         // חֹדֶשׁ - month, new moon
 };
 
 // Simple transliteration for Hebrew
