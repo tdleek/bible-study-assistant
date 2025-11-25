@@ -498,12 +498,17 @@
                 </div>
             </div>
             
-            <!-- Regular AI Response -->
-            <div x-show="aiResponse && !comparativeMode && !loading && !verseLookupResult" 
+            <!-- Regular AI Response (also shown as fallback if comparative parsing fails) -->
+            <div x-show="aiResponse && (!comparativeMode || !perspectiveResponse) && !loading && !verseLookupResult"
                  class="rounded-2xl p-8 border mb-8 transition-colors"
-                 :class="darkMode 
-                     ? 'bg-[#243044]/80 border-[#C0C5D9]/30' 
+                 :class="darkMode
+                     ? 'bg-[#243044]/80 border-[#C0C5D9]/30'
                      : 'bg-white/80 border-[#D4A017]/30'">
+                <div x-show="comparativeMode && !perspectiveResponse"
+                     class="mb-4 p-3 rounded-lg text-sm"
+                     :class="darkMode ? 'bg-yellow-900/20 text-yellow-300' : 'bg-yellow-50 text-yellow-700'">
+                    ⚠️ Could not parse comparative format. Showing raw response:
+                </div>
                 <div class="font-lora text-lg leading-relaxed transition-colors"
                      :class="darkMode ? 'text-[#F5F5F0]/90' : 'text-[#0F1C3A]/90'"
                      x-html="formatResponse(aiResponse)"></div>
@@ -1892,17 +1897,14 @@
                     let systemPrompt = '';
                     
                     if (this.comparativeMode) {
-                        systemPrompt = `You are a knowledgeable Bible study assistant. Provide perspectives from Protestant, Catholic, and Orthodox traditions.
+                        systemPrompt = `You are a knowledgeable Bible study assistant. Provide perspectives from Protestant, Catholic, and Orthodox Christian traditions.
 
-Format your response as JSON:
-{
-  "protestant": "Protestant perspective...",
-  "catholic": "Catholic perspective...",
-  "orthodox": "Orthodox perspective...",
-  "common": "What all traditions agree on..."
-}
+IMPORTANT: You MUST respond with ONLY a valid JSON object, no other text before or after. Do not wrap in markdown code blocks.
 
-Use the ${this.selectedTranslation} translation. Be respectful and accurate.`;
+Required JSON format:
+{"protestant":"Protestant perspective here...","catholic":"Catholic perspective here...","orthodox":"Orthodox perspective here...","common":"What all three traditions agree on..."}
+
+Each perspective should be 2-3 sentences. Use the ${this.selectedTranslation} translation when citing Scripture. Be respectful, accurate, and highlight both agreements and distinctive emphases.`;
                     } else {
                         systemPrompt = `You are a knowledgeable and reverent Bible study assistant. Help users understand Scripture with accuracy and spiritual insight. Use the ${this.selectedTranslation} translation when referencing verses. Provide thoughtful explanations that honor the text.`;
                     }
@@ -1975,11 +1977,31 @@ Use the ${this.selectedTranslation} translation. Be respectful and accurate.`;
                         
                         if (this.comparativeMode) {
                             try {
-                                this.perspectiveResponse = JSON.parse(assistantMessage);
+                                // Try to extract JSON from the response
+                                // LLMs often wrap JSON in markdown code blocks or add extra text
+                                let jsonStr = assistantMessage;
+
+                                // Remove markdown code blocks if present
+                                const jsonMatch = assistantMessage.match(/```(?:json)?\s*([\s\S]*?)```/);
+                                if (jsonMatch) {
+                                    jsonStr = jsonMatch[1].trim();
+                                } else {
+                                    // Try to find JSON object directly
+                                    const objectMatch = assistantMessage.match(/\{[\s\S]*\}/);
+                                    if (objectMatch) {
+                                        jsonStr = objectMatch[0];
+                                    }
+                                }
+
+                                this.perspectiveResponse = JSON.parse(jsonStr);
                                 this.aiResponse = assistantMessage;
+                                console.log('Parsed comparative response:', this.perspectiveResponse);
                             } catch (e) {
                                 console.error('Failed to parse comparative response:', e);
+                                console.log('Raw response:', assistantMessage);
+                                // Fallback: show as regular response if JSON parsing fails
                                 this.aiResponse = assistantMessage;
+                                this.perspectiveResponse = null;
                             }
                         } else {
                             this.aiResponse = assistantMessage;
