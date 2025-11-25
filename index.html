@@ -326,6 +326,20 @@
                           :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#FFE8E0]/90'"
                           x-show="!comparativeMode">Protestant, Catholic & Orthodox</span>
                 </div>
+
+                <!-- Hebrew/Greek Interlinear Toggle -->
+                <div class="flex items-center gap-3">
+                    <button @click="autoShowInterlinear = !autoShowInterlinear"
+                            class="px-4 py-2 rounded-xl font-inter text-sm font-medium border-2 transition-all hover:scale-105"
+                            :class="autoShowInterlinear
+                                ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332] border-[#C0C5D9]' : 'bg-[#D4A017] text-white border-[#D4A017]')
+                                : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/50' : 'bg-transparent text-[#D4A017] border-[#D4A017]/50')">
+                        <span x-text="autoShowInterlinear ? '📜 Hebrew/Greek ON' : '📜 Hebrew/Greek'"></span>
+                    </button>
+                    <span class="text-xs transition-colors"
+                          :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#FFE8E0]/90'"
+                          x-show="!autoShowInterlinear">Word-by-word original language</span>
+                </div>
             </div>
 
             <button
@@ -865,6 +879,7 @@
                 
                 // Interlinear Mode
                 showInterlinear: false,
+                autoShowInterlinear: false,  // Pre-set from home page toggle
                 
                 // ===========================================
                 // INTERLINEAR DATABASE (Hebrew/Greek word-by-word) - EXPANDED VERSION
@@ -1967,6 +1982,11 @@
                         this.hasSearched = true;
                         this.showNav = true;
 
+                        // Auto-show interlinear if enabled from home page
+                        if (this.autoShowInterlinear) {
+                            this.showInterlinear = true;
+                        }
+
                         // Auto-fetch interlinear data in the background
                         this.fetchInterlinear();
 
@@ -1992,6 +2012,11 @@
                             this.hasSearched = true;
                             this.showNav = true;
                             this.loading = false;
+
+                            // Auto-show interlinear if enabled from home page
+                            if (this.autoShowInterlinear) {
+                                this.showInterlinear = true;
+                            }
 
                             // Auto-fetch interlinear data in the background
                             this.fetchInterlinear();
