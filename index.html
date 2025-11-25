@@ -1879,24 +1879,33 @@
                 // ===========================================
                 async handleSearch() {
                     if (!this.userQuery.trim()) return;
-                    
+
                     // Check for verse lookup first
                     const verseInfo = this.detectVerseReference(this.userQuery);
                     if (verseInfo) {
                         const found = await this.lookupVerse(this.userQuery);
-                        if (found) return;
+                        // If NOT in comparative mode, just show the verse and return
+                        // If in comparative mode, continue to get AI perspectives on the verse
+                        if (found && !this.comparativeMode) return;
                     }
-                    
+
                     this.hasSearched = true;
                     this.loading = true;
                     this.errorMessage = '';
                     this.showNav = true;
                     this.perspectiveResponse = null;
-                    this.verseLookupResult = null;
+                    // Don't clear verseLookupResult if we found a verse - keep showing it
+                    if (!verseInfo) this.verseLookupResult = null;
                     
                     let systemPrompt = '';
-                    
+                    let userMessage = this.userQuery;
+
                     if (this.comparativeMode) {
+                        // If we have a verse, include its text in the question
+                        if (this.verseLookupResult) {
+                            userMessage = `Provide comparative theological perspectives on ${this.verseLookupResult.reference}: "${this.verseLookupResult.text}"`;
+                        }
+
                         systemPrompt = `You are a knowledgeable Bible study assistant. Provide perspectives from Protestant, Catholic, and Orthodox Christian traditions.
 
 IMPORTANT: You MUST respond with ONLY a valid JSON object, no other text before or after. Do not wrap in markdown code blocks.
@@ -1911,9 +1920,9 @@ Each perspective should be 2-3 sentences. Use the ${this.selectedTranslation} tr
                     
                     this.conversationHistory = [
                         { role: 'system', content: systemPrompt },
-                        { role: 'user', content: this.userQuery }
+                        { role: 'user', content: userMessage }
                     ];
-                    
+
                     await this.callBackendAPI();
                 },
                 
@@ -1942,6 +1951,11 @@ Each perspective should be 2-3 sentences. Use the ${this.selectedTranslation} tr
                 // ===========================================
                 async callBackendAPI() {
                     try {
+                        console.log('=== Calling Backend API ===');
+                        console.log('Endpoint:', this.apiEndpoint);
+                        console.log('Comparative Mode:', this.comparativeMode);
+                        console.log('Messages:', this.conversationHistory);
+
                         const response = await fetch(this.apiEndpoint, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -1950,7 +1964,8 @@ Each perspective should be 2-3 sentences. Use the ${this.selectedTranslation} tr
                                 selectedTranslation: this.selectedTranslation
                             })
                         });
-                        
+
+                        console.log('Response status:', response.status);
                         const data = await response.json();
                         console.log('API Response:', data);
                         
