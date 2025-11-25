@@ -274,20 +274,47 @@
                 />
             </div>
 
-            <!-- Mode Toggle on Home Screen -->
-            <div class="flex items-center justify-center gap-4 mb-6">
-                <button @click="comparativeMode = !comparativeMode"
-                        class="px-4 py-2 rounded-xl font-inter text-sm font-medium border-2 transition-all hover:scale-105"
-                        :class="comparativeMode
-                            ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332] border-[#C0C5D9]' : 'bg-[#D4A017] text-white border-[#D4A017]')
-                            : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/50 hover:border-[#C0C5D9]' : 'bg-transparent text-[#D4A017] border-[#D4A017]/50 hover:border-[#D4A017]')">
-                    <span x-text="comparativeMode ? '🕊️ Comparative Mode ON' : '📖 Standard Mode'"></span>
-                </button>
-                <span class="text-xs max-w-48 text-center transition-colors"
-                      :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#FFE8E0]/90'">
-                    <span x-show="!comparativeMode">Click to see Protestant, Catholic & Orthodox perspectives</span>
-                    <span x-show="comparativeMode">Will show perspectives from different Christian traditions</span>
-                </span>
+            <!-- Mode Toggles on Home Screen -->
+            <div class="flex flex-col items-center gap-3 mb-6">
+                <!-- Translation Compare Toggle -->
+                <div class="flex items-center gap-3">
+                    <button @click="translationCompareMode = !translationCompareMode"
+                            class="px-4 py-2 rounded-xl font-inter text-sm font-medium border-2 transition-all hover:scale-105"
+                            :class="translationCompareMode
+                                ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332] border-[#C0C5D9]' : 'bg-[#D4A017] text-white border-[#D4A017]')
+                                : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/50' : 'bg-transparent text-[#D4A017] border-[#D4A017]/50')">
+                        <span x-text="translationCompareMode ? '📚 Compare Translations ON' : '📚 Compare Translations'"></span>
+                    </button>
+                    <span class="text-xs transition-colors"
+                          :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#FFE8E0]/90'"
+                          x-show="!translationCompareMode">See verse in ESV, NIV, KJV side-by-side</span>
+                </div>
+
+                <!-- Translation Selector (shows when compare mode is on) -->
+                <div x-show="translationCompareMode" class="flex flex-wrap justify-center gap-2">
+                    <template x-for="trans in ['ESV', 'NIV', 'KJV', 'NASB', 'NLT', 'NKJV']" :key="trans">
+                        <button @click="toggleTranslation(trans)"
+                                class="px-3 py-1 rounded-lg font-inter text-xs font-medium border transition-all"
+                                :class="selectedTranslationsToCompare.includes(trans)
+                                    ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-[#D4A017] text-white')
+                                    : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-transparent text-[#FFE8E0] border-[#FFE8E0]/30')"
+                                x-text="trans"></button>
+                    </template>
+                </div>
+
+                <!-- Theological Perspectives Toggle -->
+                <div class="flex items-center gap-3">
+                    <button @click="comparativeMode = !comparativeMode"
+                            class="px-4 py-2 rounded-xl font-inter text-sm font-medium border-2 transition-all hover:scale-105"
+                            :class="comparativeMode
+                                ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332] border-[#C0C5D9]' : 'bg-[#D4A017] text-white border-[#D4A017]')
+                                : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/50' : 'bg-transparent text-[#D4A017] border-[#D4A017]/50')">
+                        <span x-text="comparativeMode ? '⛪ Theological Views ON' : '⛪ Theological Views'"></span>
+                    </button>
+                    <span class="text-xs transition-colors"
+                          :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#FFE8E0]/90'"
+                          x-show="!comparativeMode">Protestant, Catholic & Orthodox</span>
+                </div>
             </div>
 
             <button
@@ -449,7 +476,37 @@
                     💡 <span class="cursor-pointer underline" @click="askAboutVerse()">Ask AI to explain this verse</span>
                 </p>
             </div>
-            
+
+            <!-- Translation Comparison View -->
+            <div x-show="translationCompareResults && translationCompareResults.length > 0 && !loading"
+                 class="mb-8 space-y-4">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="text-2xl">📚</span>
+                    <h2 class="font-playfair text-xl transition-colors"
+                        :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'">
+                        Translation Comparison
+                    </h2>
+                </div>
+
+                <div class="grid gap-4" :class="translationCompareResults.length <= 2 ? 'md:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-3'">
+                    <template x-for="result in translationCompareResults" :key="result.translation">
+                        <div class="rounded-xl p-5 border transition-colors"
+                             :class="darkMode
+                                 ? 'bg-[#243044]/80 border-[#C0C5D9]/30'
+                                 : 'bg-white/80 border-[#D4A017]/30'">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="font-inter text-sm font-bold px-2 py-1 rounded transition-colors"
+                                      :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#D4A017]/20 text-[#D4A017]'"
+                                      x-text="result.translation"></span>
+                            </div>
+                            <p class="font-lora text-base leading-relaxed italic transition-colors"
+                               :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#0F1C3A]'"
+                               x-text="result.text"></p>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
             <!-- Comparative Perspectives View -->
             <div x-show="perspectiveResponse && !loading" class="space-y-6 mb-8">
                 <div class="flex items-center gap-3 mb-6">
@@ -684,7 +741,10 @@
                 hasSearched: false,
                 showNav: false,
                 selectedTranslation: 'ESV',
-                comparativeMode: false,
+                comparativeMode: false,  // Theological perspectives mode
+                translationCompareMode: false,  // Translation comparison mode
+                selectedTranslationsToCompare: ['ESV', 'NIV', 'KJV'],  // Default translations to compare
+                translationCompareResults: null,  // Results from translation comparison
                 perspectiveResponse: null,
                 verseLookupResult: null,
                 copied: false,
@@ -1724,10 +1784,49 @@
                     return null;
                 },
                 
+                // Toggle a translation in the comparison list
+                toggleTranslation(trans) {
+                    const index = this.selectedTranslationsToCompare.indexOf(trans);
+                    if (index > -1) {
+                        // Don't allow removing if only 2 left
+                        if (this.selectedTranslationsToCompare.length > 2) {
+                            this.selectedTranslationsToCompare.splice(index, 1);
+                        }
+                    } else {
+                        // Max 4 translations
+                        if (this.selectedTranslationsToCompare.length < 4) {
+                            this.selectedTranslationsToCompare.push(trans);
+                        }
+                    }
+                },
+
+                // Fetch verse in multiple translations for comparison
+                async fetchTranslationComparison(reference) {
+                    console.log('Fetching translation comparison for:', reference);
+                    this.translationCompareResults = [];
+
+                    const promises = this.selectedTranslationsToCompare.map(async (trans) => {
+                        try {
+                            const response = await fetch(`/api/verse?ref=${encodeURIComponent(reference)}&translation=${trans}`);
+                            const data = await response.json();
+                            if (data.text) {
+                                return { translation: trans, text: data.text, reference: data.reference };
+                            }
+                        } catch (error) {
+                            console.error(`Failed to fetch ${trans}:`, error);
+                        }
+                        return { translation: trans, text: 'Unable to load', reference: reference };
+                    });
+
+                    this.translationCompareResults = await Promise.all(promises);
+                    console.log('Translation comparison results:', this.translationCompareResults);
+                },
+
                 // Lookup verse - tries local DB first, then fetches from API
                 async lookupVerse(query) {
                     const normalizedQuery = query.toLowerCase().trim();
-                    
+                    this.translationCompareResults = null;  // Reset comparison results
+
                     // 1. Check local database first (instant)
                     if (this.VERSE_DATABASE[normalizedQuery]) {
                         this.verseLookupResult = {
@@ -1740,9 +1839,14 @@
                         // Auto-fetch interlinear data in the background
                         this.fetchInterlinear();
 
+                        // If translation compare mode is on, fetch all translations
+                        if (this.translationCompareMode) {
+                            this.fetchTranslationComparison(query);
+                        }
+
                         return true;
                     }
-                    
+
                     // 2. Try to fetch from verse API (works for ANY verse)
                     try {
                         this.loading = true;
@@ -1760,6 +1864,11 @@
 
                             // Auto-fetch interlinear data in the background
                             this.fetchInterlinear();
+
+                            // If translation compare mode is on, fetch all translations
+                            if (this.translationCompareMode) {
+                                this.fetchTranslationComparison(data.reference);
+                            }
 
                             return true;
                         }
