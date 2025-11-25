@@ -378,7 +378,7 @@
                      : 'bg-gradient-to-br from-white to-[#FFE8E0] border-[#D4A017]/40'">
                 
                 <!-- Header with Toggle -->
-                <div class="flex items-center justify-between mb-4">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
                     <div class="flex items-center gap-3">
                         <span class="text-2xl">📖</span>
                         <h3 class="font-playfair text-xl transition-colors"
@@ -388,24 +388,100 @@
                               :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#D4A017]/20 text-[#D4A017]'"
                               x-text="selectedTranslation"></span>
                     </div>
-                    
-                    <!-- Interlinear Toggle Button -->
-                    <button @click="showInterlinear = !showInterlinear"
-                            class="flex items-center gap-2 px-3 py-2 rounded-lg font-inter text-sm border transition-all hover:scale-105"
-                            :class="showInterlinear 
-                                ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-[#D4A017] text-white')
-                                : (darkMode ? 'bg-[#243044] text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-white text-[#D4A017] border-[#D4A017]/30')">
-                        <span>📜</span>
-                        <span x-text="showInterlinear ? 'Hide Original' : 'Show Hebrew/Greek'"></span>
-                    </button>
+
+                    <div class="flex items-center gap-2">
+                        <!-- Compare Translations Button -->
+                        <button @click="showSideBySide = !showSideBySide; if(showSideBySide) fetchSideBySideComparison()"
+                                class="flex items-center gap-2 px-3 py-2 rounded-lg font-inter text-sm border transition-all hover:scale-105"
+                                :class="showSideBySide
+                                    ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-[#D4A017] text-white')
+                                    : (darkMode ? 'bg-[#243044] text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-white text-[#D4A017] border-[#D4A017]/30')">
+                            <span>📚</span>
+                            <span x-text="showSideBySide ? 'Hide Compare' : 'Compare'"></span>
+                        </button>
+
+                        <!-- Interlinear Toggle Button -->
+                        <button @click="showInterlinear = !showInterlinear"
+                                class="flex items-center gap-2 px-3 py-2 rounded-lg font-inter text-sm border transition-all hover:scale-105"
+                                :class="showInterlinear
+                                    ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-[#D4A017] text-white')
+                                    : (darkMode ? 'bg-[#243044] text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-white text-[#D4A017] border-[#D4A017]/30')">
+                            <span>📜</span>
+                            <span x-text="showInterlinear ? 'Hide Original' : 'Hebrew/Greek'"></span>
+                        </button>
+                    </div>
                 </div>
                 
-                <!-- English Text (always shown) -->
-                <p x-show="!showInterlinear"
+                <!-- English Text (shown when not comparing) -->
+                <p x-show="!showInterlinear && !showSideBySide"
                    class="font-lora text-xl leading-relaxed italic transition-colors"
                    :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#0F1C3A]'"
                    x-text="verseLookupResult ? verseLookupResult.text : ''"></p>
-                
+
+                <!-- Side-by-Side Comparison View -->
+                <div x-show="showSideBySide && !showInterlinear" class="space-y-4">
+                    <!-- Translation Selectors -->
+                    <div class="flex flex-wrap items-center justify-center gap-4 mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="font-inter text-xs" :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#6B5D4A]'">Left:</span>
+                            <select x-model="sideBySideLeft" @change="fetchSideBySideComparison()"
+                                    class="rounded-lg px-2 py-1 font-inter text-sm border cursor-pointer"
+                                    :class="darkMode ? 'bg-[#1A2332] text-[#F5F5F0] border-[#C0C5D9]/30' : 'bg-white text-[#0F1C3A] border-[#D4A017]/30'">
+                                <option value="ESV">ESV</option>
+                                <option value="NIV">NIV</option>
+                                <option value="KJV">KJV</option>
+                                <option value="NASB">NASB</option>
+                                <option value="NLT">NLT</option>
+                                <option value="NKJV">NKJV</option>
+                            </select>
+                        </div>
+                        <span class="text-lg" :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#D4A017]'">⟷</span>
+                        <div class="flex items-center gap-2">
+                            <span class="font-inter text-xs" :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#6B5D4A]'">Right:</span>
+                            <select x-model="sideBySideRight" @change="fetchSideBySideComparison()"
+                                    class="rounded-lg px-2 py-1 font-inter text-sm border cursor-pointer"
+                                    :class="darkMode ? 'bg-[#1A2332] text-[#F5F5F0] border-[#C0C5D9]/30' : 'bg-white text-[#0F1C3A] border-[#D4A017]/30'">
+                                <option value="ESV">ESV</option>
+                                <option value="NIV">NIV</option>
+                                <option value="KJV">KJV</option>
+                                <option value="NASB">NASB</option>
+                                <option value="NLT">NLT</option>
+                                <option value="NKJV">NKJV</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div x-show="loadingSideBySide" class="text-center py-4">
+                        <div class="animate-spin rounded-full h-6 w-6 border-2 mx-auto"
+                             :class="darkMode ? 'border-[#C0C5D9] border-t-transparent' : 'border-[#D4A017] border-t-transparent'"></div>
+                    </div>
+
+                    <!-- Side-by-Side Results -->
+                    <div x-show="sideBySideResults && !loadingSideBySide" class="grid md:grid-cols-2 gap-4">
+                        <!-- Left Translation -->
+                        <div class="rounded-xl p-4 border"
+                             :class="darkMode ? 'bg-[#1A2332]/50 border-[#C0C5D9]/20' : 'bg-white/50 border-[#D4A017]/20'">
+                            <div class="font-inter text-sm font-bold mb-2 px-2 py-1 rounded inline-block"
+                                 :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#D4A017]/20 text-[#D4A017]'"
+                                 x-text="sideBySideResults?.left?.translation"></div>
+                            <p class="font-lora text-base leading-relaxed italic"
+                               :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#0F1C3A]'"
+                               x-text="sideBySideResults?.left?.text"></p>
+                        </div>
+                        <!-- Right Translation -->
+                        <div class="rounded-xl p-4 border"
+                             :class="darkMode ? 'bg-[#1A2332]/50 border-[#C0C5D9]/20' : 'bg-white/50 border-[#D4A017]/20'">
+                            <div class="font-inter text-sm font-bold mb-2 px-2 py-1 rounded inline-block"
+                                 :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#D4A017]/20 text-[#D4A017]'"
+                                 x-text="sideBySideResults?.right?.translation"></div>
+                            <p class="font-lora text-base leading-relaxed italic"
+                               :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#0F1C3A]'"
+                               x-text="sideBySideResults?.right?.text"></p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Interlinear View -->
                 <div x-show="showInterlinear && hasInterlinear()" 
                      class="space-y-4">
@@ -756,6 +832,12 @@
                 translationCompareMode: false,  // Translation comparison mode
                 selectedTranslationsToCompare: ['ESV', 'NIV', 'KJV'],  // Default translations to compare
                 translationCompareResults: null,  // Results from translation comparison
+                // Side-by-side 2-version comparison
+                showSideBySide: false,
+                sideBySideLeft: 'ESV',
+                sideBySideRight: 'KJV',
+                sideBySideResults: null,
+                loadingSideBySide: false,
                 perspectiveResponse: null,
                 verseLookupResult: null,
                 copied: false,
@@ -1795,6 +1877,35 @@
                     return null;
                 },
                 
+                // Fetch side-by-side comparison (2 translations)
+                async fetchSideBySideComparison() {
+                    if (!this.verseLookupResult) return;
+
+                    this.loadingSideBySide = true;
+                    this.sideBySideResults = null;
+                    const reference = this.verseLookupResult.reference;
+
+                    try {
+                        const [leftResult, rightResult] = await Promise.all([
+                            fetch(`/api/verse?ref=${encodeURIComponent(reference)}&translation=${this.sideBySideLeft}`).then(r => r.json()),
+                            fetch(`/api/verse?ref=${encodeURIComponent(reference)}&translation=${this.sideBySideRight}`).then(r => r.json())
+                        ]);
+
+                        this.sideBySideResults = {
+                            left: { translation: this.sideBySideLeft, text: leftResult.text || 'Unable to load' },
+                            right: { translation: this.sideBySideRight, text: rightResult.text || 'Unable to load' }
+                        };
+                    } catch (error) {
+                        console.error('Side-by-side fetch error:', error);
+                        this.sideBySideResults = {
+                            left: { translation: this.sideBySideLeft, text: 'Error loading' },
+                            right: { translation: this.sideBySideRight, text: 'Error loading' }
+                        };
+                    }
+
+                    this.loadingSideBySide = false;
+                },
+
                 // Toggle a translation in the comparison list
                 toggleTranslation(trans) {
                     const index = this.selectedTranslationsToCompare.indexOf(trans);
