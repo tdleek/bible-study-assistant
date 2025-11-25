@@ -581,12 +581,25 @@
             <!-- Translation Comparison View -->
             <div x-show="translationCompareResults && translationCompareResults.length > 0 && !loading"
                  class="mb-8 space-y-4">
-                <div class="flex items-center gap-3 mb-4">
-                    <span class="text-2xl">📚</span>
-                    <h2 class="font-playfair text-xl transition-colors"
-                        :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'">
-                        Translation Comparison
-                    </h2>
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">📚</span>
+                        <h2 class="font-playfair text-xl transition-colors"
+                            :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'">
+                            Translation Comparison
+                        </h2>
+                    </div>
+                    <!-- Translation Selector Pills -->
+                    <div class="flex flex-wrap justify-center gap-2">
+                        <template x-for="trans in ['ESV', 'NIV', 'KJV', 'NASB', 'NLT', 'NKJV']" :key="trans">
+                            <button @click="toggleTranslation(trans); if(verseLookupResult) fetchTranslationComparison(verseLookupResult.reference)"
+                                    class="px-3 py-1 rounded-lg font-inter text-xs font-medium border transition-all hover:scale-105"
+                                    :class="selectedTranslationsToCompare.includes(trans)
+                                        ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-[#D4A017] text-white')
+                                        : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-transparent text-[#D4A017] border-[#D4A017]/30')"
+                                    x-text="trans"></button>
+                        </template>
+                    </div>
                 </div>
 
                 <div class="grid gap-4" :class="translationCompareResults.length <= 2 ? 'md:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-3'">
