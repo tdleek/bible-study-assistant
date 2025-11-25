@@ -1880,13 +1880,24 @@
                 async handleSearch() {
                     if (!this.userQuery.trim()) return;
 
+                    console.log('=== handleSearch called ===');
+                    console.log('Query:', this.userQuery);
+                    console.log('Comparative Mode:', this.comparativeMode);
+
                     // Check for verse lookup first
                     const verseInfo = this.detectVerseReference(this.userQuery);
+                    console.log('Verse detected:', verseInfo);
+
                     if (verseInfo) {
                         const found = await this.lookupVerse(this.userQuery);
+                        console.log('Verse found:', found);
                         // If NOT in comparative mode, just show the verse and return
                         // If in comparative mode, continue to get AI perspectives on the verse
-                        if (found && !this.comparativeMode) return;
+                        if (found && !this.comparativeMode) {
+                            console.log('Returning early - verse found, NOT in comparative mode');
+                            return;
+                        }
+                        console.log('Continuing to AI call (comparative mode is ON)');
                     }
 
                     this.hasSearched = true;
