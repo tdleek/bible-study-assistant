@@ -86,7 +86,212 @@ function parseReference(ref) {
   return { bookNum, chapter, verseStart, bookName: match[1] };
 }
 
+// =============================================================================
+// HEBREW STRONG'S GLOSS CACHE
+// =============================================================================
+// This cache provides accurate, contextually-appropriate English glosses for
+// the most common Hebrew words. The Bolls.life API's short_definition field
+// often returns generic or secondary meanings (e.g., "angels" for אֱלֹהִים
+// instead of "God"). This cache ensures users see the primary biblical meaning.
+//
+// Format: Strong's Number -> { gloss: "primary meaning", translit: "transliteration" }
+// =============================================================================
+const HEBREW_GLOSS_CACHE = {
+  // ==================== DIVINE NAMES & TITLES ====================
+  'H430':  { gloss: 'God', translit: 'elohim' },           // אֱלֹהִים - Most common name for God
+  'H3068': { gloss: 'the LORD', translit: 'YHWH' },        // יְהוָה - Covenant name of God
+  'H136':  { gloss: 'Lord', translit: 'Adonai' },          // אֲדֹנָי - Master, Lord
+  'H410':  { gloss: 'God', translit: 'El' },               // אֵל - God (singular)
+  'H433':  { gloss: 'God', translit: 'Eloah' },            // אֱלוֹהַּ - God (poetic singular)
+  'H5945': { gloss: 'Most High', translit: 'Elyon' },      // עֶלְיוֹן - Most High
+  'H7706': { gloss: 'Almighty', translit: 'Shaddai' },     // שַׁדַּי - Almighty
+
+  // ==================== COMMON VERBS ====================
+  'H559':  { gloss: 'said', translit: 'amar' },            // אָמַר - to say
+  'H1696': { gloss: 'spoke', translit: 'dabar' },          // דָּבַר - to speak
+  'H1961': { gloss: 'was/be', translit: 'hayah' },         // הָיָה - to be, become
+  'H5414': { gloss: 'gave', translit: 'natan' },           // נָתַן - to give
+  'H6213': { gloss: 'made/do', translit: 'asah' },         // עָשָׂה - to do, make
+  'H7200': { gloss: 'saw', translit: 'raah' },             // רָאָה - to see
+  'H8085': { gloss: 'heard', translit: 'shama' },          // שָׁמַע - to hear
+  'H3045': { gloss: 'know', translit: 'yada' },            // יָדַע - to know
+  'H1254': { gloss: 'created', translit: 'bara' },         // בָּרָא - to create (divine)
+  'H3318': { gloss: 'went out', translit: 'yatsa' },       // יָצָא - to go out
+  'H935':  { gloss: 'came', translit: 'bo' },              // בּוֹא - to come, enter
+  'H3212': { gloss: 'went', translit: 'halak' },           // הָלַךְ - to walk, go
+  'H5975': { gloss: 'stood', translit: 'amad' },           // עָמַד - to stand
+  'H3427': { gloss: 'dwelt', translit: 'yashab' },         // יָשַׁב - to dwell, sit
+  'H7725': { gloss: 'returned', translit: 'shuv' },        // שׁוּב - to return
+  'H6680': { gloss: 'commanded', translit: 'tsavah' },     // צָוָה - to command
+  'H7121': { gloss: 'called', translit: 'qara' },          // קָרָא - to call
+  'H3947': { gloss: 'took', translit: 'laqach' },          // לָקַח - to take
+  'H7971': { gloss: 'sent', translit: 'shalach' },         // שָׁלַח - to send
+  'H5307': { gloss: 'fell', translit: 'naphal' },          // נָפַל - to fall
+  'H6965': { gloss: 'arose', translit: 'qum' },            // קוּם - to arise
+  'H4191': { gloss: 'died', translit: 'mut' },             // מוּת - to die
+  'H2421': { gloss: 'lived', translit: 'chayah' },         // חָיָה - to live
+  'H157':  { gloss: 'loved', translit: 'ahav' },           // אָהַב - to love
+  'H3372': { gloss: 'feared', translit: 'yare' },          // יָרֵא - to fear
+  'H982':  { gloss: 'trusted', translit: 'batach' },       // בָּטַח - to trust
+  'H539':  { gloss: 'believed', translit: 'aman' },        // אָמַן - to believe
+  'H1288': { gloss: 'blessed', translit: 'barak' },        // בָּרַךְ - to bless
+  'H6419': { gloss: 'prayed', translit: 'palal' },         // פָּלַל - to pray
+  'H7812': { gloss: 'worshiped', translit: 'shachah' },    // שָׁחָה - to bow down
+  'H3467': { gloss: 'saved', translit: 'yasha' },          // יָשַׁע - to save
+  'H5337': { gloss: 'delivered', translit: 'natsal' },     // נָצַל - to deliver
+  'H7462': { gloss: 'shepherds', translit: 'raah' },       // רָעָה - to shepherd
+  'H2637': { gloss: 'lack', translit: 'chaser' },          // חָסֵר - to lack, want
+
+  // ==================== COMMON NOUNS ====================
+  'H776':  { gloss: 'earth/land', translit: 'erets' },     // אֶרֶץ - earth, land
+  'H8064': { gloss: 'heavens', translit: 'shamayim' },     // שָׁמַיִם - heavens, sky
+  'H3117': { gloss: 'day', translit: 'yom' },              // יוֹם - day
+  'H3915': { gloss: 'night', translit: 'layil' },          // לַיְלָה - night
+  'H4325': { gloss: 'water', translit: 'mayim' },          // מַיִם - water
+  'H784':  { gloss: 'fire', translit: 'esh' },             // אֵשׁ - fire
+  'H7307': { gloss: 'spirit/wind', translit: 'ruach' },    // רוּחַ - spirit, wind
+  'H5315': { gloss: 'soul', translit: 'nephesh' },         // נֶפֶשׁ - soul, life
+  'H3820': { gloss: 'heart', translit: 'lev' },            // לֵב - heart
+  'H1697': { gloss: 'word', translit: 'dabar' },           // דָּבָר - word, thing
+  'H8034': { gloss: 'name', translit: 'shem' },            // שֵׁם - name
+  'H1': { gloss: 'father', translit: 'av' },               // אָב - father
+  'H517':  { gloss: 'mother', translit: 'em' },            // אֵם - mother
+  'H1121': { gloss: 'son', translit: 'ben' },              // בֵּן - son
+  'H1323': { gloss: 'daughter', translit: 'bat' },         // בַּת - daughter
+  'H376':  { gloss: 'man', translit: 'ish' },              // אִישׁ - man
+  'H802':  { gloss: 'woman/wife', translit: 'ishah' },     // אִשָּׁה - woman, wife
+  'H5971': { gloss: 'people', translit: 'am' },            // עַם - people
+  'H1471': { gloss: 'nation', translit: 'goy' },           // גּוֹי - nation
+  'H4428': { gloss: 'king', translit: 'melek' },           // מֶלֶךְ - king
+  'H5650': { gloss: 'servant', translit: 'eved' },         // עֶבֶד - servant
+  'H3548': { gloss: 'priest', translit: 'kohen' },         // כֹּהֵן - priest
+  'H5030': { gloss: 'prophet', translit: 'navi' },         // נָבִיא - prophet
+  'H4397': { gloss: 'messenger/angel', translit: 'malak' }, // מַלְאָךְ - angel
+  'H1004': { gloss: 'house', translit: 'bayit' },          // בַּיִת - house
+  'H5892': { gloss: 'city', translit: 'ir' },              // עִיר - city
+  'H1870': { gloss: 'way/path', translit: 'derek' },       // דֶּרֶךְ - way, path
+  'H216':  { gloss: 'light', translit: 'or' },             // אוֹר - light
+  'H2822': { gloss: 'darkness', translit: 'choshek' },     // חֹשֶׁךְ - darkness
+  'H2416': { gloss: 'life/living', translit: 'chay' },     // חַי - life, living
+  'H4194': { gloss: 'death', translit: 'mavet' },          // מָוֶת - death
+  'H7965': { gloss: 'peace', translit: 'shalom' },         // שָׁלוֹם - peace
+  'H2617': { gloss: 'steadfast love', translit: 'chesed' }, // חֶסֶד - lovingkindness
+  'H571':  { gloss: 'truth', translit: 'emet' },           // אֱמֶת - truth
+  'H6664': { gloss: 'righteousness', translit: 'tsedeq' }, // צֶדֶק - righteousness
+  'H4941': { gloss: 'justice', translit: 'mishpat' },      // מִשְׁפָּט - justice
+  'H8451': { gloss: 'law/Torah', translit: 'torah' },      // תּוֹרָה - law, instruction
+  'H1285': { gloss: 'covenant', translit: 'berit' },       // בְּרִית - covenant
+  'H2403': { gloss: 'sin', translit: 'chatta' },           // חַטָּאת - sin
+  'H5771': { gloss: 'iniquity', translit: 'avon' },        // עָוֺן - iniquity
+  'H6588': { gloss: 'transgression', translit: 'pesha' },  // פֶּשַׁע - transgression
+  'H3444': { gloss: 'salvation', translit: 'yeshuah' },    // יְשׁוּעָה - salvation
+  'H1293': { gloss: 'blessing', translit: 'berakah' },     // בְּרָכָה - blessing
+  'H8605': { gloss: 'prayer', translit: 'tefillah' },      // תְּפִלָּה - prayer
+
+  // ==================== PARTICLES & PREPOSITIONS ====================
+  'H853':  { gloss: '[obj]', translit: 'et' },             // אֵת - direct object marker
+  'H3605': { gloss: 'all', translit: 'kol' },              // כֹּל - all, every
+  'H3808': { gloss: 'not', translit: 'lo' },               // לֹא - not
+  'H408':  { gloss: 'not', translit: 'al' },               // אַל - not (jussive)
+  'H3588': { gloss: 'for/that', translit: 'ki' },          // כִּי - for, because, that
+  'H834':  { gloss: 'which/who', translit: 'asher' },      // אֲשֶׁר - which, who
+  'H5921': { gloss: 'upon/over', translit: 'al' },         // עַל - upon, over
+  'H413':  { gloss: 'to/toward', translit: 'el' },         // אֶל - to, toward
+  'H4480': { gloss: 'from', translit: 'min' },             // מִן - from
+  'H5973': { gloss: 'with', translit: 'im' },              // עִם - with
+  'H996':  { gloss: 'between', translit: 'bein' },         // בֵּין - between
+  'H6440': { gloss: 'face/before', translit: 'panim' },    // פָּנִים - face, before
+  'H310':  { gloss: 'after', translit: 'achar' },          // אַחַר - after
+  'H6924': { gloss: 'before/east', translit: 'qedem' },    // קֶדֶם - before, east
+  'H2088': { gloss: 'this', translit: 'zeh' },             // זֶה - this (masc)
+  'H2063': { gloss: 'this', translit: 'zot' },             // זֹאת - this (fem)
+  'H1931': { gloss: 'he/it', translit: 'hu' },             // הוּא - he, it
+  'H1992': { gloss: 'they', translit: 'hem' },             // הֵם - they (masc)
+  'H595':  { gloss: 'I', translit: 'anokhi' },             // אָנֹכִי - I
+  'H589':  { gloss: 'I', translit: 'ani' },                // אֲנִי - I
+  'H859':  { gloss: 'you', translit: 'attah' },            // אַתָּה - you (masc sg)
+
+  // ==================== NUMBERS ====================
+  'H259':  { gloss: 'one', translit: 'echad' },            // אֶחָד - one
+  'H8147': { gloss: 'two', translit: 'shenayim' },         // שְׁנַיִם - two
+  'H7969': { gloss: 'three', translit: 'shalosh' },        // שָׁלוֹשׁ - three
+  'H7651': { gloss: 'seven', translit: 'sheva' },          // שֶׁבַע - seven
+  'H6235': { gloss: 'ten', translit: 'eser' },             // עֶשֶׂר - ten
+
+  // ==================== ADJECTIVES ====================
+  'H2896': { gloss: 'good', translit: 'tov' },             // טוֹב - good
+  'H7451': { gloss: 'evil/bad', translit: 'ra' },          // רַע - evil, bad
+  'H1419': { gloss: 'great', translit: 'gadol' },          // גָּדוֹל - great
+  'H6996': { gloss: 'small', translit: 'qatan' },          // קָטָן - small
+  'H7227': { gloss: 'many/great', translit: 'rav' },       // רַב - many, great
+  'H6918': { gloss: 'holy', translit: 'qadosh' },          // קָדוֹשׁ - holy
+  'H2389': { gloss: 'strong', translit: 'chazaq' },        // חָזָק - strong
+  'H3477': { gloss: 'upright', translit: 'yashar' },       // יָשָׁר - upright
+
+  // ==================== GENESIS 1 SPECIFIC ====================
+  'H7225': { gloss: 'beginning', translit: 'reshit' },     // רֵאשִׁית - beginning
+  'H8414': { gloss: 'formless', translit: 'tohu' },        // תֹהוּ - formless, void
+  'H922':  { gloss: 'void', translit: 'bohu' },            // בֹהוּ - void, emptiness
+  'H8415': { gloss: 'deep', translit: 'tehom' },           // תְּהוֹם - deep, abyss
+  'H7363': { gloss: 'hovering', translit: 'rachaph' },     // רָחַף - to hover
+  'H7549': { gloss: 'expanse', translit: 'raqia' },        // רָקִיעַ - expanse, firmament
+  'H3556': { gloss: 'stars', translit: 'kokav' },          // כּוֹכָב - star
+
+  // ==================== EXODUS 20 (TEN COMMANDMENTS) ====================
+  'H6440': { gloss: 'face/presence', translit: 'panim' },  // פָּנִים - face
+  'H6754': { gloss: 'image', translit: 'tselem' },         // צֶלֶם - image
+  'H5375': { gloss: 'take/lift', translit: 'nasa' },       // נָשָׂא - to lift, carry
+  'H7723': { gloss: 'vain/false', translit: 'shav' },      // שָׁוְא - vain, false
+  'H2142': { gloss: 'remember', translit: 'zakar' },       // זָכַר - to remember
+  'H7676': { gloss: 'Sabbath', translit: 'shabbat' },      // שַׁבָּת - Sabbath
+  'H6942': { gloss: 'sanctify', translit: 'qadash' },      // קָדַשׁ - to sanctify
+  'H3513': { gloss: 'honor', translit: 'kavad' },          // כָּבַד - to honor
+  'H7523': { gloss: 'murder', translit: 'ratsach' },       // רָצַח - to murder
+  'H5003': { gloss: 'commit adultery', translit: 'naaph' }, // נָאַף - to commit adultery
+  'H1589': { gloss: 'steal', translit: 'ganav' },          // גָּנַב - to steal
+  'H6030': { gloss: 'answer/testify', translit: 'anah' },  // עָנָה - to answer
+  'H8267': { gloss: 'false', translit: 'sheqer' },         // שֶׁקֶר - falsehood
+  'H2530': { gloss: 'covet', translit: 'chamad' },         // חָמַד - to covet
+
+  // ==================== PSALM 23 SPECIFIC ====================
+  'H4999': { gloss: 'pastures', translit: 'naah' },        // נָאָה - pasture
+  'H1877': { gloss: 'green', translit: 'deshe' },          // דֶּשֶׁא - grass, green
+  'H7257': { gloss: 'lie down', translit: 'ravats' },      // רָבַץ - to lie down
+  'H4496': { gloss: 'rest', translit: 'menuchah' },        // מְנוּחָה - rest
+  'H5095': { gloss: 'lead', translit: 'nahal' },           // נָהַל - to lead
+  'H5148': { gloss: 'guide', translit: 'nachah' },         // נָחָה - to guide
+  'H4570': { gloss: 'paths', translit: 'magal' },          // מַעְגָּל - path
+  'H6738': { gloss: 'shadow', translit: 'tsel' },          // צֵל - shadow
+  'H7626': { gloss: 'rod', translit: 'shevet' },           // שֵׁבֶט - rod, staff
+  'H4938': { gloss: 'staff', translit: 'mishenet' },       // מִשְׁעֶנֶת - staff
+  'H5162': { gloss: 'comfort', translit: 'nacham' },       // נָחַם - to comfort
+  'H7218': { gloss: 'head', translit: 'rosh' },            // רֹאשׁ - head
+  'H8081': { gloss: 'oil', translit: 'shemen' },           // שֶׁמֶן - oil
+  'H3563': { gloss: 'cup', translit: 'kos' },              // כּוֹס - cup
+  'H7310': { gloss: 'overflow', translit: 'revayah' },     // רְוָיָה - overflow
+
+  // ==================== ISAIAH 53 SPECIFIC ====================
+  'H2490': { gloss: 'pierced', translit: 'chalal' },       // חָלַל - to pierce
+  'H1792': { gloss: 'crushed', translit: 'daka' },         // דָּכָא - to crush
+  'H4148': { gloss: 'discipline', translit: 'musar' },     // מוּסָר - discipline
+  'H2250': { gloss: 'stripes', translit: 'chaburah' },     // חַבּוּרָה - wound, stripe
+  'H7495': { gloss: 'healed', translit: 'rapha' },         // רָפָא - to heal
+
+  // ==================== ADDITIONAL COMMON WORDS ====================
+  'H5002': { gloss: 'declares', translit: 'neum' },        // נְאֻם - declaration
+  'H4284': { gloss: 'plans', translit: 'machashavah' },    // מַחֲשָׁבָה - thought, plan
+  'H2803': { gloss: 'think/plan', translit: 'chashav' },   // חָשַׁב - to think
+  'H6960': { gloss: 'wait/hope', translit: 'qavah' },      // קָוָה - to wait
+  'H2498': { gloss: 'renew', translit: 'chalaph' },        // חָלַף - to renew
+  'H3581': { gloss: 'strength', translit: 'koach' },       // כֹּחַ - strength
+  'H5927': { gloss: 'go up', translit: 'alah' },           // עָלָה - to go up
+  'H83':   { gloss: 'wing', translit: 'ever' },            // אֵבֶר - wing
+  'H5404': { gloss: 'eagle', translit: 'nesher' },         // נֶשֶׁר - eagle
+  'H428':  { gloss: 'these', translit: 'elleh' },          // אֵלֶּה - these
+};
+
 // Simple transliteration for Hebrew
+// Used as fallback when API transliteration is not available
 function transliterateHebrew(text) {
   if (!text) return '';
   const map = {
@@ -270,37 +475,161 @@ function parseInterlinearText(html, language) {
   return words;
 }
 
-// Fetch Strong's definitions to get English glosses
-async function enrichWithStrongs(words) {
+// =============================================================================
+// ENRICH WORDS WITH STRONG'S DEFINITIONS
+// =============================================================================
+// This function enhances the word data with accurate English glosses.
+// It uses a three-tier lookup strategy:
+//   1. Local cache (HEBREW_GLOSS_CACHE) - instant, accurate glosses
+//   2. Parse the full BDB definition from Bolls.life API
+//   3. Fallback to short_definition if parsing fails
+// =============================================================================
+async function enrichWithStrongs(words, language) {
   const enriched = [...words];
-  
+
   for (let i = 0; i < enriched.length; i++) {
     const word = enriched[i];
-    if (word.strongs && !word.english) {
-      try {
-        const url = `https://bolls.life/dictionary-definition/BDBT/${word.strongs}/`;
-        const response = await fetch(url);
-        
-        if (response.ok) {
-          const data = await response.json();
-          if (data && data[0]) {
-            // Get short definition, clean it up
-            const def = data[0].short_definition || data[0].definition || '';
-            // Take first part, clean HTML, limit length
-            word.english = def
+    if (!word.strongs) continue;
+
+    // Already has a gloss? Skip (unless it's empty)
+    if (word.english && word.english.trim()) continue;
+
+    // =========================================================
+    // TIER 1: Check local cache first (Hebrew only for now)
+    // =========================================================
+    if (language === 'Hebrew' && HEBREW_GLOSS_CACHE[word.strongs]) {
+      const cached = HEBREW_GLOSS_CACHE[word.strongs];
+      word.english = cached.gloss;
+      // Also use better transliteration if available
+      if (cached.translit && (!word.translit || word.translit.length < 2)) {
+        word.translit = cached.translit;
+      }
+      console.log(`  ✓ Cache hit: ${word.strongs} → "${cached.gloss}"`);
+      continue;
+    }
+
+    // =========================================================
+    // TIER 2 & 3: Fetch from Bolls.life API
+    // =========================================================
+    try {
+      const url = `https://bolls.life/dictionary-definition/BDBT/${word.strongs}/`;
+      const response = await fetch(url);
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data[0]) {
+          const entry = data[0];
+
+          // Use API transliteration if better than our generated one
+          if (entry.transliteration && entry.transliteration.length > 1) {
+            // Clean up the transliteration (remove special chars)
+            word.translit = entry.transliteration
+              .replace(/[ʼˈˌ]/g, "'")
+              .replace(/[āâ]/g, 'a')
+              .replace(/[ēêé]/g, 'e')
+              .replace(/[īîı̂]/g, 'i')
+              .replace(/[ōôó]/g, 'o')
+              .replace(/[ūû]/g, 'u');
+          }
+
+          // =====================================================
+          // TIER 2: Parse full BDB definition for better gloss
+          // =====================================================
+          const fullDef = entry.definition || '';
+          let bestGloss = extractBestGloss(fullDef, language);
+
+          if (bestGloss) {
+            word.english = bestGloss;
+            console.log(`  ✓ Parsed: ${word.strongs} → "${bestGloss}"`);
+          } else {
+            // =================================================
+            // TIER 3: Fallback to short_definition
+            // =================================================
+            const shortDef = entry.short_definition || '';
+            word.english = shortDef
               .replace(/<[^>]*>/g, '')
               .split(/[,;]/)[0]
               .trim()
               .substring(0, 25);
+            console.log(`  ~ Fallback: ${word.strongs} → "${word.english}"`);
           }
         }
-      } catch (e) {
-        // Skip failed lookups silently
+      }
+    } catch (e) {
+      console.log(`  ✗ API error for ${word.strongs}: ${e.message}`);
+    }
+  }
+
+  return enriched;
+}
+
+// =============================================================================
+// EXTRACT BEST GLOSS FROM BDB DEFINITION
+// =============================================================================
+// The BDB (Brown-Driver-Briggs) definition contains rich information but
+// in complex HTML format. This function extracts the most appropriate gloss.
+//
+// Strategy:
+//   1. Look for the primary meaning in the first <li> or <ol> element
+//   2. Extract verbs in "to X" format for action words
+//   3. Handle nouns and other parts of speech appropriately
+//   4. Prefer shorter, cleaner glosses
+// =============================================================================
+function extractBestGloss(htmlDef, language) {
+  if (!htmlDef) return null;
+
+  // Remove HTML tags but preserve structure hints
+  let text = htmlDef
+    .replace(/<br\s*\/?>/gi, ' ')
+    .replace(/<p\s*\/?>/gi, ' ')
+    .replace(/<\/p>/gi, ' ')
+    .replace(/<li>/gi, '|ITEM|')
+    .replace(/<\/li>/gi, ' ')
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  // Split by list items
+  const items = text.split('|ITEM|').filter(s => s.trim());
+
+  if (items.length === 0) return null;
+
+  // Look through items for best gloss
+  for (const item of items) {
+    const cleaned = item.trim();
+
+    // Skip if too short or just a reference
+    if (cleaned.length < 2) continue;
+    if (/^[A-Z]?\d+$/.test(cleaned)) continue; // Just a number
+    if (/^Origin:/.test(cleaned)) continue;
+    if (/^TWOT/.test(cleaned)) continue;
+    if (/^Part\(s\)/.test(cleaned)) continue;
+    if (/^Phonetic:/.test(cleaned)) continue;
+    if (/^Transliteration:/.test(cleaned)) continue;
+    if (/^Original:/.test(cleaned)) continue;
+    if (/^BDB Definition/.test(cleaned)) continue;
+
+    // Extract the gloss - look for patterns like "to speak", "God", etc.
+
+    // Pattern 1: "to VERB" at start
+    const verbMatch = cleaned.match(/^to\s+(\w+)/i);
+    if (verbMatch) {
+      return verbMatch[0].toLowerCase();
+    }
+
+    // Pattern 2: Simple noun/adjective at start (before punctuation)
+    const simpleMatch = cleaned.match(/^([a-zA-Z][a-zA-Z\s-]{1,20}?)(?:[,;:\(\[]|$)/);
+    if (simpleMatch) {
+      const gloss = simpleMatch[1].trim().toLowerCase();
+      // Skip if it's just a letter/number or too generic
+      if (gloss.length > 1 && !/^[a-z]$/.test(gloss)) {
+        return gloss;
       }
     }
   }
-  
-  return enriched;
+
+  return null;
 }
 
 // Pre-loaded popular verses for instant access
@@ -423,9 +752,9 @@ export default async function handler(req, res) {
     const data = await fetchFromBolls(parsed.bookNum, parsed.chapter, parsed.verseStart, language);
     
     if (data && data.words && data.words.length > 0) {
-      // Enrich with Strong's definitions
+      // Enrich with Strong's definitions (pass language for cache lookup)
       console.log('📚 Enriching with Strong\'s definitions...');
-      const enrichedWords = await enrichWithStrongs(data.words);
+      const enrichedWords = await enrichWithStrongs(data.words, language);
       
       const response = {
         reference: referenceKey,
