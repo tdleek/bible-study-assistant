@@ -262,23 +262,39 @@
             
             <!-- Search Box -->
             <div class="w-full max-w-xl mx-auto mb-6">
-                <input 
+                <input
                     type="text"
                     x-model="userQuery"
                     @keydown.enter="handleSearch()"
                     placeholder="Try: 'John 3:16' or 'What does the Bible say about grace?'"
                     class="w-full rounded-2xl px-6 py-5 font-lora text-lg border-2 transition-all focus:outline-none focus:ring-4"
-                    :class="darkMode 
-                        ? 'bg-[#243044] border-[#C0C5D9]/30 text-[#F5F5F0] placeholder-[#9BA4B8] focus:border-[#C0C5D9] focus:ring-[#C0C5D9]/20' 
+                    :class="darkMode
+                        ? 'bg-[#243044] border-[#C0C5D9]/30 text-[#F5F5F0] placeholder-[#9BA4B8] focus:border-[#C0C5D9] focus:ring-[#C0C5D9]/20'
                         : 'bg-white border-[#D4A017]/30 text-[#0F1C3A] placeholder-[#6B5D4A] focus:border-[#D4A017] focus:ring-[#D4A017]/20'"
                 />
             </div>
-            
-            <button 
+
+            <!-- Mode Toggle on Home Screen -->
+            <div class="flex items-center justify-center gap-4 mb-6">
+                <button @click="comparativeMode = !comparativeMode"
+                        class="px-4 py-2 rounded-xl font-inter text-sm font-medium border-2 transition-all hover:scale-105"
+                        :class="comparativeMode
+                            ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332] border-[#C0C5D9]' : 'bg-[#D4A017] text-white border-[#D4A017]')
+                            : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/50 hover:border-[#C0C5D9]' : 'bg-transparent text-[#D4A017] border-[#D4A017]/50 hover:border-[#D4A017]')">
+                    <span x-text="comparativeMode ? '🕊️ Comparative Mode ON' : '📖 Standard Mode'"></span>
+                </button>
+                <span class="text-xs max-w-48 text-center transition-colors"
+                      :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#FFE8E0]/90'">
+                    <span x-show="!comparativeMode">Click to see Protestant, Catholic & Orthodox perspectives</span>
+                    <span x-show="comparativeMode">Will show perspectives from different Christian traditions</span>
+                </span>
+            </div>
+
+            <button
                 @click="handleSearch()"
                 class="font-inter font-semibold text-lg px-10 py-4 rounded-xl transition-all hover:scale-105 hover:shadow-lg"
-                :class="darkMode 
-                    ? 'bg-[#C0C5D9] text-[#1A2332] hover:bg-[#E8ECF4]' 
+                :class="darkMode
+                    ? 'bg-[#C0C5D9] text-[#1A2332] hover:bg-[#E8ECF4]'
                     : 'bg-[#D4A017] text-[#0F1C3A] hover:bg-[#FFB627]'">
                 Begin Your Journey
             </button>
