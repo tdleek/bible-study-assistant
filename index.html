@@ -236,8 +236,8 @@
     
     <!-- ==================== HERO SECTION ==================== -->
     <section x-show="!hasSearched" class="hero-gradient min-h-screen flex flex-col items-center justify-center px-4 relative">
-        <!-- Animated Path (negative z-index keeps it behind all content) -->
-        <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-30" style="z-index: -1;">
+        <!-- Animated Path (z-index 1, content is z-10+) -->
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-[1] opacity-40">
             <svg class="w-48 h-[80vh] path-glow" viewBox="0 0 200 600" fill="none">
                 <path class="path-line" 
                       d="M100 600 Q 60 500, 100 450 Q 140 400, 100 350 Q 60 300, 100 250 Q 140 200, 100 150 Q 80 100, 100 50"
