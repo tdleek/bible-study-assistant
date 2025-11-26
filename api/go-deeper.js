@@ -1,6 +1,6 @@
-// api/xray.js
+// api/go-deeper.js
 // =============================================================================
-// X-RAY MODE API - Deep Scripture Analysis
+// GO DEEPER API - Deep Scripture Analysis
 // =============================================================================
 //
 // This endpoint provides comprehensive, AI-generated explanations for Bible
@@ -22,10 +22,10 @@ const MODELS = {
 };
 
 // =============================================================================
-// X-RAY SYSTEM PROMPT
+// GO DEEPER SYSTEM PROMPT
 // =============================================================================
 
-const XRAY_SYSTEM_PROMPT = `You are a world-class Bible scholar and teacher who makes Scripture accessible to everyday believers. Your goal is to help people truly understand God's Word—not just read it.
+const GO_DEEPER_SYSTEM_PROMPT = `You are a world-class Bible scholar and teacher who makes Scripture accessible to everyday believers. Your goal is to help people truly understand God's Word—not just read it.
 
 You combine:
 - Seminary-level biblical scholarship
@@ -147,32 +147,32 @@ export default async function handler(req, res) {
     }
 
     // Build the user prompt
-    const userPrompt = buildXrayPrompt(verse, verseText, translation, perspective);
+    const userPrompt = buildGoDeepPrompt(verse, verseText, translation, perspective);
 
     // Call the appropriate AI provider
-    let xrayResponse;
+    let goDeepResponse;
 
     if (provider === 'claude') {
-      xrayResponse = await callClaudeForXray(userPrompt, claudeKey);
+      goDeepResponse = await callClaudeForGoDeep(userPrompt, claudeKey);
     } else {
-      xrayResponse = await callGroqForXray(userPrompt, groqKey);
+      goDeepResponse = await callGroqForGoDeep(userPrompt, groqKey);
     }
 
     // Parse the JSON response
-    const parsedXray = parseXrayResponse(xrayResponse);
+    const parsedResponse = parseGoDeepResponse(goDeepResponse);
 
-    // Return the structured X-Ray data
+    // Return the structured Go Deeper data
     return res.status(200).json({
       success: true,
       verse: verse,
       translation: translation || 'ESV',
       perspective: perspective || 'protestant',
       provider: provider,
-      sections: parsedXray
+      sections: parsedResponse
     });
 
   } catch (error) {
-    console.error('X-Ray API error:', error);
+    console.error('Go Deeper API error:', error);
     return res.status(500).json({
       error: 'Internal server error',
       message: error.message
@@ -184,8 +184,8 @@ export default async function handler(req, res) {
 // PROMPT BUILDER
 // =============================================================================
 
-function buildXrayPrompt(verse, verseText, translation, perspective) {
-  let prompt = `Provide an X-Ray analysis for: ${verse}`;
+function buildGoDeepPrompt(verse, verseText, translation, perspective) {
+  let prompt = `Provide a deep analysis for: ${verse}`;
 
   if (verseText) {
     prompt += `\n\nVerse text (${translation || 'ESV'}): "${verseText}"`;
@@ -208,7 +208,7 @@ function buildXrayPrompt(verse, verseText, translation, perspective) {
 // GROQ API HANDLER
 // =============================================================================
 
-async function callGroqForXray(userPrompt, apiKey) {
+async function callGroqForGoDeep(userPrompt, apiKey) {
   const response = await fetch(MODELS.groq.endpoint, {
     method: 'POST',
     headers: {
@@ -218,7 +218,7 @@ async function callGroqForXray(userPrompt, apiKey) {
     body: JSON.stringify({
       model: MODELS.groq.default,
       messages: [
-        { role: 'system', content: XRAY_SYSTEM_PROMPT },
+        { role: 'system', content: GO_DEEPER_SYSTEM_PROMPT },
         { role: 'user', content: userPrompt }
       ],
       temperature: 0.7,
@@ -241,7 +241,7 @@ async function callGroqForXray(userPrompt, apiKey) {
 // CLAUDE API HANDLER
 // =============================================================================
 
-async function callClaudeForXray(userPrompt, apiKey) {
+async function callClaudeForGoDeep(userPrompt, apiKey) {
   const response = await fetch(MODELS.claude.endpoint, {
     method: 'POST',
     headers: {
@@ -253,7 +253,7 @@ async function callClaudeForXray(userPrompt, apiKey) {
       model: MODELS.claude.default,
       max_tokens: 4000,
       temperature: 0.7,
-      system: XRAY_SYSTEM_PROMPT,
+      system: GO_DEEPER_SYSTEM_PROMPT,
       messages: [
         { role: 'user', content: userPrompt }
       ]
@@ -274,7 +274,7 @@ async function callClaudeForXray(userPrompt, apiKey) {
 // RESPONSE PARSER
 // =============================================================================
 
-function parseXrayResponse(responseText) {
+function parseGoDeepResponse(responseText) {
   try {
     // Try to extract JSON from the response
     // Sometimes the AI might wrap it in code blocks
@@ -306,7 +306,7 @@ function parseXrayResponse(responseText) {
     return parsed;
 
   } catch (error) {
-    console.error('Failed to parse X-Ray response:', error);
+    console.error('Failed to parse Go Deeper response:', error);
     console.error('Raw response:', responseText);
 
     // Return a fallback structure with error message

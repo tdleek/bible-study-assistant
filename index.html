@@ -468,6 +468,83 @@
                 </button>
             </div>
 
+            <!-- Go Deeper Feature Card -->
+            <div class="w-full max-w-xl mx-auto mt-12 mb-4">
+                <div class="rounded-2xl p-6 border-2 transition-all"
+                     :class="darkMode
+                         ? 'bg-gradient-to-br from-[#243044] to-[#2D3A52] border-[#C0C5D9]/30'
+                         : 'bg-gradient-to-br from-[#FFFDF9] to-[#F5F0E6] border-[#e0d9cb] shadow-[0_4px_16px_rgba(61,50,37,0.1)]'">
+
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="text-2xl">🔍</span>
+                        <h3 class="font-playfair text-xl font-bold"
+                            :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
+                            Go Deeper
+                        </h3>
+                        <span class="px-2 py-0.5 rounded-full text-xs font-inter font-semibold"
+                              :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#c4960c]/15 text-[#c4960c]'">
+                            NEW
+                        </span>
+                    </div>
+
+                    <p class="font-lora text-sm mb-4"
+                       :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
+                        Understand the <em>why</em> behind the words — cultural context, original languages, and what it means for you today.
+                    </p>
+
+                    <div class="flex gap-2 mb-3">
+                        <input type="text"
+                               x-model="goDeeperVerseRef"
+                               @keydown.enter="homeGoDeep()"
+                               placeholder="Enter verse (e.g., John 3:16)"
+                               class="flex-1 rounded-xl px-4 py-3 font-inter text-sm border-2 transition-all focus:outline-none"
+                               :class="darkMode
+                                   ? 'bg-[#1A2332] border-[#C0C5D9]/30 text-[#F5F5F0] placeholder-[#9BA4B8] focus:border-[#C0C5D9]'
+                                   : 'bg-white border-[#e0d9cb] text-[#3d3225] placeholder-[#a69d8a] focus:border-[#c4960c]'">
+                        <button @click="homeGoDeep()"
+                                :disabled="goDeeperLoading || !goDeeperVerseRef.trim()"
+                                class="px-5 py-3 rounded-xl font-inter font-semibold transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
+                                :class="darkMode
+                                    ? 'bg-[#C0C5D9] text-[#1A2332] hover:bg-[#E8ECF4]'
+                                    : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white'">
+                            <span x-show="!goDeeperLoading">Go →</span>
+                            <span x-show="goDeeperLoading" class="flex items-center gap-1">
+                                <span class="animate-spin text-sm">⏳</span>
+                            </span>
+                        </button>
+                    </div>
+
+                    <!-- Popular Verses Quick Links -->
+                    <div class="flex flex-wrap items-center gap-1 text-xs font-inter"
+                         :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
+                        <span>Try:</span>
+                        <button @click="goDeeperVerseRef = 'John 3:16'; homeGoDeep()"
+                                class="px-2 py-1 rounded-lg transition-colors hover:scale-105"
+                                :class="darkMode ? 'text-[#C0C5D9] hover:bg-[#C0C5D9]/10' : 'text-[#c4960c] hover:bg-[#c4960c]/10'">
+                            John 3:16
+                        </button>
+                        <span>·</span>
+                        <button @click="goDeeperVerseRef = 'Romans 8:28'; homeGoDeep()"
+                                class="px-2 py-1 rounded-lg transition-colors hover:scale-105"
+                                :class="darkMode ? 'text-[#C0C5D9] hover:bg-[#C0C5D9]/10' : 'text-[#c4960c] hover:bg-[#c4960c]/10'">
+                            Romans 8:28
+                        </button>
+                        <span>·</span>
+                        <button @click="goDeeperVerseRef = 'Psalm 23:1'; homeGoDeep()"
+                                class="px-2 py-1 rounded-lg transition-colors hover:scale-105"
+                                :class="darkMode ? 'text-[#C0C5D9] hover:bg-[#C0C5D9]/10' : 'text-[#c4960c] hover:bg-[#c4960c]/10'">
+                            Psalm 23:1
+                        </button>
+                        <span>·</span>
+                        <button @click="goDeeperVerseRef = 'Jeremiah 29:11'; homeGoDeep()"
+                                class="px-2 py-1 rounded-lg transition-colors hover:scale-105"
+                                :class="darkMode ? 'text-[#C0C5D9] hover:bg-[#C0C5D9]/10' : 'text-[#c4960c] hover:bg-[#c4960c]/10'">
+                            Jeremiah 29:11
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Tagline -->
             <p class="mt-16 font-lora text-sm italic transition-colors"
                :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
@@ -1113,14 +1190,14 @@
                     </div>
 
                     <div class="flex flex-wrap items-center gap-2">
-                        <!-- X-Ray Button (Primary Feature) -->
+                        <!-- Go Deeper Button (Primary Feature) -->
                         <button @click="fetchXray(verseLookupResult.reference, verseLookupResult.text)"
                                 class="flex items-center gap-2 px-3 py-2 rounded-lg font-inter text-sm border transition-all hover:scale-105"
                                 :class="showXrayPanel
                                     ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white')
                                     : (darkMode ? 'bg-gradient-to-r from-[#C0C5D9]/20 to-[#9BA4B8]/20 text-[#C0C5D9] border-[#C0C5D9]/50 hover:border-[#C0C5D9]' : 'bg-gradient-to-r from-[#c4960c]/15 to-[#daa520]/15 text-[#c4960c] border-[#c4960c]/50 hover:border-[#c4960c]')">
-                            <span>🔬</span>
-                            <span>X-Ray</span>
+                            <span>🔍</span>
+                            <span>Go Deeper</span>
                         </button>
 
                         <!-- Compare Translations Button -->
@@ -1667,7 +1744,7 @@
         </div>
     </div>
 
-    <!-- ==================== X-RAY MODE PANEL ==================== -->
+    <!-- ==================== GO DEEPER PANEL ==================== -->
     <div x-show="showXrayPanel"
          x-transition:enter="transition ease-out duration-200"
          x-transition:enter-start="opacity-0"
@@ -1684,15 +1761,15 @@
             <div class="flex justify-between items-start mb-6">
                 <div>
                     <div class="flex items-center gap-2 mb-2">
-                        <span class="text-2xl">🔬</span>
+                        <span class="text-2xl">🔍</span>
                         <h2 class="font-playfair text-2xl font-bold"
                             :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
-                            X-Ray Mode
+                            Go Deeper
                         </h2>
                     </div>
                     <p class="font-inter text-sm"
                        :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
-                        Deep analysis of <span class="font-semibold" x-text="xrayVerseRef"></span>
+                        Understanding <span class="font-semibold" x-text="xrayVerseRef"></span>
                     </p>
                 </div>
                 <button @click="closeXray()"
@@ -1707,10 +1784,10 @@
                 <div class="animate-spin rounded-full h-12 w-12 border-3 mx-auto mb-4"
                      :class="darkMode ? 'border-[#C0C5D9] border-t-transparent' : 'border-[#c4960c] border-t-transparent'"></div>
                 <p class="font-inter text-base" :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
-                    Analyzing Scripture...
+                    Going deeper...
                 </p>
                 <p class="font-inter text-sm mt-2" :class="darkMode ? 'text-[#9BA4B8]/70' : 'text-[#7a6f5f]/70'">
-                    Examining context, language, and connections
+                    Exploring context, language, and connections
                 </p>
             </div>
 
@@ -1727,7 +1804,7 @@
                 </button>
             </div>
 
-            <!-- X-Ray Content -->
+            <!-- Go Deeper Content -->
             <div x-show="xrayData && !xrayLoading" class="space-y-4">
 
                 <!-- Section: What It Means (expanded by default) -->
@@ -1923,7 +2000,7 @@
                     :class="darkMode
                         ? 'bg-[#C0C5D9] text-[#1A2332] hover:bg-[#E8ECF4]'
                         : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white hover:from-[#daa520] hover:to-[#e6b836] shadow-[0_4px_12px_rgba(196,150,12,0.3)]'">
-                Close X-Ray
+                Close
             </button>
         </div>
     </div>
@@ -2036,17 +2113,21 @@
                 readingPlanProgress: {},          // { planId: { completedDays: [1, 2, 3], startDate: '...' } }
 
                 // ===========================================
-                // X-RAY MODE - Deep Scripture Analysis
+                // GO DEEPER - Deep Scripture Analysis
                 // ===========================================
-                showXrayPanel: false,             // Show/hide X-Ray panel
-                xrayData: null,                   // Parsed X-Ray response data
+                showXrayPanel: false,             // Show/hide Go Deeper panel
+                xrayData: null,                   // Parsed Go Deeper response data
                 xrayLoading: false,               // Loading state
                 xrayError: null,                  // Error message if any
                 xrayExpandedSections: ['meaning'], // Which sections are expanded (default: meaning)
-                xrayVerseRef: null,               // The verse being X-Rayed
+                xrayVerseRef: null,               // The verse being analyzed
                 xrayFollowUpQuery: '',            // Follow-up question input
                 xrayFollowUpResponse: '',         // Response to follow-up question
                 xrayFollowUpLoading: false,       // Loading state for follow-up
+
+                // Home page Go Deeper entry point
+                goDeeperVerseRef: '',             // Verse reference input on home page
+                goDeeperLoading: false,           // Loading state for home page entry
 
                 // ===========================================
                 // INTERLINEAR DATABASE (Hebrew/Greek word-by-word) - EXPANDED VERSION
@@ -3808,7 +3889,7 @@ Each perspective should be 2-3 sentences. Use the ${this.selectedTranslation} tr
                 },
 
                 // ===========================================
-                // X-RAY MODE METHODS - Deep Scripture Analysis
+                // GO DEEPER METHODS - Deep Scripture Analysis
                 // ===========================================
 
                 async fetchXray(verseRef, verseText) {
@@ -3835,7 +3916,7 @@ Each perspective should be 2-3 sentences. Use the ${this.selectedTranslation} tr
                     this.xrayFollowUpResponse = '';
 
                     try {
-                        const response = await fetch('/api/xray', {
+                        const response = await fetch('/api/go-deeper', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
@@ -3850,7 +3931,7 @@ Each perspective should be 2-3 sentences. Use the ${this.selectedTranslation} tr
                         const data = await response.json();
 
                         if (!response.ok || !data.success) {
-                            throw new Error(data.message || 'Failed to generate X-Ray analysis');
+                            throw new Error(data.message || 'Failed to generate analysis');
                         }
 
                         this.xrayData = data.sections;
@@ -3859,10 +3940,47 @@ Each perspective should be 2-3 sentences. Use the ${this.selectedTranslation} tr
                         this.saveXrayToCache(cacheKey, data.sections);
 
                     } catch (error) {
-                        console.error('X-Ray error:', error);
+                        console.error('Go Deeper error:', error);
                         this.xrayError = error.message || 'Failed to analyze verse. Please try again.';
                     } finally {
                         this.xrayLoading = false;
+                    }
+                },
+
+                // Home page Go Deeper entry point
+                async homeGoDeep() {
+                    if (!this.goDeeperVerseRef.trim()) return;
+
+                    this.goDeeperLoading = true;
+
+                    try {
+                        // First, fetch the verse text using the existing verse API
+                        const verseResponse = await fetch('/api/verse', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                reference: this.goDeeperVerseRef.trim(),
+                                translation: this.selectedTranslation
+                            })
+                        });
+
+                        const verseData = await verseResponse.json();
+
+                        if (!verseResponse.ok || !verseData.text) {
+                            throw new Error(verseData.error || 'Could not find that verse. Please check the reference and try again.');
+                        }
+
+                        // Now trigger Go Deeper with the verse reference and text
+                        this.goDeeperLoading = false;
+                        await this.fetchXray(verseData.reference || this.goDeeperVerseRef.trim(), verseData.text);
+
+                    } catch (error) {
+                        console.error('Home Go Deeper error:', error);
+                        this.goDeeperLoading = false;
+                        // Show the error in the Go Deeper panel
+                        this.xrayVerseRef = this.goDeeperVerseRef.trim();
+                        this.xrayError = error.message || 'Failed to load verse. Please check the reference.';
+                        this.showXrayPanel = true;
                     }
                 },
 
@@ -3902,7 +4020,7 @@ Each perspective should be 2-3 sentences. Use the ${this.selectedTranslation} tr
                                 messages: [
                                     {
                                         role: 'system',
-                                        content: `You are a Bible scholar helping someone understand ${this.xrayVerseRef}. They have already seen an X-Ray analysis of this verse. Answer their follow-up question concisely but thoroughly. Use plain language. If relevant, include original language insights or cross-references.`
+                                        content: `You are a Bible scholar helping someone understand ${this.xrayVerseRef}. They have already seen a deep analysis of this verse. Answer their follow-up question concisely but thoroughly. Use plain language. If relevant, include original language insights or cross-references.`
                                     },
                                     {
                                         role: 'user',
@@ -3922,14 +4040,14 @@ Each perspective should be 2-3 sentences. Use the ${this.selectedTranslation} tr
                         this.xrayFollowUpResponse = data.message;
 
                     } catch (error) {
-                        console.error('X-Ray follow-up error:', error);
+                        console.error('Go Deeper follow-up error:', error);
                         this.xrayFollowUpResponse = 'Sorry, I couldn\'t process your question. Please try again.';
                     } finally {
                         this.xrayFollowUpLoading = false;
                     }
                 },
 
-                // X-Ray localStorage caching
+                // Go Deeper localStorage caching
                 getXrayFromCache(key) {
                     try {
                         const cached = localStorage.getItem(key);
@@ -3955,7 +4073,7 @@ Each perspective should be 2-3 sentences. Use the ${this.selectedTranslation} tr
                             timestamp: Date.now()
                         }));
                     } catch (error) {
-                        console.warn('Failed to cache X-Ray data:', error);
+                        console.warn('Failed to cache Go Deeper data:', error);
                     }
                 },
 
