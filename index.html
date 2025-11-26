@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" x-data="{ darkMode: true }" :class="{ 'dark': darkMode }">
+<html lang="en"
+      x-data="{ darkMode: localStorage.getItem('gospelpath-theme') !== 'light' }"
+      x-init="$watch('darkMode', val => localStorage.setItem('gospelpath-theme', val ? 'dark' : 'light'))"
+      :class="{ 'dark': darkMode }">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -263,6 +266,20 @@
         </div>
     </nav>
     
+    <!-- ==================== FLOATING THEME TOGGLE (Home Page) ==================== -->
+    <!-- Shows on home page when the main nav is hidden -->
+    <div x-show="!showNav"
+         class="fixed top-4 right-4 z-50">
+        <button @click="darkMode = !darkMode"
+                class="w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all hover:scale-110 shadow-lg backdrop-blur-md"
+                :class="darkMode
+                    ? 'bg-[#1A2332]/90 text-[#C0C5D9] border-[#C0C5D9]/30 hover:bg-[#243044]'
+                    : 'bg-white/90 text-[#D4A017] border-[#D4A017]/30 hover:bg-[#FDFBF7]'"
+                :title="darkMode ? 'Switch to Emmaus Road (light) theme' : 'Switch to Gethsemane (dark) theme'">
+            <span class="text-xl" x-text="darkMode ? '☀️' : '🌙'"></span>
+        </button>
+    </div>
+
     <!-- ==================== HERO SECTION ==================== -->
     <section x-show="!hasSearched" class="hero-gradient min-h-screen flex flex-col items-center justify-center px-4 relative">
         <!-- Animated Path (z-index 1, content is z-10+) -->
