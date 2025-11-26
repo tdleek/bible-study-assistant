@@ -192,14 +192,31 @@
                 <!-- Translation Selector -->
                 <select x-model="selectedTranslation"
                         class="rounded-lg px-3 py-2 font-inter text-sm border cursor-pointer transition-colors"
-                        :class="darkMode 
-                            ? 'bg-[#243044] text-[#F5F5F0] border-[#C0C5D9]/30' 
+                        :class="darkMode
+                            ? 'bg-[#243044] text-[#F5F5F0] border-[#C0C5D9]/30'
                             : 'bg-white text-[#0F1C3A] border-[#D4A017]/30'">
-                    <option value="ESV">ESV</option>
-                    <option value="NIV">NIV</option>
-                    <option value="KJV">KJV</option>
-                    <option value="NASB">NASB</option>
-                    <option value="NLT">NLT</option>
+                    <!-- Popular Translations -->
+                    <optgroup label="Popular">
+                        <option value="ESV">ESV</option>
+                        <option value="NIV">NIV</option>
+                        <option value="KJV">KJV</option>
+                        <option value="NKJV">NKJV</option>
+                        <option value="NASB">NASB</option>
+                        <option value="NLT">NLT</option>
+                    </optgroup>
+                    <!-- Additional Translations -->
+                    <optgroup label="Additional">
+                        <option value="AMP">AMP - Amplified</option>
+                        <option value="CSB">CSB</option>
+                        <option value="MSG">MSG - The Message</option>
+                        <option value="NRSV">NRSV</option>
+                        <option value="WEB">WEB - World English</option>
+                        <option value="YLT">YLT - Young's Literal</option>
+                    </optgroup>
+                    <!-- Historical Translations -->
+                    <optgroup label="Historical">
+                        <option value="Tyndale">Tyndale (1525)</option>
+                    </optgroup>
                 </select>
                 
                 <!-- Translation Compare Toggle -->
@@ -347,13 +364,14 @@
 
                 <!-- Translation Selector (shows when compare mode is on) -->
                 <div x-show="translationCompareMode" class="flex flex-wrap justify-center gap-2">
-                    <template x-for="trans in ['ESV', 'NIV', 'KJV', 'NASB', 'NLT', 'NKJV']" :key="trans">
-                        <button @click="toggleTranslation(trans)"
+                    <!-- All available translations for comparison -->
+                    <template x-for="trans in availableTranslations" :key="trans.value">
+                        <button @click="toggleTranslation(trans.value)"
                                 class="px-3 py-1 rounded-lg font-inter text-xs font-medium border transition-all"
-                                :class="selectedTranslationsToCompare.includes(trans)
+                                :class="selectedTranslationsToCompare.includes(trans.value)
                                     ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-[#D4A017] text-white')
                                     : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-transparent text-[#FFE8E0] border-[#FFE8E0]/30')"
-                                x-text="trans"></button>
+                                x-text="trans.label"></button>
                     </template>
                 </div>
             </div>
@@ -513,12 +531,28 @@
                                     :class="darkMode
                                         ? 'bg-[#1A2332] text-[#F5F5F0] border-[#C0C5D9]/30'
                                         : 'bg-white text-[#0F1C3A] border-[#D4A017]/30'">
-                                <option value="ESV">ESV</option>
-                                <option value="NIV">NIV</option>
-                                <option value="KJV">KJV</option>
-                                <option value="NASB">NASB</option>
-                                <option value="NLT">NLT</option>
-                                <option value="NKJV">NKJV</option>
+                                <!-- Popular Translations -->
+                                <optgroup label="Popular">
+                                    <option value="ESV">ESV - English Standard</option>
+                                    <option value="NIV">NIV - New International</option>
+                                    <option value="KJV">KJV - King James</option>
+                                    <option value="NKJV">NKJV - New King James</option>
+                                    <option value="NASB">NASB - New American Standard</option>
+                                    <option value="NLT">NLT - New Living</option>
+                                </optgroup>
+                                <!-- Additional Translations -->
+                                <optgroup label="Additional">
+                                    <option value="AMP">AMP - Amplified</option>
+                                    <option value="CSB">CSB - Christian Standard</option>
+                                    <option value="MSG">MSG - The Message</option>
+                                    <option value="NRSV">NRSV - New Revised Standard</option>
+                                    <option value="WEB">WEB - World English</option>
+                                    <option value="YLT">YLT - Young's Literal</option>
+                                </optgroup>
+                                <!-- Historical Translations -->
+                                <optgroup label="Historical">
+                                    <option value="Tyndale">Tyndale (1525)</option>
+                                </optgroup>
                             </select>
                         </div>
                     </div>
@@ -794,12 +828,25 @@
                             <select x-model="sideBySideLeft" @change="fetchSideBySideComparison()"
                                     class="rounded-lg px-2 py-1 font-inter text-sm border cursor-pointer"
                                     :class="darkMode ? 'bg-[#1A2332] text-[#F5F5F0] border-[#C0C5D9]/30' : 'bg-white text-[#0F1C3A] border-[#D4A017]/30'">
-                                <option value="ESV">ESV</option>
-                                <option value="NIV">NIV</option>
-                                <option value="KJV">KJV</option>
-                                <option value="NASB">NASB</option>
-                                <option value="NLT">NLT</option>
-                                <option value="NKJV">NKJV</option>
+                                <optgroup label="Popular">
+                                    <option value="ESV">ESV</option>
+                                    <option value="NIV">NIV</option>
+                                    <option value="KJV">KJV</option>
+                                    <option value="NKJV">NKJV</option>
+                                    <option value="NASB">NASB</option>
+                                    <option value="NLT">NLT</option>
+                                </optgroup>
+                                <optgroup label="Additional">
+                                    <option value="AMP">AMP</option>
+                                    <option value="CSB">CSB</option>
+                                    <option value="MSG">MSG</option>
+                                    <option value="NRSV">NRSV</option>
+                                    <option value="WEB">WEB</option>
+                                    <option value="YLT">YLT</option>
+                                </optgroup>
+                                <optgroup label="Historical">
+                                    <option value="Tyndale">Tyndale (1525)</option>
+                                </optgroup>
                             </select>
                         </div>
                         <span class="text-lg" :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#D4A017]'">⟷</span>
@@ -808,12 +855,25 @@
                             <select x-model="sideBySideRight" @change="fetchSideBySideComparison()"
                                     class="rounded-lg px-2 py-1 font-inter text-sm border cursor-pointer"
                                     :class="darkMode ? 'bg-[#1A2332] text-[#F5F5F0] border-[#C0C5D9]/30' : 'bg-white text-[#0F1C3A] border-[#D4A017]/30'">
-                                <option value="ESV">ESV</option>
-                                <option value="NIV">NIV</option>
-                                <option value="KJV">KJV</option>
-                                <option value="NASB">NASB</option>
-                                <option value="NLT">NLT</option>
-                                <option value="NKJV">NKJV</option>
+                                <optgroup label="Popular">
+                                    <option value="ESV">ESV</option>
+                                    <option value="NIV">NIV</option>
+                                    <option value="KJV">KJV</option>
+                                    <option value="NKJV">NKJV</option>
+                                    <option value="NASB">NASB</option>
+                                    <option value="NLT">NLT</option>
+                                </optgroup>
+                                <optgroup label="Additional">
+                                    <option value="AMP">AMP</option>
+                                    <option value="CSB">CSB</option>
+                                    <option value="MSG">MSG</option>
+                                    <option value="NRSV">NRSV</option>
+                                    <option value="WEB">WEB</option>
+                                    <option value="YLT">YLT</option>
+                                </optgroup>
+                                <optgroup label="Historical">
+                                    <option value="Tyndale">Tyndale (1525)</option>
+                                </optgroup>
                             </select>
                         </div>
                     </div>
@@ -944,13 +1004,13 @@
                     </div>
                     <!-- Translation Selector Pills -->
                     <div class="flex flex-wrap justify-center gap-2">
-                        <template x-for="trans in ['ESV', 'NIV', 'KJV', 'NASB', 'NLT', 'NKJV']" :key="trans">
-                            <button @click="toggleTranslation(trans); if(verseLookupResult) fetchTranslationComparison(verseLookupResult.reference)"
+                        <template x-for="trans in availableTranslations" :key="trans.value">
+                            <button @click="toggleTranslation(trans.value); if(verseLookupResult) fetchTranslationComparison(verseLookupResult.reference)"
                                     class="px-3 py-1 rounded-lg font-inter text-xs font-medium border transition-all hover:scale-105"
-                                    :class="selectedTranslationsToCompare.includes(trans)
+                                    :class="selectedTranslationsToCompare.includes(trans.value)
                                         ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-[#D4A017] text-white')
                                         : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-transparent text-[#D4A017] border-[#D4A017]/30')"
-                                    x-text="trans"></button>
+                                    x-text="trans.label"></button>
                         </template>
                     </div>
                 </div>
@@ -1221,6 +1281,27 @@
                 translationCompareMode: false,  // Translation comparison mode
                 selectedTranslationsToCompare: ['ESV', 'NIV', 'KJV'],  // Default translations to compare
                 translationCompareResults: null,  // Results from translation comparison
+
+                // All available Bible translations
+                // Organized by category: Popular, Additional, Historical
+                availableTranslations: [
+                    // Popular translations (most commonly used)
+                    { value: 'ESV', label: 'ESV' },
+                    { value: 'NIV', label: 'NIV' },
+                    { value: 'KJV', label: 'KJV' },
+                    { value: 'NKJV', label: 'NKJV' },
+                    { value: 'NASB', label: 'NASB' },
+                    { value: 'NLT', label: 'NLT' },
+                    // Additional translations
+                    { value: 'AMP', label: 'AMP' },
+                    { value: 'CSB', label: 'CSB' },
+                    { value: 'MSG', label: 'MSG' },
+                    { value: 'NRSV', label: 'NRSV' },
+                    { value: 'WEB', label: 'WEB' },
+                    { value: 'YLT', label: 'YLT' },
+                    // Historical translations
+                    { value: 'Tyndale', label: 'Tyndale' }
+                ],
                 // Side-by-side 2-version comparison
                 showSideBySide: false,
                 sideBySideLeft: 'ESV',
