@@ -36,18 +36,24 @@
             --text-secondary: #9BA4B8;
         }
         
-        /* Light Theme - Emmaus Road */
+        /* Light Theme - Emmaus Road (Warm Parchment) */
         :root {
-            --scripture-blue: #0F1C3A;
-            --sunrise-gold: #D4A017;
-            --warm-parchment: #FDFBF7;
-            --soft-dawn-pink: #FFE8E0;
-            --olive-green: #5D7555;
-            --accent: #D4A017;
-            --bg-primary: #FDFBF7;
-            --bg-secondary: #FFE8E0;
-            --text-primary: #0F1C3A;
-            --text-secondary: #5D7555;
+            --warm-parchment: #FAF7F2;
+            --parchment-dark: #F0EBE1;
+            --card-bg: #FFFDF9;
+            --card-border: #e0d9cb;
+            --card-shadow: rgba(61, 50, 37, 0.08);
+            --gold-accent: #c4960c;
+            --gold-accent-hover: #daa520;
+            --text-primary: #3d3225;
+            --text-secondary: #7a6f5f;
+            --text-placeholder: #a69d8a;
+            --btn-secondary-bg: #FFFDF9;
+            --btn-secondary-border: #d4cabb;
+            --btn-secondary-text: #5c5245;
+            --accent: #c4960c;
+            --bg-primary: #FAF7F2;
+            --bg-secondary: #F0EBE1;
         }
         
         .font-playfair { font-family: 'Playfair Display SC', serif; }
@@ -59,7 +65,7 @@
             background: linear-gradient(180deg, #1A2332 0%, #2D3A52 50%, #243044 100%);
         }
         .hero-gradient {
-            background: linear-gradient(180deg, #0F1C3A 0%, #FDFBF7 50%, #FFE8E0 100%);
+            background: linear-gradient(180deg, #FAF7F2 0%, #F0EBE1 100%);
         }
         
         /* Path Animations */
@@ -137,8 +143,8 @@
     </style>
 </head>
 
-<body class="font-inter antialiased transition-colors duration-300" 
-      :class="darkMode ? 'bg-[#1A2332]' : 'bg-[#FDFBF7]'" 
+<body class="font-inter antialiased transition-colors duration-300"
+      :class="darkMode ? 'bg-[#1A2332]' : 'bg-[#FAF7F2]'" 
       x-data="gospelPathApp()">
     
     <!-- ==================== DAILY VERSE WIDGET ==================== -->
@@ -148,23 +154,23 @@
          x-transition:enter-end="opacity-100 transform translate-y-0"
          class="fixed top-4 left-1/2 transform -translate-x-1/2 z-40 w-11/12 max-w-xl">
         <div class="rounded-xl p-4 backdrop-blur-md border transition-colors relative overflow-hidden"
-             :class="darkMode 
-                 ? 'bg-[#243044]/80 border-[#C0C5D9]/30' 
-                 : 'bg-white/80 border-[#D4A017]/30'">
+             :class="darkMode
+                 ? 'bg-[#243044]/80 border-[#C0C5D9]/30'
+                 : 'bg-[#FFFDF9]/90 border-[#e0d9cb] shadow-[0_4px_12px_rgba(61,50,37,0.08)]'">
             <div class="daily-verse-shimmer absolute inset-0 pointer-events-none"></div>
             <div class="relative z-10">
                 <div class="flex items-center gap-2 mb-2">
                     <span class="text-lg">✨</span>
                     <span class="font-inter text-xs font-semibold uppercase tracking-wider transition-colors"
-                          :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#D4A017]'">
+                          :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#c4960c]'">
                         Today's Verse
                     </span>
                 </div>
                 <p class="font-lora text-sm italic leading-relaxed transition-colors"
-                   :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#0F1C3A]'"
+                   :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#3d3225]'"
                    x-text="dailyVerse.text"></p>
                 <p class="font-inter text-xs mt-2 transition-colors"
-                   :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#6B5D4A]'"
+                   :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'"
                    x-text="'— ' + dailyVerse.reference"></p>
             </div>
         </div>
@@ -174,18 +180,18 @@
     <nav x-show="showNav" 
          x-transition
          class="fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b transition-colors"
-         :class="darkMode 
-             ? 'bg-[#1A2332]/95 border-[#C0C5D9]/20' 
-             : 'bg-[#FDFBF7]/95 border-[#D4A017]/30'">
+         :class="darkMode
+             ? 'bg-[#1A2332]/95 border-[#C0C5D9]/20'
+             : 'bg-[#FAF7F2]/95 border-[#e0d9cb]'">
         <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
             <!-- Logo -->
             <a href="#" @click.prevent="resetToHome()" class="flex items-center gap-3 group">
                 <div class="w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 group-hover:scale-110"
-                     :class="darkMode ? 'border-[#C0C5D9] bg-[#C0C5D9]/10' : 'border-[#D4A017] bg-[#D4A017]/10'">
+                     :class="darkMode ? 'border-[#C0C5D9] bg-[#C0C5D9]/10' : 'border-[#c4960c] bg-[#c4960c]/10'">
                     <span class="text-xl">✝</span>
                 </div>
                 <span class="font-playfair text-xl transition-colors"
-                      :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'">
+                      :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
                     GospelPath
                 </span>
             </a>
@@ -199,7 +205,7 @@
                         class="rounded-lg px-3 py-2 font-inter text-sm border cursor-pointer transition-colors"
                         :class="darkMode
                             ? 'bg-[#243044] text-[#F5F5F0] border-[#C0C5D9]/30'
-                            : 'bg-white text-[#0F1C3A] border-[#D4A017]/30'">
+                            : 'bg-[#FFFDF9] text-[#3d3225] border-[#d4cabb]'">
                     <!-- Popular Translations -->
                     <optgroup label="Popular">
                         <option value="ESV">ESV</option>
@@ -228,8 +234,8 @@
                 <button @click="translationCompareMode = !translationCompareMode; if(verseLookupResult && translationCompareMode) fetchTranslationComparison(verseLookupResult.reference)"
                         class="px-3 py-2 rounded-lg font-inter text-sm border transition-all"
                         :class="translationCompareMode
-                            ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-[#D4A017] text-white')
-                            : (darkMode ? 'bg-[#243044] text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-white text-[#D4A017] border-[#D4A017]/30')"
+                            ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white')
+                            : (darkMode ? 'bg-[#243044] text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-[#FFFDF9] text-[#5c5245] border-[#d4cabb]')"
                         title="Compare translations side-by-side">
                     <span x-text="translationCompareMode ? '📚 Comparing' : '📚 Compare'"></span>
                 </button>
@@ -238,8 +244,8 @@
                 <button @click="comparativeMode = !comparativeMode; if(comparativeMode && userQuery) handleSearch()"
                         class="px-3 py-2 rounded-lg font-inter text-sm border transition-all"
                         :class="comparativeMode
-                            ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-[#D4A017] text-white')
-                            : (darkMode ? 'bg-[#243044] text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-white text-[#D4A017] border-[#D4A017]/30')"
+                            ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white')
+                            : (darkMode ? 'bg-[#243044] text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-[#FFFDF9] text-[#5c5245] border-[#d4cabb]')"
                         title="Protestant, Catholic, Orthodox perspectives">
                     <span x-text="comparativeMode ? '⛪ Views ON' : '⛪ Views'"></span>
                 </button>
@@ -248,8 +254,8 @@
                 <button @click="openStudyPlanGenerator()"
                         class="px-3 py-2 rounded-lg font-inter text-sm border transition-all hover:scale-105"
                         :class="showStudyPlanGenerator
-                            ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-[#D4A017] text-white')
-                            : (darkMode ? 'bg-[#243044] text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-white text-[#D4A017] border-[#D4A017]/30')"
+                            ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white')
+                            : (darkMode ? 'bg-[#243044] text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-[#FFFDF9] text-[#5c5245] border-[#d4cabb]')"
                         title="Create a personalized Bible study plan">
                     <span>📖 Study Plan</span>
                 </button>
@@ -257,9 +263,9 @@
                 <!-- Theme Toggle -->
                 <button @click="darkMode = !darkMode"
                         class="w-10 h-10 rounded-lg flex items-center justify-center border transition-all hover:scale-105"
-                        :class="darkMode 
-                            ? 'bg-[#243044] text-[#C0C5D9] border-[#C0C5D9]/30' 
-                            : 'bg-white text-[#D4A017] border-[#D4A017]/30'">
+                        :class="darkMode
+                            ? 'bg-[#243044] text-[#C0C5D9] border-[#C0C5D9]/30'
+                            : 'bg-[#FFFDF9] text-[#c4960c] border-[#d4cabb]'">
                     <span x-text="darkMode ? '☀️' : '🌙'"></span>
                 </button>
             </div>
@@ -274,7 +280,7 @@
                 class="w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all hover:scale-110 shadow-lg backdrop-blur-md"
                 :class="darkMode
                     ? 'bg-[#1A2332]/90 text-[#C0C5D9] border-[#C0C5D9]/30 hover:bg-[#243044]'
-                    : 'bg-white/90 text-[#D4A017] border-[#D4A017]/30 hover:bg-[#FDFBF7]'"
+                    : 'bg-[#FFFDF9]/90 text-[#c4960c] border-[#d4cabb] hover:bg-[#FAF7F2] shadow-[0_4px_12px_rgba(61,50,37,0.12)]'"
                 :title="darkMode ? 'Switch to Emmaus Road (light) theme' : 'Switch to Gethsemane (dark) theme'">
             <span class="text-xl" x-text="darkMode ? '☀️' : '🌙'"></span>
         </button>
@@ -287,13 +293,13 @@
             <svg class="w-48 h-[80vh] path-glow" viewBox="0 0 200 600" fill="none">
                 <path class="path-line" 
                       d="M100 600 Q 60 500, 100 450 Q 140 400, 100 350 Q 60 300, 100 250 Q 140 200, 100 150 Q 80 100, 100 50"
-                      :stroke="darkMode ? '#C0C5D9' : '#D4A017'"
+                      :stroke="darkMode ? '#C0C5D9' : '#c4960c'"
                       stroke-width="4"
                       stroke-linecap="round"
                       fill="none"/>
                 <g class="cross-glow" transform="translate(85, 10)">
-                    <rect x="10" y="0" width="10" height="40" rx="2" :fill="darkMode ? '#E8ECF4' : '#D4A017'"/>
-                    <rect x="0" y="10" width="30" height="10" rx="2" :fill="darkMode ? '#E8ECF4' : '#D4A017'"/>
+                    <rect x="10" y="0" width="10" height="40" rx="2" :fill="darkMode ? '#E8ECF4' : '#c4960c'"/>
+                    <rect x="0" y="10" width="30" height="10" rx="2" :fill="darkMode ? '#E8ECF4' : '#c4960c'"/>
                 </g>
             </svg>
         </div>
@@ -302,18 +308,18 @@
         <div class="relative z-10 text-center max-w-3xl mx-auto pt-20">
             <div class="mb-8 flex justify-center">
                 <div class="w-20 h-20 rounded-full flex items-center justify-center border-3"
-                     :class="darkMode ? 'border-[#C0C5D9] bg-[#C0C5D9]/10' : 'border-[#D4A017] bg-[#D4A017]/10'">
+                     :class="darkMode ? 'border-[#C0C5D9] bg-[#C0C5D9]/10' : 'border-[#c4960c] bg-[#c4960c]/10'">
                     <span class="text-4xl">✝</span>
                 </div>
             </div>
             
             <h1 class="font-playfair text-5xl md:text-6xl font-bold mb-4 transition-colors"
-                :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#F5F5F0]'">
+                :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
                 GospelPath
             </h1>
             
             <p class="font-lora text-xl md:text-2xl mb-12 transition-colors"
-               :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#FFE8E0]'">
+               :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#7a6f5f]'">
                 Your AI-Powered Journey Through Scripture
             </p>
             
@@ -327,7 +333,7 @@
                     class="w-full rounded-2xl px-6 py-5 font-lora text-lg border-2 transition-all focus:outline-none focus:ring-4"
                     :class="darkMode
                         ? 'bg-[#243044] border-[#C0C5D9]/30 text-[#F5F5F0] placeholder-[#9BA4B8] focus:border-[#C0C5D9] focus:ring-[#C0C5D9]/20'
-                        : 'bg-white border-[#D4A017]/30 text-[#0F1C3A] placeholder-[#6B5D4A] focus:border-[#D4A017] focus:ring-[#D4A017]/20'"
+                        : 'bg-[#FFFDF9] border-[#e0d9cb] text-[#3d3225] placeholder-[#a69d8a] focus:border-[#c4960c] focus:ring-[#c4960c]/20 shadow-[0_4px_12px_rgba(61,50,37,0.08)]'"
                 />
             </div>
 
@@ -340,12 +346,12 @@
                         <button @click="translationCompareMode = !translationCompareMode"
                                 class="px-4 py-2 rounded-xl font-inter text-sm font-medium border-2 transition-all hover:scale-105"
                                 :class="translationCompareMode
-                                    ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332] border-[#C0C5D9]' : 'bg-[#D4A017] text-white border-[#D4A017]')
-                                    : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/50' : 'bg-transparent text-[#D4A017] border-[#D4A017]/50')">
+                                    ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332] border-[#C0C5D9]' : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white border-[#c4960c]')
+                                    : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/50' : 'bg-[#FFFDF9]/80 text-[#5c5245] border-[#d4cabb]')">
                             <span x-text="translationCompareMode ? '📚 Compare ON' : '📚 Compare'"></span>
                         </button>
                         <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded-lg text-xs font-inter whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30"
-                             :class="darkMode ? 'bg-[#1A2332] text-[#F5F5F0] border border-[#C0C5D9]/30' : 'bg-white text-[#0F1C3A] border border-[#D4A017]/30 shadow-lg'">
+                             :class="darkMode ? 'bg-[#1A2332] text-[#F5F5F0] border border-[#C0C5D9]/30' : 'bg-[#FFFDF9] text-[#3d3225] border border-[#e0d9cb] shadow-[0_4px_12px_rgba(61,50,37,0.12)]'">
                             See verse in ESV, NIV, KJV & more
                         </div>
                     </div>
@@ -355,12 +361,12 @@
                         <button @click="comparativeMode = !comparativeMode"
                                 class="px-4 py-2 rounded-xl font-inter text-sm font-medium border-2 transition-all hover:scale-105"
                                 :class="comparativeMode
-                                    ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332] border-[#C0C5D9]' : 'bg-[#D4A017] text-white border-[#D4A017]')
-                                    : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/50' : 'bg-transparent text-[#D4A017] border-[#D4A017]/50')">
+                                    ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332] border-[#C0C5D9]' : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white border-[#c4960c]')
+                                    : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/50' : 'bg-[#FFFDF9]/80 text-[#5c5245] border-[#d4cabb]')">
                             <span x-text="comparativeMode ? '⛪ Theology ON' : '⛪ Theology'"></span>
                         </button>
                         <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded-lg text-xs font-inter whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30"
-                             :class="darkMode ? 'bg-[#1A2332] text-[#F5F5F0] border border-[#C0C5D9]/30' : 'bg-white text-[#0F1C3A] border border-[#D4A017]/30 shadow-lg'">
+                             :class="darkMode ? 'bg-[#1A2332] text-[#F5F5F0] border border-[#C0C5D9]/30' : 'bg-[#FFFDF9] text-[#3d3225] border border-[#e0d9cb] shadow-[0_4px_12px_rgba(61,50,37,0.12)]'">
                             Protestant, Catholic & Orthodox views
                         </div>
                     </div>
@@ -370,12 +376,12 @@
                         <button @click="autoShowInterlinear = !autoShowInterlinear"
                                 class="px-4 py-2 rounded-xl font-inter text-sm font-medium border-2 transition-all hover:scale-105"
                                 :class="autoShowInterlinear
-                                    ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332] border-[#C0C5D9]' : 'bg-[#D4A017] text-white border-[#D4A017]')
-                                    : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/50' : 'bg-transparent text-[#D4A017] border-[#D4A017]/50')">
+                                    ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332] border-[#C0C5D9]' : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white border-[#c4960c]')
+                                    : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/50' : 'bg-[#FFFDF9]/80 text-[#5c5245] border-[#d4cabb]')">
                             <span x-text="autoShowInterlinear ? '📜 Hebrew/Greek ON' : '📜 Hebrew/Greek'"></span>
                         </button>
                         <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded-lg text-xs font-inter whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30"
-                             :class="darkMode ? 'bg-[#1A2332] text-[#F5F5F0] border border-[#C0C5D9]/30' : 'bg-white text-[#0F1C3A] border border-[#D4A017]/30 shadow-lg'">
+                             :class="darkMode ? 'bg-[#1A2332] text-[#F5F5F0] border border-[#C0C5D9]/30' : 'bg-[#FFFDF9] text-[#3d3225] border border-[#e0d9cb] shadow-[0_4px_12px_rgba(61,50,37,0.12)]'">
                             Word-by-word original language
                         </div>
                     </div>
@@ -388,8 +394,8 @@
                         <button @click="toggleTranslation(trans.value)"
                                 class="px-3 py-1 rounded-lg font-inter text-xs font-medium border transition-all"
                                 :class="selectedTranslationsToCompare.includes(trans.value)
-                                    ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-[#D4A017] text-white')
-                                    : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-transparent text-[#FFE8E0] border-[#FFE8E0]/30')"
+                                    ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white')
+                                    : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-[#FFFDF9]/60 text-[#5c5245] border-[#d4cabb]')"
                                 x-text="trans.label"></button>
                     </template>
                 </div>
@@ -401,7 +407,7 @@
                     class="font-inter font-semibold text-lg px-10 py-4 rounded-xl transition-all hover:scale-105 hover:shadow-lg"
                     :class="darkMode
                         ? 'bg-[#C0C5D9] text-[#1A2332] hover:bg-[#E8ECF4]'
-                        : 'bg-[#D4A017] text-[#0F1C3A] hover:bg-[#FFB627]'">
+                        : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white hover:from-[#daa520] hover:to-[#e6b836] shadow-[0_4px_12px_rgba(196,150,12,0.3)]'">
                     Begin Your Journey
                 </button>
 
@@ -410,14 +416,14 @@
                     class="font-inter font-semibold text-lg px-8 py-4 rounded-xl transition-all hover:scale-105 hover:shadow-lg border-2"
                     :class="darkMode
                         ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9] hover:bg-[#C0C5D9]/10'
-                        : 'bg-transparent text-[#D4A017] border-[#D4A017] hover:bg-[#D4A017]/10'">
+                        : 'bg-[#FFFDF9] text-[#5c5245] border-[#d4cabb] hover:bg-[#F0EBE1] hover:border-[#c4960c]'">
                     <span class="mr-2">📖</span> Create Study Plan
                 </button>
             </div>
 
             <!-- Tagline -->
             <p class="mt-16 font-lora text-sm italic transition-colors"
-               :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#FFE8E0]/80'">
+               :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
                 "Your word is a lamp to my feet and a light to my path." — Psalm 119:105
             </p>
         </div>
@@ -427,7 +433,7 @@
     <section x-show="hasSearched" 
              x-transition
              class="min-h-screen pt-24 pb-20 px-4 transition-colors"
-             :class="darkMode ? 'bg-[#1A2332]' : 'bg-[#FDFBF7]'">
+             :class="darkMode ? 'bg-[#1A2332]' : 'bg-[#FAF7F2]'"
         <div class="max-w-4xl mx-auto">
             
             <!-- Loading State -->
@@ -436,7 +442,7 @@
                     <span class="text-6xl">✝</span>
                 </div>
                 <p class="mt-6 font-lora text-lg transition-colors"
-                   :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#6B5D4A]'">
+                   :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#7a6f5f]'">
                     Searching the Scriptures...
                 </p>
             </div>
@@ -461,18 +467,18 @@
                         <span class="text-3xl">📖</span>
                         <div>
                             <h2 class="font-playfair text-2xl transition-colors"
-                                :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'">
+                                :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
                                 Study Plan Generator
                             </h2>
                             <p class="font-inter text-sm transition-colors"
-                               :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#6B5D4A]'">
+                               :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
                                 Create a personalized Bible study plan on any topic
                             </p>
                         </div>
                     </div>
                     <button @click="closeStudyPlanGenerator()"
                             class="p-2 rounded-lg transition-all hover:scale-105"
-                            :class="darkMode ? 'text-[#9BA4B8] hover:bg-[#243044]' : 'text-[#6B5D4A] hover:bg-[#FFE8E0]'">
+                            :class="darkMode ? 'text-[#9BA4B8] hover:bg-[#243044]' : 'text-[#7a6f5f] hover:bg-[#F0EBE1]'">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -484,12 +490,12 @@
                      class="rounded-2xl p-6 border transition-colors"
                      :class="darkMode
                          ? 'bg-gradient-to-br from-[#243044] to-[#2D3A52] border-[#C0C5D9]/30'
-                         : 'bg-gradient-to-br from-white to-[#FFE8E0] border-[#D4A017]/30'">
+                         : 'bg-gradient-to-br from-[#FFFDF9] to-[#F0EBE1] border-[#e0d9cb] shadow-[0_4px_12px_rgba(61,50,37,0.08)]'">
 
                     <!-- Topic Input -->
                     <div class="mb-6">
                         <label class="block font-inter text-sm font-medium mb-2 transition-colors"
-                               :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#0F1C3A]'">
+                               :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#3d3225]'">
                             What topic would you like to study?
                         </label>
                         <input type="text"
@@ -499,13 +505,13 @@
                                class="w-full rounded-xl px-5 py-4 font-lora text-lg border-2 transition-all focus:outline-none focus:ring-4"
                                :class="darkMode
                                    ? 'bg-[#1A2332] border-[#C0C5D9]/30 text-[#F5F5F0] placeholder-[#9BA4B8] focus:border-[#C0C5D9] focus:ring-[#C0C5D9]/20'
-                                   : 'bg-white border-[#D4A017]/30 text-[#0F1C3A] placeholder-[#6B5D4A] focus:border-[#D4A017] focus:ring-[#D4A017]/20'">
+                                   : 'bg-[#FFFDF9] border-[#e0d9cb] text-[#3d3225] placeholder-[#a69d8a] focus:border-[#c4960c] focus:ring-[#c4960c]/20'">
                     </div>
 
                     <!-- Quick Suggestions -->
                     <div class="mb-6">
                         <label class="block font-inter text-sm font-medium mb-3 transition-colors"
-                               :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#6B5D4A]'">
+                               :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
                             Quick suggestions:
                         </label>
                         <div class="flex flex-wrap gap-2">
@@ -513,8 +519,8 @@
                                 <button @click="selectSuggestion(suggestion)"
                                         class="px-3 py-1.5 rounded-full font-inter text-sm border transition-all hover:scale-105"
                                         :class="studyPlanTopic === suggestion
-                                            ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332] border-[#C0C5D9]' : 'bg-[#D4A017] text-white border-[#D4A017]')
-                                            : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/30 hover:border-[#C0C5D9]' : 'bg-transparent text-[#D4A017] border-[#D4A017]/30 hover:border-[#D4A017]')"
+                                            ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332] border-[#C0C5D9]' : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white border-[#c4960c]')
+                                            : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/30 hover:border-[#C0C5D9]' : 'bg-[#FFFDF9] text-[#5c5245] border-[#d4cabb] hover:border-[#c4960c]')"
                                         x-text="suggestion"></button>
                             </template>
                         </div>
@@ -524,14 +530,14 @@
                     <div class="grid md:grid-cols-2 gap-4 mb-6">
                         <div>
                             <label class="block font-inter text-sm font-medium mb-2 transition-colors"
-                                   :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#0F1C3A]'">
+                                   :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#3d3225]'">
                                 Study Duration
                             </label>
                             <select x-model.number="studyPlanDuration"
                                     class="w-full rounded-xl px-4 py-3 font-inter border-2 cursor-pointer transition-colors"
                                     :class="darkMode
                                         ? 'bg-[#1A2332] text-[#F5F5F0] border-[#C0C5D9]/30'
-                                        : 'bg-white text-[#0F1C3A] border-[#D4A017]/30'">
+                                        : 'bg-[#FFFDF9] text-[#3d3225] border-[#d4cabb]'">
                                 <option value="3">3 Days (Quick Start)</option>
                                 <option value="5">5 Days (Short Study)</option>
                                 <option value="7">7 Days (One Week)</option>
@@ -542,14 +548,14 @@
                         </div>
                         <div>
                             <label class="block font-inter text-sm font-medium mb-2 transition-colors"
-                                   :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#0F1C3A]'">
+                                   :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#3d3225]'">
                                 Bible Translation
                             </label>
                             <select x-model="selectedTranslation"
                                     class="w-full rounded-xl px-4 py-3 font-inter border-2 cursor-pointer transition-colors"
                                     :class="darkMode
                                         ? 'bg-[#1A2332] text-[#F5F5F0] border-[#C0C5D9]/30'
-                                        : 'bg-white text-[#0F1C3A] border-[#D4A017]/30'">
+                                        : 'bg-[#FFFDF9] text-[#3d3225] border-[#d4cabb]'">
                                 <!-- Popular Translations -->
                                 <optgroup label="Popular">
                                     <option value="ESV">ESV - English Standard</option>
@@ -589,7 +595,7 @@
                             class="w-full py-4 rounded-xl font-inter font-semibold text-lg transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                             :class="darkMode
                                 ? 'bg-[#C0C5D9] text-[#1A2332] hover:bg-[#E8ECF4]'
-                                : 'bg-[#D4A017] text-[#0F1C3A] hover:bg-[#FFB627]'">
+                                : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white hover:from-[#daa520] hover:to-[#e6b836] shadow-[0_4px_12px_rgba(196,150,12,0.3)]'">
                         <span class="mr-2">✨</span> Generate Study Plan
                     </button>
                 </div>
@@ -600,11 +606,11 @@
                         <span class="text-6xl">📖</span>
                     </div>
                     <p class="mt-6 font-lora text-lg transition-colors"
-                       :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#6B5D4A]'">
+                       :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#7a6f5f]'">
                         Creating your personalized study plan...
                     </p>
                     <p class="mt-2 font-inter text-sm transition-colors"
-                       :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#6B5D4A]/70'">
+                       :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]/70'">
                         This may take a moment
                     </p>
                 </div>
@@ -616,18 +622,18 @@
                     <div class="rounded-2xl p-6 mb-6 border transition-colors"
                          :class="darkMode
                              ? 'bg-gradient-to-br from-[#243044] to-[#2D3A52] border-[#C0C5D9]/30'
-                             : 'bg-gradient-to-br from-white to-[#FFE8E0] border-[#D4A017]/30'">
+                             : 'bg-gradient-to-br from-[#FFFDF9] to-[#F0EBE1] border-[#e0d9cb] shadow-[0_4px_12px_rgba(61,50,37,0.08)]'">
                         <div class="flex flex-wrap items-start justify-between gap-4">
                             <div>
                                 <h3 class="font-playfair text-xl mb-2 transition-colors"
-                                    :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'">
+                                    :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
                                     <span x-text="generatedStudyPlan?.duration"></span>-Day Study Plan
                                 </h3>
                                 <p class="font-lora text-lg italic transition-colors"
-                                   :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#6B5D4A]'"
+                                   :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#7a6f5f]'"
                                    x-text="generatedStudyPlan?.topic"></p>
                                 <p class="font-inter text-sm mt-2 transition-colors"
-                                   :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#6B5D4A]/70'">
+                                   :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]/70'">
                                     Translation: <span x-text="generatedStudyPlan?.translation"></span>
                                 </p>
                             </div>
@@ -636,21 +642,21 @@
                                         class="px-4 py-2 rounded-lg font-inter text-sm border transition-all hover:scale-105"
                                         :class="darkMode
                                             ? 'bg-[#243044] text-[#C0C5D9] border-[#C0C5D9]/30 hover:bg-[#2D3A52]'
-                                            : 'bg-white text-[#D4A017] border-[#D4A017]/30 hover:bg-[#FFE8E0]'">
+                                            : 'bg-[#FFFDF9] text-[#5c5245] border-[#d4cabb] hover:bg-[#F0EBE1] hover:border-[#c4960c]'">
                                     <span x-text="copiedPlan ? '✓ Copied!' : '📋 Copy'"></span>
                                 </button>
                                 <button @click="saveStudyPlan()"
                                         class="px-4 py-2 rounded-lg font-inter text-sm border transition-all hover:scale-105"
                                         :class="darkMode
                                             ? 'bg-[#243044] text-[#C0C5D9] border-[#C0C5D9]/30 hover:bg-[#2D3A52]'
-                                            : 'bg-white text-[#D4A017] border-[#D4A017]/30 hover:bg-[#FFE8E0]'">
+                                            : 'bg-[#FFFDF9] text-[#5c5245] border-[#d4cabb] hover:bg-[#F0EBE1] hover:border-[#c4960c]'">
                                     💾 Save
                                 </button>
                                 <button @click="resetStudyPlan()"
                                         class="px-4 py-2 rounded-lg font-inter text-sm border transition-all hover:scale-105"
                                         :class="darkMode
                                             ? 'bg-[#243044] text-[#C0C5D9] border-[#C0C5D9]/30 hover:bg-[#2D3A52]'
-                                            : 'bg-white text-[#D4A017] border-[#D4A017]/30 hover:bg-[#FFE8E0]'">
+                                            : 'bg-[#FFFDF9] text-[#5c5245] border-[#d4cabb] hover:bg-[#F0EBE1] hover:border-[#c4960c]'">
                                     🔄 New Plan
                                 </button>
                             </div>
@@ -663,29 +669,29 @@
                             <div class="rounded-xl border overflow-hidden transition-all"
                                  :class="darkMode
                                      ? 'bg-[#243044]/80 border-[#C0C5D9]/20'
-                                     : 'bg-white/80 border-[#D4A017]/20'">
+                                     : 'bg-[#FFFDF9]/90 border-[#e0d9cb] shadow-[0_2px_8px_rgba(61,50,37,0.06)]'">
 
                                 <!-- Day Header (always visible, clickable) -->
                                 <button @click="toggleDay(day.day)"
                                         class="w-full px-6 py-4 flex items-center justify-between text-left transition-colors hover:bg-opacity-80"
                                         :class="expandedDay === day.day
-                                            ? (darkMode ? 'bg-[#C0C5D9]/10' : 'bg-[#D4A017]/10')
+                                            ? (darkMode ? 'bg-[#C0C5D9]/10' : 'bg-[#c4960c]/10')
                                             : ''">
                                     <div class="flex items-center gap-4">
                                         <span class="w-10 h-10 rounded-full flex items-center justify-center font-inter font-bold text-sm"
-                                              :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#D4A017]/20 text-[#D4A017]'"
+                                              :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#c4960c]/15 text-[#c4960c]'"
                                               x-text="day.day"></span>
                                         <div>
                                             <h4 class="font-playfair text-lg transition-colors"
-                                                :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'"
+                                                :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'"
                                                 x-text="day.title"></h4>
                                             <p class="font-inter text-sm transition-colors"
-                                               :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#6B5D4A]'"
+                                               :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'"
                                                x-text="day.verses.join(', ')"></p>
                                         </div>
                                     </div>
                                     <svg class="w-5 h-5 transition-transform duration-200"
-                                         :class="[expandedDay === day.day ? 'rotate-180' : '', darkMode ? 'text-[#C0C5D9]' : 'text-[#D4A017]']"
+                                         :class="[expandedDay === day.day ? 'rotate-180' : '', darkMode ? 'text-[#C0C5D9]' : 'text-[#c4960c]']"
                                          fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                     </svg>
@@ -697,12 +703,12 @@
                                      x-transition:enter-start="opacity-0 transform -translate-y-2"
                                      x-transition:enter-end="opacity-100 transform translate-y-0"
                                      class="px-6 pb-6 border-t"
-                                     :class="darkMode ? 'border-[#C0C5D9]/10' : 'border-[#D4A017]/10'">
+                                     :class="darkMode ? 'border-[#C0C5D9]/10' : 'border-[#e0d9cb]/60'">
 
                                     <!-- Verses -->
                                     <div class="mt-4 mb-4">
                                         <h5 class="font-inter text-sm font-semibold mb-2 flex items-center gap-2"
-                                            :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#D4A017]'">
+                                            :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#c4960c]'">
                                             <span>📖</span> Today's Reading
                                         </h5>
                                         <div class="flex flex-wrap gap-2">
@@ -711,7 +717,7 @@
                                                         class="px-3 py-1.5 rounded-lg font-inter text-sm border transition-all hover:scale-105"
                                                         :class="darkMode
                                                             ? 'bg-[#1A2332] text-[#C0C5D9] border-[#C0C5D9]/30 hover:border-[#C0C5D9]'
-                                                            : 'bg-[#FDFBF7] text-[#D4A017] border-[#D4A017]/30 hover:border-[#D4A017]'"
+                                                            : 'bg-[#FFFDF9] text-[#5c5245] border-[#d4cabb] hover:border-[#c4960c]'"
                                                         x-text="verse"></button>
                                             </template>
                                         </div>
@@ -720,34 +726,34 @@
                                     <!-- Focus -->
                                     <div class="mb-4">
                                         <h5 class="font-inter text-sm font-semibold mb-2 flex items-center gap-2"
-                                            :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#D4A017]'">
+                                            :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#c4960c]'">
                                             <span>🎯</span> Focus
                                         </h5>
                                         <p class="font-lora text-base leading-relaxed transition-colors"
-                                           :class="darkMode ? 'text-[#F5F5F0]/90' : 'text-[#0F1C3A]/90'"
+                                           :class="darkMode ? 'text-[#F5F5F0]/90' : 'text-[#3d3225]/90'"
                                            x-text="day.focus"></p>
                                     </div>
 
                                     <!-- Reflection -->
                                     <div class="mb-4">
                                         <h5 class="font-inter text-sm font-semibold mb-2 flex items-center gap-2"
-                                            :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#D4A017]'">
+                                            :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#c4960c]'">
                                             <span>💭</span> Reflection
                                         </h5>
                                         <p class="font-lora text-base leading-relaxed transition-colors"
-                                           :class="darkMode ? 'text-[#F5F5F0]/90' : 'text-[#0F1C3A]/90'"
+                                           :class="darkMode ? 'text-[#F5F5F0]/90' : 'text-[#3d3225]/90'"
                                            x-text="day.reflection"></p>
                                     </div>
 
                                     <!-- Prayer -->
                                     <div class="p-4 rounded-lg"
-                                         :class="darkMode ? 'bg-[#1A2332]/50' : 'bg-[#D4A017]/5'">
+                                         :class="darkMode ? 'bg-[#1A2332]/50' : 'bg-[#c4960c]/5'">
                                         <h5 class="font-inter text-sm font-semibold mb-2 flex items-center gap-2"
-                                            :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#D4A017]'">
+                                            :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#c4960c]'">
                                             <span>🙏</span> Prayer
                                         </h5>
                                         <p class="font-lora text-base italic leading-relaxed transition-colors"
-                                           :class="darkMode ? 'text-[#F5F5F0]/90' : 'text-[#0F1C3A]/90'"
+                                           :class="darkMode ? 'text-[#F5F5F0]/90' : 'text-[#3d3225]/90'"
                                            x-text="day.prayer"></p>
                                     </div>
                                 </div>
@@ -759,7 +765,7 @@
                 <!-- Saved Plans Section -->
                 <div x-show="savedPlans.length > 0 && !generatedStudyPlan && !generatingPlan" class="mt-8">
                     <h3 class="font-playfair text-lg mb-4 transition-colors"
-                        :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'">
+                        :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
                         📚 Your Saved Plans
                     </h3>
                     <div class="space-y-3">
@@ -767,19 +773,19 @@
                             <div class="rounded-xl p-4 border flex items-center justify-between transition-colors"
                                  :class="darkMode
                                      ? 'bg-[#243044]/50 border-[#C0C5D9]/20'
-                                     : 'bg-white/50 border-[#D4A017]/20'">
+                                     : 'bg-[#FFFDF9]/70 border-[#e0d9cb]'">
                                 <button @click="loadSavedPlan(plan)" class="flex-1 text-left">
                                     <p class="font-inter font-medium transition-colors"
-                                       :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'"
+                                       :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'"
                                        x-text="plan.topic"></p>
                                     <p class="font-inter text-sm transition-colors"
-                                       :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#6B5D4A]'">
+                                       :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
                                         <span x-text="plan.duration"></span> days · <span x-text="plan.translation"></span>
                                     </p>
                                 </button>
                                 <button @click="deleteSavedPlan(plan.id)"
                                         class="p-2 rounded-lg transition-all hover:scale-105"
-                                        :class="darkMode ? 'text-[#9BA4B8] hover:text-red-400 hover:bg-red-900/20' : 'text-[#6B5D4A] hover:text-red-600 hover:bg-red-50'">
+                                        :class="darkMode ? 'text-[#9BA4B8] hover:text-red-400 hover:bg-red-900/20' : 'text-[#7a6f5f] hover:text-red-600 hover:bg-red-50'">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                     </svg>
@@ -795,17 +801,17 @@
                  class="mb-8 rounded-2xl p-8 border transition-colors"
                  :class="darkMode 
                      ? 'bg-gradient-to-br from-[#243044] to-[#2D3A52] border-[#C0C5D9]/40' 
-                     : 'bg-gradient-to-br from-white to-[#FFE8E0] border-[#D4A017]/40'">
+                     : 'bg-gradient-to-br from-[#FFFDF9] to-[#F0EBE1] border-[#e0d9cb] shadow-[0_4px_12px_rgba(61,50,37,0.08)]'">
                 
                 <!-- Header with Toggle -->
                 <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
                     <div class="flex items-center gap-3">
                         <span class="text-2xl">📖</span>
                         <h3 class="font-playfair text-xl transition-colors"
-                            :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'"
+                            :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'"
                             x-text="verseLookupResult ? verseLookupResult.reference : ''"></h3>
                         <span class="font-inter text-xs px-2 py-1 rounded transition-colors"
-                              :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#D4A017]/20 text-[#D4A017]'"
+                              :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#c4960c]/15 text-[#c4960c]'"
                               x-text="selectedTranslation"></span>
                     </div>
 
@@ -814,8 +820,8 @@
                         <button @click="showSideBySide = !showSideBySide; if(showSideBySide) fetchSideBySideComparison()"
                                 class="flex items-center gap-2 px-3 py-2 rounded-lg font-inter text-sm border transition-all hover:scale-105"
                                 :class="showSideBySide
-                                    ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-[#D4A017] text-white')
-                                    : (darkMode ? 'bg-[#243044] text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-white text-[#D4A017] border-[#D4A017]/30')">
+                                    ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white')
+                                    : (darkMode ? 'bg-[#243044] text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-[#FFFDF9] text-[#5c5245] border-[#d4cabb]')">
                             <span>📚</span>
                             <span x-text="showSideBySide ? 'Hide Compare' : 'Compare'"></span>
                         </button>
@@ -824,8 +830,8 @@
                         <button @click="showInterlinear = !showInterlinear; if(showInterlinear && !hasInterlinear()) fetchInterlinear()"
                                 class="flex items-center gap-2 px-3 py-2 rounded-lg font-inter text-sm border transition-all hover:scale-105"
                                 :class="showInterlinear
-                                    ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-[#D4A017] text-white')
-                                    : (darkMode ? 'bg-[#243044] text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-white text-[#D4A017] border-[#D4A017]/30')">
+                                    ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white')
+                                    : (darkMode ? 'bg-[#243044] text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-[#FFFDF9] text-[#5c5245] border-[#d4cabb]')">
                             <span>📜</span>
                             <span x-text="showInterlinear ? 'Hide Original' : 'Hebrew/Greek'"></span>
                         </button>
@@ -835,7 +841,7 @@
                 <!-- English Text (shown when not comparing) -->
                 <p x-show="!showInterlinear && !showSideBySide"
                    class="font-lora text-xl leading-relaxed italic transition-colors"
-                   :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#0F1C3A]'"
+                   :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#3d3225]'"
                    x-text="verseLookupResult ? verseLookupResult.text : ''"></p>
 
                 <!-- Side-by-Side Comparison View -->
@@ -843,10 +849,10 @@
                     <!-- Translation Selectors -->
                     <div class="flex flex-wrap items-center justify-center gap-4 mb-4">
                         <div class="flex items-center gap-2">
-                            <span class="font-inter text-xs" :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#6B5D4A]'">Left:</span>
+                            <span class="font-inter text-xs" :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">Left:</span>
                             <select x-model="sideBySideLeft" @change="fetchSideBySideComparison()"
                                     class="rounded-lg px-2 py-1 font-inter text-sm border cursor-pointer"
-                                    :class="darkMode ? 'bg-[#1A2332] text-[#F5F5F0] border-[#C0C5D9]/30' : 'bg-white text-[#0F1C3A] border-[#D4A017]/30'">
+                                    :class="darkMode ? 'bg-[#1A2332] text-[#F5F5F0] border-[#C0C5D9]/30' : 'bg-[#FFFDF9] text-[#3d3225] border-[#d4cabb]'">
                                 <optgroup label="Popular">
                                     <option value="ESV">ESV</option>
                                     <option value="NIV">NIV</option>
@@ -868,12 +874,12 @@
                                 </optgroup>
                             </select>
                         </div>
-                        <span class="text-lg" :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#D4A017]'">⟷</span>
+                        <span class="text-lg" :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#c4960c]'">⟷</span>
                         <div class="flex items-center gap-2">
-                            <span class="font-inter text-xs" :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#6B5D4A]'">Right:</span>
+                            <span class="font-inter text-xs" :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">Right:</span>
                             <select x-model="sideBySideRight" @change="fetchSideBySideComparison()"
                                     class="rounded-lg px-2 py-1 font-inter text-sm border cursor-pointer"
-                                    :class="darkMode ? 'bg-[#1A2332] text-[#F5F5F0] border-[#C0C5D9]/30' : 'bg-white text-[#0F1C3A] border-[#D4A017]/30'">
+                                    :class="darkMode ? 'bg-[#1A2332] text-[#F5F5F0] border-[#C0C5D9]/30' : 'bg-[#FFFDF9] text-[#3d3225] border-[#d4cabb]'">
                                 <optgroup label="Popular">
                                     <option value="ESV">ESV</option>
                                     <option value="NIV">NIV</option>
@@ -900,29 +906,29 @@
                     <!-- Loading State -->
                     <div x-show="loadingSideBySide" class="text-center py-4">
                         <div class="animate-spin rounded-full h-6 w-6 border-2 mx-auto"
-                             :class="darkMode ? 'border-[#C0C5D9] border-t-transparent' : 'border-[#D4A017] border-t-transparent'"></div>
+                             :class="darkMode ? 'border-[#C0C5D9] border-t-transparent' : 'border-[#c4960c] border-t-transparent'"></div>
                     </div>
 
                     <!-- Side-by-Side Results -->
                     <div x-show="sideBySideResults && !loadingSideBySide" class="grid md:grid-cols-2 gap-4">
                         <!-- Left Translation -->
                         <div class="rounded-xl p-4 border"
-                             :class="darkMode ? 'bg-[#1A2332]/50 border-[#C0C5D9]/20' : 'bg-white/50 border-[#D4A017]/20'">
+                             :class="darkMode ? 'bg-[#1A2332]/50 border-[#C0C5D9]/20' : 'bg-[#FFFDF9]/70 border-[#e0d9cb]'">
                             <div class="font-inter text-sm font-bold mb-2 px-2 py-1 rounded inline-block"
-                                 :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#D4A017]/20 text-[#D4A017]'"
+                                 :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#c4960c]/15 text-[#c4960c]'"
                                  x-text="sideBySideResults?.left?.translation"></div>
                             <p class="font-lora text-base leading-relaxed italic"
-                               :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#0F1C3A]'"
+                               :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#3d3225]'"
                                x-text="sideBySideResults?.left?.text"></p>
                         </div>
                         <!-- Right Translation -->
                         <div class="rounded-xl p-4 border"
-                             :class="darkMode ? 'bg-[#1A2332]/50 border-[#C0C5D9]/20' : 'bg-white/50 border-[#D4A017]/20'">
+                             :class="darkMode ? 'bg-[#1A2332]/50 border-[#C0C5D9]/20' : 'bg-[#FFFDF9]/70 border-[#e0d9cb]'">
                             <div class="font-inter text-sm font-bold mb-2 px-2 py-1 rounded inline-block"
-                                 :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#D4A017]/20 text-[#D4A017]'"
+                                 :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#c4960c]/15 text-[#c4960c]'"
                                  x-text="sideBySideResults?.right?.translation"></div>
                             <p class="font-lora text-base leading-relaxed italic"
-                               :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#0F1C3A]'"
+                               :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#3d3225]'"
                                x-text="sideBySideResults?.right?.text"></p>
                         </div>
                     </div>
@@ -935,7 +941,7 @@
                     <!-- Language Badge -->
                     <div class="flex items-center gap-2 mb-4">
                         <span class="px-3 py-1 rounded-full text-xs font-semibold"
-                              :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#D4A017]/20 text-[#D4A017]'"
+                              :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#c4960c]/15 text-[#c4960c]'"
                               x-text="getInterlinearData()?.language + ' Interlinear'"></span>
                     </div>
                     
@@ -943,23 +949,23 @@
                     <div class="flex flex-wrap gap-4 justify-center">
                         <template x-for="(word, index) in getInterlinearData()?.words || []" :key="index">
                             <div class="text-center p-3 rounded-lg transition-colors cursor-pointer hover:scale-105"
-                                 :class="darkMode ? 'bg-[#1A2332]/50 hover:bg-[#C0C5D9]/10' : 'bg-white/50 hover:bg-[#D4A017]/10'"
+                                 :class="darkMode ? 'bg-[#1A2332]/50 hover:bg-[#C0C5D9]/10' : 'bg-[#FFFDF9]/70 hover:bg-[#F0EBE1]'"
                                  @click="word.strongs && showOriginalLanguage(word.strongs)">
                                 <!-- Original Script -->
                                 <p class="text-2xl font-bold mb-1 transition-colors"
-                                   :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'"
+                                   :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'"
                                    x-text="word.original"></p>
                                 <!-- Transliteration -->
                                 <p class="text-xs italic mb-1 transition-colors"
-                                   :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#D4A017]'"
+                                   :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#c4960c]'"
                                    x-text="word.translit"></p>
                                 <!-- English -->
                                 <p class="text-sm font-medium transition-colors"
-                                   :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#6B5D4A]'"
+                                   :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'"
                                    x-text="word.english"></p>
                                 <!-- Strong's Number -->
                                 <p class="text-xs mt-1 transition-colors"
-                                   :class="darkMode ? 'text-[#9BA4B8]/60' : 'text-[#6B5D4A]/60'"
+                                   :class="darkMode ? 'text-[#9BA4B8]/60' : 'text-[#7a6f5f]/60'"
                                    x-text="word.strongs"></p>
                             </div>
                         </template>
@@ -967,9 +973,9 @@
                     
                     <!-- Full English below -->
                     <div class="mt-6 pt-4 border-t"
-                         :class="darkMode ? 'border-[#C0C5D9]/20' : 'border-[#D4A017]/20'">
+                         :class="darkMode ? 'border-[#C0C5D9]/20' : 'border-[#e0d9cb]'">
                         <p class="font-lora text-base leading-relaxed italic transition-colors text-center"
-                           :class="darkMode ? 'text-[#F5F5F0]/70' : 'text-[#0F1C3A]/70'"
+                           :class="darkMode ? 'text-[#F5F5F0]/70' : 'text-[#3d3225]/70'"
                            x-text="verseLookupResult ? verseLookupResult.text : ''"></p>
                     </div>
                 </div>
@@ -977,12 +983,12 @@
                 <!-- No Interlinear Available Message - With Fetch Option -->
                 <div x-show="showInterlinear && !hasInterlinear()"
                      class="p-4 rounded-lg text-center"
-                     :class="darkMode ? 'bg-[#1A2332]/50 text-[#9BA4B8]' : 'bg-white/50 text-[#6B5D4A]'">
+                     :class="darkMode ? 'bg-[#1A2332]/50 text-[#9BA4B8]' : 'bg-[#FFFDF9]/70 text-[#7a6f5f]'">
                     
                     <!-- Loading State -->
                     <div x-show="loadingInterlinear" class="py-4">
                         <div class="animate-spin rounded-full h-8 w-8 border-2 mx-auto"
-                             :class="darkMode ? 'border-[#C0C5D9] border-t-transparent' : 'border-[#D4A017] border-t-transparent'"></div>
+                             :class="darkMode ? 'border-[#C0C5D9] border-t-transparent' : 'border-[#c4960c] border-t-transparent'"></div>
                         <p class="font-inter text-sm mt-2">Fetching interlinear data...</p>
                     </div>
                     
@@ -997,7 +1003,7 @@
                         <p class="font-inter text-sm mb-3">Interlinear data not pre-loaded for this verse.</p>
                         <button @click="fetchInterlinear()"
                                 class="px-4 py-2 rounded-lg font-inter text-sm font-semibold transition-all hover:scale-105"
-                                :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9] hover:bg-[#C0C5D9]/30' : 'bg-[#D4A017]/20 text-[#D4A017] hover:bg-[#D4A017]/30'">
+                                :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9] hover:bg-[#C0C5D9]/30' : 'bg-[#c4960c]/15 text-[#c4960c] hover:bg-[#c4960c]/25'">
                             📜 Fetch Hebrew/Greek from API
                         </button>
                         <p class="font-inter text-xs mt-3 opacity-70">Or try pre-loaded verses: Genesis 1:1-3, John 1:1, John 3:16, Psalm 23:1-3, Romans 8:28</p>
@@ -1005,7 +1011,7 @@
                 </div>
                 
                 <p class="mt-4 font-inter text-sm transition-colors"
-                   :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#6B5D4A]'">
+                   :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
                     💡 <span class="cursor-pointer underline" @click="askAboutVerse()">Ask AI to explain this verse</span>
                 </p>
             </div>
@@ -1017,7 +1023,7 @@
                     <div class="flex items-center gap-3">
                         <span class="text-2xl">📚</span>
                         <h2 class="font-playfair text-xl transition-colors"
-                            :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'">
+                            :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
                             Translation Comparison
                         </h2>
                     </div>
@@ -1027,8 +1033,8 @@
                             <button @click="toggleTranslation(trans.value); if(verseLookupResult) fetchTranslationComparison(verseLookupResult.reference)"
                                     class="px-3 py-1 rounded-lg font-inter text-xs font-medium border transition-all hover:scale-105"
                                     :class="selectedTranslationsToCompare.includes(trans.value)
-                                        ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-[#D4A017] text-white')
-                                        : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-transparent text-[#D4A017] border-[#D4A017]/30')"
+                                        ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white')
+                                        : (darkMode ? 'bg-transparent text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-[#FFFDF9]/60 text-[#5c5245] border-[#d4cabb]')"
                                     x-text="trans.label"></button>
                         </template>
                     </div>
@@ -1039,14 +1045,14 @@
                         <div class="rounded-xl p-5 border transition-colors"
                              :class="darkMode
                                  ? 'bg-[#243044]/80 border-[#C0C5D9]/30'
-                                 : 'bg-white/80 border-[#D4A017]/30'">
+                                 : 'bg-[#FFFDF9]/90 border-[#e0d9cb] shadow-[0_2px_8px_rgba(61,50,37,0.06)]'">
                             <div class="flex items-center gap-2 mb-3">
                                 <span class="font-inter text-sm font-bold px-2 py-1 rounded transition-colors"
-                                      :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#D4A017]/20 text-[#D4A017]'"
+                                      :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#c4960c]/15 text-[#c4960c]'"
                                       x-text="result.translation"></span>
                             </div>
                             <p class="font-lora text-base leading-relaxed italic transition-colors"
-                               :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#0F1C3A]'"
+                               :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#3d3225]'"
                                x-text="result.text"></p>
                         </div>
                     </template>
@@ -1058,7 +1064,7 @@
                 <div class="flex items-center gap-3 mb-6">
                     <span class="text-2xl">🕊️</span>
                     <h2 class="font-playfair text-2xl transition-colors"
-                        :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'">
+                        :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
                         Comparative Perspectives
                     </h2>
                 </div>
@@ -1067,13 +1073,13 @@
                 <div class="rounded-xl p-6 border transition-colors"
                      :class="darkMode 
                          ? 'bg-[#243044]/80 border-[#C0C5D9]/30' 
-                         : 'bg-white/80 border-[#D4A017]/30'">
+                         : 'bg-[#FFFDF9]/90 border-[#e0d9cb] shadow-[0_2px_8px_rgba(61,50,37,0.06)]'">
                     <h3 class="font-playfair text-lg mb-3 flex items-center gap-2 transition-colors"
-                        :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'">
+                        :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
                         <span>🤝</span> Common Ground
                     </h3>
                     <div class="font-lora leading-relaxed transition-colors"
-                         :class="darkMode ? 'text-[#F5F5F0]/90' : 'text-[#0F1C3A]/90'"
+                         :class="darkMode ? 'text-[#F5F5F0]/90' : 'text-[#3d3225]/90'"
                          x-html="formatResponse(perspectiveResponse ? perspectiveResponse.common : '')"></div>
                 </div>
                 
@@ -1081,36 +1087,36 @@
                 <div class="grid md:grid-cols-3 gap-4">
                     <template x-if="perspectiveResponse && perspectiveResponse.protestant">
                         <div class="rounded-xl p-5 border transition-colors"
-                             :class="darkMode ? 'bg-[#243044]/70 border-[#9b59b6]/30' : 'bg-white/80 border-[#9b59b6]/30'">
+                             :class="darkMode ? 'bg-[#243044]/70 border-[#9b59b6]/30' : 'bg-[#FFFDF9]/90 border-[#9b59b6]/30'">
                             <h4 class="font-playfair text-base mb-3 text-[#9b59b6] flex items-center gap-2">
                                 <span>⛪</span> Protestant
                             </h4>
                             <div class="font-lora text-sm leading-relaxed transition-colors"
-                                 :class="darkMode ? 'text-[#F5F5F0]/85' : 'text-[#0F1C3A]/85'"
+                                 :class="darkMode ? 'text-[#F5F5F0]/85' : 'text-[#3d3225]/85'"
                                  x-html="formatResponse(perspectiveResponse.protestant)"></div>
                         </div>
                     </template>
                     
                     <template x-if="perspectiveResponse && perspectiveResponse.catholic">
                         <div class="rounded-xl p-5 border transition-colors"
-                             :class="darkMode ? 'bg-[#243044]/70 border-[#e74c3c]/30' : 'bg-white/80 border-[#e74c3c]/30'">
+                             :class="darkMode ? 'bg-[#243044]/70 border-[#e74c3c]/30' : 'bg-[#FFFDF9]/90 border-[#e74c3c]/30'">
                             <h4 class="font-playfair text-base mb-3 text-[#e74c3c] flex items-center gap-2">
                                 <span>⛪</span> Catholic
                             </h4>
                             <div class="font-lora text-sm leading-relaxed transition-colors"
-                                 :class="darkMode ? 'text-[#F5F5F0]/85' : 'text-[#0F1C3A]/85'"
+                                 :class="darkMode ? 'text-[#F5F5F0]/85' : 'text-[#3d3225]/85'"
                                  x-html="formatResponse(perspectiveResponse.catholic)"></div>
                         </div>
                     </template>
                     
                     <template x-if="perspectiveResponse && perspectiveResponse.orthodox">
                         <div class="rounded-xl p-5 border transition-colors"
-                             :class="darkMode ? 'bg-[#243044]/70 border-[#3498db]/30' : 'bg-white/80 border-[#3498db]/30'">
+                             :class="darkMode ? 'bg-[#243044]/70 border-[#3498db]/30' : 'bg-[#FFFDF9]/90 border-[#3498db]/30'">
                             <h4 class="font-playfair text-base mb-3 text-[#3498db] flex items-center gap-2">
                                 <span>⛪</span> Orthodox
                             </h4>
                             <div class="font-lora text-sm leading-relaxed transition-colors"
-                                 :class="darkMode ? 'text-[#F5F5F0]/85' : 'text-[#0F1C3A]/85'"
+                                 :class="darkMode ? 'text-[#F5F5F0]/85' : 'text-[#3d3225]/85'"
                                  x-html="formatResponse(perspectiveResponse.orthodox)"></div>
                         </div>
                     </template>
@@ -1122,28 +1128,28 @@
                  class="rounded-2xl p-8 border mb-8 transition-colors"
                  :class="darkMode
                      ? 'bg-[#243044]/80 border-[#C0C5D9]/30'
-                     : 'bg-white/80 border-[#D4A017]/30'">
+                     : 'bg-[#FFFDF9]/90 border-[#e0d9cb] shadow-[0_2px_8px_rgba(61,50,37,0.06)]'">
 
                 <!-- Verse Display (shown when AI is discussing a specific verse) -->
                 <!-- This section updates when the translation dropdown changes -->
                 <div x-show="currentVerseRef && currentVerseText" class="mb-6">
                     <div class="flex items-center justify-between mb-3">
                         <h3 class="font-playfair text-xl transition-colors"
-                            :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'"
+                            :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'"
                             x-text="currentVerseRef"></h3>
                         <span class="font-inter text-xs px-2 py-1 rounded transition-colors"
-                              :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#D4A017]/20 text-[#D4A017]'"
+                              :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#c4960c]/15 text-[#c4960c]'"
                               x-text="selectedTranslation"></span>
                     </div>
                     <p class="font-lora text-lg leading-relaxed italic transition-colors border-l-4 pl-4"
-                       :class="darkMode ? 'text-[#F5F5F0] border-[#C0C5D9]/30' : 'text-[#0F1C3A] border-[#D4A017]/30'"
+                       :class="darkMode ? 'text-[#F5F5F0] border-[#C0C5D9]/30' : 'text-[#3d3225] border-[#d4cabb]'"
                        x-text="currentVerseText"></p>
                 </div>
 
                 <!-- Divider (shown when verse is displayed above AI response) -->
                 <div x-show="currentVerseRef && currentVerseText"
                      class="border-t mb-6 transition-colors"
-                     :class="darkMode ? 'border-[#C0C5D9]/20' : 'border-[#D4A017]/20'"></div>
+                     :class="darkMode ? 'border-[#C0C5D9]/20' : 'border-[#e0d9cb]'"></div>
 
                 <div x-show="comparativeMode && !perspectiveResponse"
                      class="mb-4 p-3 rounded-lg text-sm"
@@ -1151,7 +1157,7 @@
                     ⚠️ Could not parse comparative format. Showing raw response:
                 </div>
                 <div class="font-lora text-lg leading-relaxed transition-colors"
-                     :class="darkMode ? 'text-[#F5F5F0]/90' : 'text-[#0F1C3A]/90'"
+                     :class="darkMode ? 'text-[#F5F5F0]/90' : 'text-[#3d3225]/90'"
                      x-html="formatResponse(aiResponse)"></div>
             </div>
             
@@ -1167,14 +1173,14 @@
                         class="flex-1 rounded-xl px-5 py-4 font-lora border-2 transition-all focus:outline-none focus:ring-4"
                         :class="darkMode 
                             ? 'bg-[#243044] border-[#C0C5D9]/30 text-[#F5F5F0] placeholder-[#9BA4B8] focus:border-[#C0C5D9] focus:ring-[#C0C5D9]/20' 
-                            : 'bg-white border-[#D4A017]/30 text-[#0F1C3A] placeholder-[#6B5D4A] focus:border-[#D4A017] focus:ring-[#D4A017]/20'"
+                            : 'bg-[#FFFDF9] border-[#e0d9cb] text-[#3d3225] placeholder-[#a69d8a] focus:border-[#c4960c] focus:ring-[#c4960c]/20'"
                     />
                     <button 
                         @click="askFollowUp()"
                         class="px-6 py-4 rounded-xl font-inter font-semibold transition-all hover:scale-105"
                         :class="darkMode 
                             ? 'bg-[#C0C5D9] text-[#1A2332] hover:bg-[#E8ECF4]' 
-                            : 'bg-[#D4A017] text-[#0F1C3A] hover:bg-[#FFB627]'">
+                            : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white hover:from-[#daa520] hover:to-[#e6b836] shadow-[0_4px_12px_rgba(196,150,12,0.3)]'">
                         Ask
                     </button>
                 </div>
@@ -1187,7 +1193,7 @@
                         class="flex items-center gap-2 px-4 py-2 rounded-lg font-inter text-sm border transition-all hover:scale-105"
                         :class="darkMode 
                             ? 'bg-[#243044] text-[#C0C5D9] border-[#C0C5D9]/30 hover:bg-[#2D3A52]' 
-                            : 'bg-white text-[#D4A017] border-[#D4A017]/30 hover:bg-[#FFE8E0]'">
+                            : 'bg-[#FFFDF9] text-[#5c5245] border-[#d4cabb] hover:bg-[#F0EBE1] hover:border-[#c4960c]'">
                     <span x-text="copied ? '✓ Copied!' : '📋 Copy'"></span>
                 </button>
                 
@@ -1195,7 +1201,7 @@
                         class="flex items-center gap-2 px-4 py-2 rounded-lg font-inter text-sm border transition-all hover:scale-105"
                         :class="darkMode 
                             ? 'bg-[#243044] text-[#C0C5D9] border-[#C0C5D9]/30 hover:bg-[#2D3A52]' 
-                            : 'bg-white text-[#D4A017] border-[#D4A017]/30 hover:bg-[#FFE8E0]'">
+                            : 'bg-[#FFFDF9] text-[#5c5245] border-[#d4cabb] hover:bg-[#F0EBE1] hover:border-[#c4960c]'">
                     <span>🏠</span> New Search
                 </button>
             </div>
@@ -1213,13 +1219,13 @@
          @click.self="showingLanguageModal = false"
          class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
         <div class="modal-content rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto"
-             :class="darkMode ? 'bg-[#243044]' : 'bg-[#FDFBF7]'">
+             :class="darkMode ? 'bg-[#243044]' : 'bg-[#FAF7F2]'">
 
             <!-- Loading State for Strong's Data -->
             <div x-show="!currentStrongsData && loadingLanguageExplanation" class="text-center py-8">
                 <div class="animate-spin rounded-full h-8 w-8 border-2 mx-auto mb-4"
-                     :class="darkMode ? 'border-[#C0C5D9] border-t-transparent' : 'border-[#D4A017] border-t-transparent'"></div>
-                <p class="font-inter text-sm" :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#6B5D4A]'">
+                     :class="darkMode ? 'border-[#C0C5D9] border-t-transparent' : 'border-[#c4960c] border-t-transparent'"></div>
+                <p class="font-inter text-sm" :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
                     Loading definition for <span x-text="currentStrongsNum"></span>...
                 </p>
             </div>
@@ -1227,10 +1233,10 @@
             <div x-show="currentStrongsData" class="flex justify-between items-start mb-6">
                 <div>
                     <h2 class="font-playfair original-text mb-2"
-                        :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'"
+                        :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'"
                         x-text="currentStrongsData ? currentStrongsData.lemma : ''"></h2>
                     <p class="font-inter text-sm"
-                       :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#6B5D4A]'">
+                       :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
                         <span class="font-semibold" x-text="currentStrongsData ? currentStrongsData.translit : ''"></span>
                         <span class="mx-2">•</span>
                         <span class="italic" x-text="currentStrongsData ? currentStrongsData.pronunciation : ''"></span>
@@ -1240,35 +1246,35 @@
                 </div>
                 <button @click="showingLanguageModal = false" 
                         class="text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-colors"
-                        :class="darkMode ? 'hover:bg-[#C0C5D9]/10 text-[#C0C5D9]' : 'hover:bg-[#D4A017]/10 text-[#D4A017]'">
+                        :class="darkMode ? 'hover:bg-[#C0C5D9]/10 text-[#C0C5D9]' : 'hover:bg-[#F0EBE1] text-[#c4960c]'">
                     ×
                 </button>
             </div>
 
             <div x-show="currentStrongsData" class="mb-6">
                 <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold"
-                      :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#D4A017]/20 text-[#D4A017]'"
+                      :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#c4960c]/15 text-[#c4960c]'"
                       x-text="currentStrongsData ? currentStrongsData.partOfSpeech : ''"></span>
             </div>
 
             <div x-show="currentStrongsData" class="mb-6 pb-6 border-b"
-                 :class="darkMode ? 'border-[#C0C5D9]/20' : 'border-[#D4A017]/20'">
+                 :class="darkMode ? 'border-[#C0C5D9]/20' : 'border-[#e0d9cb]'">
                 <h3 class="font-playfair text-lg mb-3"
-                    :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'">Definition</h3>
+                    :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">Definition</h3>
                 <p class="font-lora text-base mb-3"
-                   :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#0F1C3A]'"
+                   :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#3d3225]'"
                    x-text="currentStrongsData ? currentStrongsData.definition : ''"></p>
                 <p class="font-lora text-sm"
-                   :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#6B5D4A]'"
+                   :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'"
                    x-text="currentStrongsData ? currentStrongsData.longDefinition : ''"></p>
             </div>
 
             <div x-show="currentStrongsData" class="mb-6 pb-6 border-b"
-                 :class="darkMode ? 'border-[#C0C5D9]/20' : 'border-[#D4A017]/20'">
+                 :class="darkMode ? 'border-[#C0C5D9]/20' : 'border-[#e0d9cb]'">
                 <h3 class="font-playfair text-lg mb-2"
-                    :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'">Biblical Usage</h3>
+                    :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">Biblical Usage</h3>
                 <p class="font-inter text-sm"
-                   :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#6B5D4A]'"
+                   :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'"
                    x-text="currentStrongsData ? currentStrongsData.usage : ''"></p>
             </div>
 
@@ -1276,20 +1282,20 @@
             <div x-show="currentStrongsData" class="rounded-lg p-6"
                  :class="darkMode 
                      ? 'bg-gradient-to-br from-[#C0C5D9]/10 to-[#9BA4B8]/10' 
-                     : 'bg-gradient-to-br from-[#D4A017]/10 to-[#6B5D4A]/10'">
+                     : 'bg-gradient-to-br from-[#c4960c]/10 to-[#7a6f5f]/10'">
                 <h3 class="font-playfair text-lg mb-4 flex items-center gap-2"
-                    :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'">
+                    :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
                     <span>✨</span> AI Insight
                 </h3>
                 <div x-show="loadingLanguageExplanation" class="flex items-center gap-2">
                     <div class="loading-pulse">💭</div>
-                    <span class="font-inter text-sm" :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#6B5D4A]'">
+                    <span class="font-inter text-sm" :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
                         Exploring the depths of this word...
                     </span>
                 </div>
                 <p x-show="!loadingLanguageExplanation"
                    class="font-lora text-base leading-relaxed"
-                   :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#0F1C3A]'"
+                   :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#3d3225]'"
                    x-text="languageAIExplanation"></p>
             </div>
             
@@ -1297,7 +1303,7 @@
                     class="w-full mt-6 py-3 rounded-lg font-inter font-semibold transition-all hover:scale-[1.02]"
                     :class="darkMode 
                         ? 'bg-[#C0C5D9] text-[#1A2332] hover:bg-[#E8ECF4]' 
-                        : 'bg-[#D4A017] text-[#0F1C3A] hover:bg-[#FFB627]'">
+                        : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white hover:from-[#daa520] hover:to-[#e6b836] shadow-[0_4px_12px_rgba(196,150,12,0.3)]'">
                 Got It
             </button>
         </div>
