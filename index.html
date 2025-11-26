@@ -11,7 +11,8 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Alpine.js -->
+    <!-- Alpine.js with Collapse Plugin -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
     <!-- Google Fonts -->
@@ -1111,7 +1112,17 @@
                               x-text="selectedTranslation"></span>
                     </div>
 
-                    <div class="flex items-center gap-2">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <!-- X-Ray Button (Primary Feature) -->
+                        <button @click="fetchXray(verseLookupResult.reference, verseLookupResult.text)"
+                                class="flex items-center gap-2 px-3 py-2 rounded-lg font-inter text-sm border transition-all hover:scale-105"
+                                :class="showXrayPanel
+                                    ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white')
+                                    : (darkMode ? 'bg-gradient-to-r from-[#C0C5D9]/20 to-[#9BA4B8]/20 text-[#C0C5D9] border-[#C0C5D9]/50 hover:border-[#C0C5D9]' : 'bg-gradient-to-r from-[#c4960c]/15 to-[#daa520]/15 text-[#c4960c] border-[#c4960c]/50 hover:border-[#c4960c]')">
+                            <span>🔬</span>
+                            <span>X-Ray</span>
+                        </button>
+
                         <!-- Compare Translations Button -->
                         <button @click="showSideBySide = !showSideBySide; if(showSideBySide) fetchSideBySideComparison()"
                                 class="flex items-center gap-2 px-3 py-2 rounded-lg font-inter text-sm border transition-all hover:scale-105"
@@ -1655,7 +1666,268 @@
             </button>
         </div>
     </div>
-    
+
+    <!-- ==================== X-RAY MODE PANEL ==================== -->
+    <div x-show="showXrayPanel"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         @click.self="closeXray()"
+         class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
+        <div class="modal-content rounded-2xl p-6 md:p-8 max-w-3xl w-full shadow-2xl max-h-[90vh] overflow-y-auto"
+             :class="darkMode ? 'bg-[#243044]' : 'bg-[#FAF7F2]'">
+
+            <!-- Header -->
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-2xl">🔬</span>
+                        <h2 class="font-playfair text-2xl font-bold"
+                            :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
+                            X-Ray Mode
+                        </h2>
+                    </div>
+                    <p class="font-inter text-sm"
+                       :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
+                        Deep analysis of <span class="font-semibold" x-text="xrayVerseRef"></span>
+                    </p>
+                </div>
+                <button @click="closeXray()"
+                        class="text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+                        :class="darkMode ? 'hover:bg-[#C0C5D9]/10 text-[#C0C5D9]' : 'hover:bg-[#F0EBE1] text-[#c4960c]'">
+                    ×
+                </button>
+            </div>
+
+            <!-- Loading State -->
+            <div x-show="xrayLoading" class="text-center py-12">
+                <div class="animate-spin rounded-full h-12 w-12 border-3 mx-auto mb-4"
+                     :class="darkMode ? 'border-[#C0C5D9] border-t-transparent' : 'border-[#c4960c] border-t-transparent'"></div>
+                <p class="font-inter text-base" :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
+                    Analyzing Scripture...
+                </p>
+                <p class="font-inter text-sm mt-2" :class="darkMode ? 'text-[#9BA4B8]/70' : 'text-[#7a6f5f]/70'">
+                    Examining context, language, and connections
+                </p>
+            </div>
+
+            <!-- Error State -->
+            <div x-show="xrayError && !xrayLoading" class="text-center py-8">
+                <span class="text-4xl mb-4 block">⚠️</span>
+                <p class="font-inter text-base mb-4" :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#3d3225]'" x-text="xrayError"></p>
+                <button @click="fetchXray(xrayVerseRef, verseLookupResult?.text)"
+                        class="px-6 py-2 rounded-lg font-inter font-medium transition-all"
+                        :class="darkMode
+                            ? 'bg-[#C0C5D9] text-[#1A2332] hover:bg-[#E8ECF4]'
+                            : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white'">
+                    Try Again
+                </button>
+            </div>
+
+            <!-- X-Ray Content -->
+            <div x-show="xrayData && !xrayLoading" class="space-y-4">
+
+                <!-- Section: What It Means (expanded by default) -->
+                <div class="rounded-xl overflow-hidden border"
+                     :class="darkMode ? 'border-[#C0C5D9]/20 bg-[#1A2332]/50' : 'border-[#e0d9cb] bg-white'">
+                    <button @click="toggleXraySection('meaning')"
+                            class="w-full px-5 py-4 flex items-center justify-between text-left transition-colors"
+                            :class="darkMode ? 'hover:bg-[#C0C5D9]/5' : 'hover:bg-[#F0EBE1]/50'">
+                        <span class="font-playfair text-lg font-semibold flex items-center gap-2"
+                              :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
+                            <span x-text="xrayData?.meaning?.title || '❓ What This Means'"></span>
+                        </span>
+                        <span class="text-xl transition-transform"
+                              :class="[isXraySectionExpanded('meaning') ? 'rotate-180' : '', darkMode ? 'text-[#C0C5D9]' : 'text-[#c4960c]']">
+                            ▼
+                        </span>
+                    </button>
+                    <div x-show="isXraySectionExpanded('meaning')" x-collapse class="px-5 pb-5">
+                        <p class="font-lora text-base leading-relaxed"
+                           :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#3d3225]'"
+                           x-text="xrayData?.meaning?.content"></p>
+                    </div>
+                </div>
+
+                <!-- Section: Historical & Cultural Context -->
+                <div class="rounded-xl overflow-hidden border"
+                     :class="darkMode ? 'border-[#C0C5D9]/20 bg-[#1A2332]/50' : 'border-[#e0d9cb] bg-white'">
+                    <button @click="toggleXraySection('context')"
+                            class="w-full px-5 py-4 flex items-center justify-between text-left transition-colors"
+                            :class="darkMode ? 'hover:bg-[#C0C5D9]/5' : 'hover:bg-[#F0EBE1]/50'">
+                        <span class="font-playfair text-lg font-semibold flex items-center gap-2"
+                              :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
+                            <span x-text="xrayData?.context?.title || '📍 Historical & Cultural Context'"></span>
+                        </span>
+                        <span class="text-xl transition-transform"
+                              :class="[isXraySectionExpanded('context') ? 'rotate-180' : '', darkMode ? 'text-[#C0C5D9]' : 'text-[#c4960c]']">
+                            ▼
+                        </span>
+                    </button>
+                    <div x-show="isXraySectionExpanded('context')" x-collapse class="px-5 pb-5">
+                        <p class="font-lora text-base leading-relaxed"
+                           :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#3d3225]'"
+                           x-text="xrayData?.context?.content"></p>
+                    </div>
+                </div>
+
+                <!-- Section: Original Language Insights -->
+                <div class="rounded-xl overflow-hidden border"
+                     :class="darkMode ? 'border-[#C0C5D9]/20 bg-[#1A2332]/50' : 'border-[#e0d9cb] bg-white'">
+                    <button @click="toggleXraySection('language')"
+                            class="w-full px-5 py-4 flex items-center justify-between text-left transition-colors"
+                            :class="darkMode ? 'hover:bg-[#C0C5D9]/5' : 'hover:bg-[#F0EBE1]/50'">
+                        <span class="font-playfair text-lg font-semibold flex items-center gap-2"
+                              :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
+                            <span x-text="xrayData?.language?.title || '📜 Original Language Insights'"></span>
+                        </span>
+                        <span class="text-xl transition-transform"
+                              :class="[isXraySectionExpanded('language') ? 'rotate-180' : '', darkMode ? 'text-[#C0C5D9]' : 'text-[#c4960c]']">
+                            ▼
+                        </span>
+                    </button>
+                    <div x-show="isXraySectionExpanded('language')" x-collapse class="px-5 pb-5">
+                        <p class="font-lora text-base leading-relaxed mb-4"
+                           :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#3d3225]'"
+                           x-text="xrayData?.language?.content"></p>
+
+                        <!-- Key Words -->
+                        <template x-if="xrayData?.language?.keyWords?.length > 0">
+                            <div class="mt-4 space-y-3">
+                                <h4 class="font-inter text-sm font-semibold uppercase tracking-wide"
+                                    :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#c4960c]'">
+                                    Key Words
+                                </h4>
+                                <template x-for="word in xrayData?.language?.keyWords" :key="word.original">
+                                    <div class="rounded-lg p-3"
+                                         :class="darkMode ? 'bg-[#C0C5D9]/10' : 'bg-[#c4960c]/10'">
+                                        <div class="flex items-baseline gap-2 mb-1">
+                                            <span class="font-lora text-lg" :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'" x-text="word.original"></span>
+                                            <span class="font-inter text-sm italic" :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'" x-text="word.transliteration"></span>
+                                        </div>
+                                        <p class="font-inter text-sm" :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#3d3225]'" x-text="word.meaning"></p>
+                                        <p class="font-inter text-xs mt-1" :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'" x-text="word.significance"></p>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Section: Biblical Connections -->
+                <div class="rounded-xl overflow-hidden border"
+                     :class="darkMode ? 'border-[#C0C5D9]/20 bg-[#1A2332]/50' : 'border-[#e0d9cb] bg-white'">
+                    <button @click="toggleXraySection('connections')"
+                            class="w-full px-5 py-4 flex items-center justify-between text-left transition-colors"
+                            :class="darkMode ? 'hover:bg-[#C0C5D9]/5' : 'hover:bg-[#F0EBE1]/50'">
+                        <span class="font-playfair text-lg font-semibold flex items-center gap-2"
+                              :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
+                            <span x-text="xrayData?.connections?.title || '🔗 Biblical Connections'"></span>
+                        </span>
+                        <span class="text-xl transition-transform"
+                              :class="[isXraySectionExpanded('connections') ? 'rotate-180' : '', darkMode ? 'text-[#C0C5D9]' : 'text-[#c4960c]']">
+                            ▼
+                        </span>
+                    </button>
+                    <div x-show="isXraySectionExpanded('connections')" x-collapse class="px-5 pb-5">
+                        <p class="font-lora text-base leading-relaxed mb-4"
+                           :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#3d3225]'"
+                           x-text="xrayData?.connections?.content"></p>
+
+                        <!-- Cross References -->
+                        <template x-if="xrayData?.connections?.references?.length > 0">
+                            <div class="flex flex-wrap gap-2 mt-3">
+                                <template x-for="ref in xrayData?.connections?.references" :key="ref">
+                                    <button @click="closeXray(); userQuery = ref; handleSearch()"
+                                            class="px-3 py-1 rounded-full text-sm font-inter transition-all hover:scale-105"
+                                            :class="darkMode
+                                                ? 'bg-[#C0C5D9]/20 text-[#C0C5D9] hover:bg-[#C0C5D9]/30'
+                                                : 'bg-[#c4960c]/15 text-[#c4960c] hover:bg-[#c4960c]/25'"
+                                            x-text="ref">
+                                    </button>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Section: Why It Matters -->
+                <div class="rounded-xl overflow-hidden border"
+                     :class="darkMode ? 'border-[#C0C5D9]/20 bg-[#1A2332]/50' : 'border-[#e0d9cb] bg-white'">
+                    <button @click="toggleXraySection('application')"
+                            class="w-full px-5 py-4 flex items-center justify-between text-left transition-colors"
+                            :class="darkMode ? 'hover:bg-[#C0C5D9]/5' : 'hover:bg-[#F0EBE1]/50'">
+                        <span class="font-playfair text-lg font-semibold flex items-center gap-2"
+                              :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
+                            <span x-text="xrayData?.application?.title || '💡 Why This Matters'"></span>
+                        </span>
+                        <span class="text-xl transition-transform"
+                              :class="[isXraySectionExpanded('application') ? 'rotate-180' : '', darkMode ? 'text-[#C0C5D9]' : 'text-[#c4960c]']">
+                            ▼
+                        </span>
+                    </button>
+                    <div x-show="isXraySectionExpanded('application')" x-collapse class="px-5 pb-5">
+                        <p class="font-lora text-base leading-relaxed"
+                           :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#3d3225]'"
+                           x-text="xrayData?.application?.content"></p>
+                    </div>
+                </div>
+
+                <!-- Follow-Up Question Section -->
+                <div class="mt-6 pt-6 border-t"
+                     :class="darkMode ? 'border-[#C0C5D9]/20' : 'border-[#e0d9cb]'">
+                    <h4 class="font-playfair text-lg mb-3 flex items-center gap-2"
+                        :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
+                        <span>💬</span> Ask a Follow-Up Question
+                    </h4>
+                    <div class="flex gap-2">
+                        <input type="text"
+                               x-model="xrayFollowUpQuery"
+                               @keydown.enter="askXrayFollowUp()"
+                               placeholder="What else would you like to know about this verse?"
+                               class="flex-1 rounded-xl px-4 py-3 font-inter text-sm border transition-all focus:outline-none"
+                               :class="darkMode
+                                   ? 'bg-[#1A2332] border-[#C0C5D9]/30 text-[#F5F5F0] placeholder-[#9BA4B8] focus:border-[#C0C5D9]'
+                                   : 'bg-white border-[#e0d9cb] text-[#3d3225] placeholder-[#a69d8a] focus:border-[#c4960c]'">
+                        <button @click="askXrayFollowUp()"
+                                :disabled="xrayFollowUpLoading || !xrayFollowUpQuery.trim()"
+                                class="px-5 py-3 rounded-xl font-inter font-medium transition-all disabled:opacity-50"
+                                :class="darkMode
+                                    ? 'bg-[#C0C5D9] text-[#1A2332] hover:bg-[#E8ECF4]'
+                                    : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white'">
+                            <span x-show="!xrayFollowUpLoading">Ask</span>
+                            <span x-show="xrayFollowUpLoading" class="flex items-center gap-2">
+                                <span class="animate-spin">⏳</span>
+                            </span>
+                        </button>
+                    </div>
+
+                    <!-- Follow-Up Response -->
+                    <div x-show="xrayFollowUpResponse"
+                         x-transition
+                         class="mt-4 rounded-xl p-4"
+                         :class="darkMode ? 'bg-[#C0C5D9]/10' : 'bg-[#c4960c]/10'">
+                        <p class="font-lora text-base leading-relaxed"
+                           :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#3d3225]'"
+                           x-text="xrayFollowUpResponse"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Close Button -->
+            <button @click="closeXray()"
+                    class="w-full mt-6 py-3 rounded-lg font-inter font-semibold transition-all hover:scale-[1.02]"
+                    :class="darkMode
+                        ? 'bg-[#C0C5D9] text-[#1A2332] hover:bg-[#E8ECF4]'
+                        : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white hover:from-[#daa520] hover:to-[#e6b836] shadow-[0_4px_12px_rgba(196,150,12,0.3)]'">
+                Close X-Ray
+            </button>
+        </div>
+    </div>
+
     <!-- ==================== JAVASCRIPT ==================== -->
     <script>
         function gospelPathApp() {
@@ -1762,6 +2034,19 @@
                 selectedPlan: null,               // Currently selected plan object
                 viewingPlanDay: null,             // Currently viewing day (1-based)
                 readingPlanProgress: {},          // { planId: { completedDays: [1, 2, 3], startDate: '...' } }
+
+                // ===========================================
+                // X-RAY MODE - Deep Scripture Analysis
+                // ===========================================
+                showXrayPanel: false,             // Show/hide X-Ray panel
+                xrayData: null,                   // Parsed X-Ray response data
+                xrayLoading: false,               // Loading state
+                xrayError: null,                  // Error message if any
+                xrayExpandedSections: ['meaning'], // Which sections are expanded (default: meaning)
+                xrayVerseRef: null,               // The verse being X-Rayed
+                xrayFollowUpQuery: '',            // Follow-up question input
+                xrayFollowUpResponse: '',         // Response to follow-up question
+                xrayFollowUpLoading: false,       // Loading state for follow-up
 
                 // ===========================================
                 // INTERLINEAR DATABASE (Hebrew/Greek word-by-word) - EXPANDED VERSION
@@ -3519,6 +3804,159 @@ Each perspective should be 2-3 sentences. Use the ${this.selectedTranslation} tr
                     this.showInterlinear = false;
                     this.showStudyPlanGenerator = false;
                     this.generatedStudyPlan = null;
+                    this.closeXray();
+                },
+
+                // ===========================================
+                // X-RAY MODE METHODS - Deep Scripture Analysis
+                // ===========================================
+
+                async fetchXray(verseRef, verseText) {
+                    if (!verseRef) return;
+
+                    // Check cache first
+                    const cacheKey = `xray_${verseRef}_${this.selectedTranslation}`;
+                    const cached = this.getXrayFromCache(cacheKey);
+                    if (cached) {
+                        this.xrayData = cached;
+                        this.xrayVerseRef = verseRef;
+                        this.showXrayPanel = true;
+                        this.xrayExpandedSections = ['meaning'];
+                        return;
+                    }
+
+                    this.xrayLoading = true;
+                    this.xrayError = null;
+                    this.xrayData = null;
+                    this.xrayVerseRef = verseRef;
+                    this.showXrayPanel = true;
+                    this.xrayExpandedSections = ['meaning'];
+                    this.xrayFollowUpQuery = '';
+                    this.xrayFollowUpResponse = '';
+
+                    try {
+                        const response = await fetch('/api/xray', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                verse: verseRef,
+                                verseText: verseText,
+                                translation: this.selectedTranslation,
+                                perspective: 'protestant',
+                                provider: 'groq'
+                            })
+                        });
+
+                        const data = await response.json();
+
+                        if (!response.ok || !data.success) {
+                            throw new Error(data.message || 'Failed to generate X-Ray analysis');
+                        }
+
+                        this.xrayData = data.sections;
+
+                        // Cache the result
+                        this.saveXrayToCache(cacheKey, data.sections);
+
+                    } catch (error) {
+                        console.error('X-Ray error:', error);
+                        this.xrayError = error.message || 'Failed to analyze verse. Please try again.';
+                    } finally {
+                        this.xrayLoading = false;
+                    }
+                },
+
+                toggleXraySection(section) {
+                    const index = this.xrayExpandedSections.indexOf(section);
+                    if (index > -1) {
+                        this.xrayExpandedSections.splice(index, 1);
+                    } else {
+                        this.xrayExpandedSections.push(section);
+                    }
+                },
+
+                isXraySectionExpanded(section) {
+                    return this.xrayExpandedSections.includes(section);
+                },
+
+                closeXray() {
+                    this.showXrayPanel = false;
+                    this.xrayData = null;
+                    this.xrayError = null;
+                    this.xrayVerseRef = null;
+                    this.xrayFollowUpQuery = '';
+                    this.xrayFollowUpResponse = '';
+                },
+
+                async askXrayFollowUp() {
+                    if (!this.xrayFollowUpQuery.trim() || !this.xrayVerseRef) return;
+
+                    this.xrayFollowUpLoading = true;
+                    this.xrayFollowUpResponse = '';
+
+                    try {
+                        const response = await fetch('/api/chat', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                messages: [
+                                    {
+                                        role: 'system',
+                                        content: `You are a Bible scholar helping someone understand ${this.xrayVerseRef}. They have already seen an X-Ray analysis of this verse. Answer their follow-up question concisely but thoroughly. Use plain language. If relevant, include original language insights or cross-references.`
+                                    },
+                                    {
+                                        role: 'user',
+                                        content: `Regarding ${this.xrayVerseRef}: ${this.xrayFollowUpQuery}`
+                                    }
+                                ],
+                                provider: 'groq'
+                            })
+                        });
+
+                        const data = await response.json();
+
+                        if (!response.ok) {
+                            throw new Error(data.message || 'Failed to get response');
+                        }
+
+                        this.xrayFollowUpResponse = data.message;
+
+                    } catch (error) {
+                        console.error('X-Ray follow-up error:', error);
+                        this.xrayFollowUpResponse = 'Sorry, I couldn\'t process your question. Please try again.';
+                    } finally {
+                        this.xrayFollowUpLoading = false;
+                    }
+                },
+
+                // X-Ray localStorage caching
+                getXrayFromCache(key) {
+                    try {
+                        const cached = localStorage.getItem(key);
+                        if (!cached) return null;
+
+                        const { data, timestamp } = JSON.parse(cached);
+                        // Cache expires after 7 days
+                        const sevenDays = 7 * 24 * 60 * 60 * 1000;
+                        if (Date.now() - timestamp > sevenDays) {
+                            localStorage.removeItem(key);
+                            return null;
+                        }
+                        return data;
+                    } catch {
+                        return null;
+                    }
+                },
+
+                saveXrayToCache(key, data) {
+                    try {
+                        localStorage.setItem(key, JSON.stringify({
+                            data: data,
+                            timestamp: Date.now()
+                        }));
+                    } catch (error) {
+                        console.warn('Failed to cache X-Ray data:', error);
+                    }
                 },
 
                 // ===========================================
