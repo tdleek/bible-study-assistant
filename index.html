@@ -1106,6 +1106,28 @@
                  :class="darkMode
                      ? 'bg-[#243044]/80 border-[#C0C5D9]/30'
                      : 'bg-white/80 border-[#D4A017]/30'">
+
+                <!-- Verse Display (shown when AI is discussing a specific verse) -->
+                <!-- This section updates when the translation dropdown changes -->
+                <div x-show="currentVerseRef && currentVerseText" class="mb-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-playfair text-xl transition-colors"
+                            :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#0F1C3A]'"
+                            x-text="currentVerseRef"></h3>
+                        <span class="font-inter text-xs px-2 py-1 rounded transition-colors"
+                              :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#D4A017]/20 text-[#D4A017]'"
+                              x-text="selectedTranslation"></span>
+                    </div>
+                    <p class="font-lora text-lg leading-relaxed italic transition-colors border-l-4 pl-4"
+                       :class="darkMode ? 'text-[#F5F5F0] border-[#C0C5D9]/30' : 'text-[#0F1C3A] border-[#D4A017]/30'"
+                       x-text="currentVerseText"></p>
+                </div>
+
+                <!-- Divider (shown when verse is displayed above AI response) -->
+                <div x-show="currentVerseRef && currentVerseText"
+                     class="border-t mb-6 transition-colors"
+                     :class="darkMode ? 'border-[#C0C5D9]/20' : 'border-[#D4A017]/20'"></div>
+
                 <div x-show="comparativeMode && !perspectiveResponse"
                      class="mb-4 p-3 rounded-lg text-sm"
                      :class="darkMode ? 'bg-yellow-900/20 text-yellow-300' : 'bg-yellow-50 text-yellow-700'">
@@ -1315,6 +1337,12 @@
                 copied: false,
                 conversationHistory: [],
                 apiEndpoint: '/api/chat',
+
+                // Track the verse being discussed in AI chat (for translation switching)
+                // This allows us to re-fetch the verse text when translation changes
+                // while keeping the AI commentary the same
+                currentVerseRef: null,        // e.g., "John 10:10"
+                currentVerseText: null,       // The verse text in the selected translation
                 
                 // Daily Verse
                 dailyVerse: { text: '', reference: '' },
@@ -2525,49 +2553,73 @@
                 // ===========================================
                 // Called when the user changes the translation dropdown.
                 // Re-fetches the current verse in the newly selected translation.
+                // Handles two cases:
+                //   1. Direct verse lookup (verseLookupResult)
+                //   2. AI chat about a verse (currentVerseRef + aiResponse)
                 async refreshWithNewTranslation() {
                     console.log('Translation changed to:', this.selectedTranslation);
 
-                    // If we have a verse displayed, re-fetch it in the new translation
-                    if (this.verseLookupResult && this.verseLookupResult.reference) {
-                        const reference = this.verseLookupResult.reference;
-                        console.log('Re-fetching verse:', reference, 'in', this.selectedTranslation);
+                    // Determine which verse reference to use
+                    // Priority: verseLookupResult (direct lookup) > currentVerseRef (AI chat)
+                    const reference = (this.verseLookupResult && this.verseLookupResult.reference)
+                        ? this.verseLookupResult.reference
+                        : this.currentVerseRef;
 
-                        try {
-                            this.loading = true;
-                            const response = await fetch(
-                                `/api/verse?ref=${encodeURIComponent(reference)}&translation=${this.selectedTranslation}`
-                            );
-                            const data = await response.json();
+                    if (!reference) {
+                        console.log('No verse reference to refresh');
+                        return;
+                    }
 
-                            if (data.text) {
-                                // Update the displayed verse with the new translation
+                    console.log('Re-fetching verse:', reference, 'in', this.selectedTranslation);
+
+                    try {
+                        // Show subtle loading indicator (don't clear content)
+                        const response = await fetch(
+                            `/api/verse?ref=${encodeURIComponent(reference)}&translation=${this.selectedTranslation}`
+                        );
+                        const data = await response.json();
+
+                        if (data.text) {
+                            // Update the appropriate display based on context
+                            if (this.verseLookupResult) {
+                                // Case 1: Direct verse lookup view
                                 this.verseLookupResult = {
                                     reference: data.reference,
                                     text: data.text
                                 };
+                            }
 
-                                // If side-by-side comparison is showing, refresh it too
-                                if (this.showSideBySide) {
-                                    this.fetchSideBySideComparison();
-                                }
+                            // Case 2: AI chat with verse - always update currentVerseText
+                            // This updates the verse display in the AI response area
+                            if (this.currentVerseRef) {
+                                this.currentVerseText = data.text;
+                            }
 
-                                // If translation comparison is showing, refresh it too
-                                if (this.translationCompareMode && this.translationCompareResults) {
-                                    this.fetchTranslationComparison(reference);
-                                }
-                            } else if (data.available === false) {
-                                // Handle Tyndale or other translations that don't have this verse
+                            // If side-by-side comparison is showing, refresh it too
+                            if (this.showSideBySide) {
+                                this.fetchSideBySideComparison();
+                            }
+
+                            // If translation comparison is showing, refresh it too
+                            if (this.translationCompareMode && this.translationCompareResults) {
+                                this.fetchTranslationComparison(reference);
+                            }
+                        } else if (data.available === false) {
+                            // Handle Tyndale or other translations that don't have this verse
+                            const message = data.message || 'This verse is not available in the selected translation.';
+
+                            if (this.verseLookupResult) {
                                 this.verseLookupResult = {
                                     reference: data.reference,
-                                    text: data.message || 'This verse is not available in the selected translation.'
+                                    text: message
                                 };
                             }
-                        } catch (error) {
-                            console.error('Error refreshing verse:', error);
-                        } finally {
-                            this.loading = false;
+                            if (this.currentVerseRef) {
+                                this.currentVerseText = message;
+                            }
                         }
+                    } catch (error) {
+                        console.error('Error refreshing verse:', error);
                     }
                 },
 
@@ -2698,6 +2750,15 @@
                     if (verseInfo) {
                         const found = await this.lookupVerse(this.userQuery);
                         console.log('Verse found:', found);
+
+                        // Store the verse reference and text for translation switching
+                        // This allows the user to change translations and see the verse
+                        // in the new translation while keeping the AI commentary
+                        if (this.verseLookupResult) {
+                            this.currentVerseRef = this.verseLookupResult.reference;
+                            this.currentVerseText = this.verseLookupResult.text;
+                        }
+
                         // If NOT in comparative mode, just show the verse and return
                         // If in comparative mode, continue to get AI perspectives on the verse
                         if (found && !this.comparativeMode) {
@@ -2705,6 +2766,10 @@
                             return;
                         }
                         console.log('Continuing to AI call (comparative mode is ON)');
+                    } else {
+                        // No verse detected - clear the verse tracking
+                        this.currentVerseRef = null;
+                        this.currentVerseText = null;
                     }
 
                     this.hasSearched = true;
