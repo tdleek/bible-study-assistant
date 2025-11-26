@@ -190,7 +190,9 @@
             <!-- Controls -->
             <div class="flex items-center gap-3">
                 <!-- Translation Selector -->
+                <!-- When translation changes, re-fetch the current verse in the new translation -->
                 <select x-model="selectedTranslation"
+                        @change="refreshWithNewTranslation()"
                         class="rounded-lg px-3 py-2 font-inter text-sm border cursor-pointer transition-colors"
                         :class="darkMode
                             ? 'bg-[#243044] text-[#F5F5F0] border-[#C0C5D9]/30'
@@ -2517,7 +2519,58 @@
                         this.handleSearch();
                     }
                 },
-                
+
+                // ===========================================
+                // TRANSLATION REFRESH
+                // ===========================================
+                // Called when the user changes the translation dropdown.
+                // Re-fetches the current verse in the newly selected translation.
+                async refreshWithNewTranslation() {
+                    console.log('Translation changed to:', this.selectedTranslation);
+
+                    // If we have a verse displayed, re-fetch it in the new translation
+                    if (this.verseLookupResult && this.verseLookupResult.reference) {
+                        const reference = this.verseLookupResult.reference;
+                        console.log('Re-fetching verse:', reference, 'in', this.selectedTranslation);
+
+                        try {
+                            this.loading = true;
+                            const response = await fetch(
+                                `/api/verse?ref=${encodeURIComponent(reference)}&translation=${this.selectedTranslation}`
+                            );
+                            const data = await response.json();
+
+                            if (data.text) {
+                                // Update the displayed verse with the new translation
+                                this.verseLookupResult = {
+                                    reference: data.reference,
+                                    text: data.text
+                                };
+
+                                // If side-by-side comparison is showing, refresh it too
+                                if (this.showSideBySide) {
+                                    this.fetchSideBySideComparison();
+                                }
+
+                                // If translation comparison is showing, refresh it too
+                                if (this.translationCompareMode && this.translationCompareResults) {
+                                    this.fetchTranslationComparison(reference);
+                                }
+                            } else if (data.available === false) {
+                                // Handle Tyndale or other translations that don't have this verse
+                                this.verseLookupResult = {
+                                    reference: data.reference,
+                                    text: data.message || 'This verse is not available in the selected translation.'
+                                };
+                            }
+                        } catch (error) {
+                            console.error('Error refreshing verse:', error);
+                        } finally {
+                            this.loading = false;
+                        }
+                    }
+                },
+
                 // ===========================================
                 // INTERLINEAR FUNCTIONS
                 // ===========================================
