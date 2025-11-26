@@ -1,10 +1,67 @@
 /**
  * GospelPath Verse API Endpoint
- * 
- * Fetches verse text in various English translations from Bolls.life API.
- * 
+ *
+ * Fetches verse text in various English translations.
+ *
+ * Most translations are fetched from Bolls.life API, but the Tyndale Bible
+ * (1525/1530) is served from a local JSON file since Bolls.life doesn't have it.
+ *
  * Usage: /api/verse?ref=Genesis%201:1&translation=ESV
+ *        /api/verse?ref=John%203:16&translation=Tyndale
+ *
+ * =============================================================================
+ * ABOUT THE TYNDALE BIBLE
+ * =============================================================================
+ * William Tyndale (c. 1494-1536) produced the first English Bible translation
+ * directly from the original Hebrew and Greek texts. He was martyred before
+ * completing the entire Bible.
+ *
+ * Tyndale translated:
+ * - Old Testament: Pentateuch (Genesis-Deuteronomy) + Jonah only
+ * - New Testament: Complete (Matthew through Revelation)
+ *
+ * Many of Tyndale's phrases became part of the King James Version and remain
+ * in use today, such as "Let there be light" and "the salt of the earth".
+ * =============================================================================
  */
+
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+// =============================================================================
+// TYNDALE BIBLE DATA (loaded from local JSON file)
+// =============================================================================
+// We load the Tyndale Bible from a local JSON file since it's public domain
+// and not available on Bolls.life. The file contains ~13,800 verses covering
+// the Pentateuch, Jonah, and the complete New Testament.
+// =============================================================================
+let tyndaleData = null;
+
+function loadTyndaleData() {
+  if (tyndaleData) return tyndaleData;
+
+  try {
+    // In Vercel, we need to use process.cwd() to get the project root
+    const filePath = join(process.cwd(), 'data', 'tyndale.json');
+    const fileContent = readFileSync(filePath, 'utf-8');
+    tyndaleData = JSON.parse(fileContent);
+    console.log('✓ Tyndale Bible loaded successfully');
+    return tyndaleData;
+  } catch (error) {
+    console.error('✗ Failed to load Tyndale Bible:', error.message);
+    return null;
+  }
+}
+
+// Books that Tyndale translated (for error messages)
+const TYNDALE_BOOKS = new Set([
+  'Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy', 'Jonah',
+  'Matthew', 'Mark', 'Luke', 'John', 'Acts', 'Romans',
+  '1 Corinthians', '2 Corinthians', 'Galatians', 'Ephesians',
+  'Philippians', 'Colossians', '1 Thessalonians', '2 Thessalonians',
+  '1 Timothy', '2 Timothy', 'Titus', 'Philemon', 'Hebrews', 'James',
+  '1 Peter', '2 Peter', '1 John', '2 John', '3 John', 'Jude', 'Revelation'
+]);
 
 // Book name to number mapping
 const BOOK_MAP = {
@@ -67,6 +124,7 @@ const BOOK_NAMES = {
 };
 
 // Translation mapping for Bolls.life
+// Note: 'TYNDALE' is handled separately via local JSON file
 const TRANSLATION_MAP = {
   'ESV': 'ESV',
   'NIV': 'NIV',
@@ -81,6 +139,54 @@ const TRANSLATION_MAP = {
   'WEB': 'WEB',
   'YLT': 'YLT'
 };
+
+// =============================================================================
+// TYNDALE VERSE LOOKUP
+// =============================================================================
+// Fetches a verse from the local Tyndale Bible JSON file.
+// Returns null if the verse is not available (Tyndale didn't translate that book).
+// =============================================================================
+function getTyndaleVerse(bookName, chapter, verseStart, verseEnd = verseStart) {
+  const data = loadTyndaleData();
+  if (!data) {
+    return { error: 'Tyndale Bible data not loaded' };
+  }
+
+  // Check if this book exists in Tyndale's translation
+  const bookData = data.books[bookName];
+  if (!bookData) {
+    // Tyndale didn't translate this book - return helpful message
+    return {
+      notTranslated: true,
+      message: `William Tyndale did not translate ${bookName}. He only translated the Pentateuch (Genesis-Deuteronomy), Jonah, and the complete New Testament before his martyrdom in 1536.`,
+      availableBooks: {
+        oldTestament: ['Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy', 'Jonah'],
+        newTestament: 'Complete (Matthew through Revelation)'
+      }
+    };
+  }
+
+  // Check if chapter exists
+  const chapterData = bookData.chapters[chapter.toString()];
+  if (!chapterData) {
+    return { error: `Chapter ${chapter} not found in ${bookName}` };
+  }
+
+  // Get verse(s)
+  let verseText = '';
+  for (let v = verseStart; v <= verseEnd; v++) {
+    const text = chapterData[v.toString()];
+    if (text) {
+      verseText += (verseText ? ' ' : '') + text;
+    }
+  }
+
+  if (!verseText) {
+    return { error: `Verse ${verseStart} not found in ${bookName} ${chapter}` };
+  }
+
+  return { text: verseText };
+}
 
 function parseReference(ref) {
   const match = ref.match(/^(\d?\s*\w+)\s+(\d+):(\d+)(?:-(\d+))?$/i);
@@ -128,23 +234,81 @@ export default async function handler(req, res) {
     
     const bookName = BOOK_NAMES[parsed.bookNum];
     const referenceKey = `${bookName} ${parsed.chapter}:${parsed.verseStart}`;
-    const bollsTranslation = TRANSLATION_MAP[translation.toUpperCase()] || 'ESV';
-    
+    const requestedTranslation = translation.toUpperCase();
+
+    // =========================================================================
+    // TYNDALE BIBLE - Served from local JSON file
+    // =========================================================================
+    // The Tyndale Bible (1525/1530) is public domain and we host it ourselves
+    // since Bolls.life doesn't have this translation. This allows users to
+    // read Scripture in one of the most historically significant English
+    // translations - the one that heavily influenced the King James Version.
+    // =========================================================================
+    if (requestedTranslation === 'TYNDALE') {
+      console.log('Fetching Tyndale verse:', referenceKey);
+
+      const result = getTyndaleVerse(
+        bookName,
+        parsed.chapter,
+        parsed.verseStart,
+        parsed.verseEnd
+      );
+
+      // Handle case where Tyndale didn't translate this book
+      if (result.notTranslated) {
+        return res.status(200).json({
+          reference: referenceKey,
+          translation: 'Tyndale',
+          available: false,
+          message: result.message,
+          tyndaleInfo: result.availableBooks,
+          bookNum: parsed.bookNum,
+          chapter: parsed.chapter,
+          verse: parsed.verseStart
+        });
+      }
+
+      // Handle other errors
+      if (result.error) {
+        return res.status(404).json({
+          error: result.error,
+          reference: referenceKey,
+          translation: 'Tyndale'
+        });
+      }
+
+      // Success - return the Tyndale verse
+      return res.status(200).json({
+        reference: referenceKey,
+        translation: 'Tyndale',
+        text: result.text,
+        bookNum: parsed.bookNum,
+        chapter: parsed.chapter,
+        verse: parsed.verseStart,
+        note: 'From William Tyndale\'s translation (1525/1530)'
+      });
+    }
+
+    // =========================================================================
+    // ALL OTHER TRANSLATIONS - Fetch from Bolls.life API
+    // =========================================================================
+    const bollsTranslation = TRANSLATION_MAP[requestedTranslation] || 'ESV';
+
     // Fetch from Bolls.life
     const url = `https://bolls.life/get-text/${bollsTranslation}/${parsed.bookNum}/${parsed.chapter}/`;
     console.log('Fetching verse from:', url);
-    
+
     const response = await fetch(url);
-    
+
     if (!response.ok) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         error: 'Verse not found',
         reference: referenceKey
       });
     }
-    
+
     const chapterData = await response.json();
-    
+
     // Find the specific verse(s)
     let verseText = '';
     for (let v = parsed.verseStart; v <= parsed.verseEnd; v++) {
@@ -158,17 +322,17 @@ export default async function handler(req, res) {
         verseText += (verseText ? ' ' : '') + cleanText;
       }
     }
-    
+
     if (!verseText) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         error: 'Verse not found in chapter',
         reference: referenceKey
       });
     }
-    
+
     return res.status(200).json({
       reference: referenceKey,
-      translation: translation.toUpperCase(),
+      translation: requestedTranslation,
       text: verseText,
       bookNum: parsed.bookNum,
       chapter: parsed.chapter,
