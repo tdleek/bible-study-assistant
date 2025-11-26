@@ -3895,12 +3895,15 @@ Each perspective should be 2-3 sentences. Use the ${this.selectedTranslation} tr
                 async fetchXray(verseRef, verseText) {
                     if (!verseRef) return;
 
-                    // Check cache first
-                    const cacheKey = `xray_${verseRef}_${this.selectedTranslation}`;
+                    // Format and clean the verse reference
+                    const cleanRef = this.formatVerseReference(verseRef.trim());
+
+                    // Check cache first (v2 prefix to invalidate old cached data)
+                    const cacheKey = `goDeeper_v2_${cleanRef}_${this.selectedTranslation}`;
                     const cached = this.getXrayFromCache(cacheKey);
                     if (cached) {
                         this.xrayData = cached;
-                        this.xrayVerseRef = verseRef;
+                        this.xrayVerseRef = cleanRef;
                         this.showXrayPanel = true;
                         this.xrayExpandedSections = ['meaning'];
                         return;
@@ -3909,7 +3912,7 @@ Each perspective should be 2-3 sentences. Use the ${this.selectedTranslation} tr
                     this.xrayLoading = true;
                     this.xrayError = null;
                     this.xrayData = null;
-                    this.xrayVerseRef = verseRef;
+                    this.xrayVerseRef = cleanRef;
                     this.showXrayPanel = true;
                     this.xrayExpandedSections = ['meaning'];
                     this.xrayFollowUpQuery = '';
@@ -3920,7 +3923,7 @@ Each perspective should be 2-3 sentences. Use the ${this.selectedTranslation} tr
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
-                                verse: verseRef,
+                                verse: cleanRef,
                                 verseText: verseText,
                                 translation: this.selectedTranslation,
                                 perspective: 'protestant',
@@ -3954,15 +3957,9 @@ Each perspective should be 2-3 sentences. Use the ${this.selectedTranslation} tr
                     this.goDeeperLoading = true;
 
                     try {
-                        // First, fetch the verse text using the existing verse API
-                        const verseResponse = await fetch('/api/verse', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                reference: this.goDeeperVerseRef.trim(),
-                                translation: this.selectedTranslation
-                            })
-                        });
+                        // First, fetch the verse text using the existing verse API (GET request with query params)
+                        const verseRef = this.goDeeperVerseRef.trim();
+                        const verseResponse = await fetch(`/api/verse?ref=${encodeURIComponent(verseRef)}&translation=${this.selectedTranslation}`);
 
                         const verseData = await verseResponse.json();
 
@@ -3970,18 +3967,30 @@ Each perspective should be 2-3 sentences. Use the ${this.selectedTranslation} tr
                             throw new Error(verseData.error || 'Could not find that verse. Please check the reference and try again.');
                         }
 
+                        // Format the reference with proper capitalization
+                        const formattedRef = verseData.reference || this.formatVerseReference(verseRef);
+
                         // Now trigger Go Deeper with the verse reference and text
                         this.goDeeperLoading = false;
-                        await this.fetchXray(verseData.reference || this.goDeeperVerseRef.trim(), verseData.text);
+                        await this.fetchXray(formattedRef, verseData.text);
 
                     } catch (error) {
                         console.error('Home Go Deeper error:', error);
                         this.goDeeperLoading = false;
                         // Show the error in the Go Deeper panel
-                        this.xrayVerseRef = this.goDeeperVerseRef.trim();
+                        this.xrayVerseRef = this.formatVerseReference(this.goDeeperVerseRef.trim());
                         this.xrayError = error.message || 'Failed to load verse. Please check the reference.';
                         this.showXrayPanel = true;
                     }
+                },
+
+                // Helper to format verse reference with proper capitalization
+                formatVerseReference(ref) {
+                    if (!ref) return ref;
+                    // Trim and clean the reference
+                    ref = ref.trim();
+                    // Capitalize first letter of the book name (handles "1 john", "john", etc.)
+                    return ref.replace(/^(\d?\s*)([a-z])/, (match, num, letter) => num + letter.toUpperCase());
                 },
 
                 toggleXraySection(section) {
