@@ -332,7 +332,43 @@
                :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#7a6f5f]'">
                 Your AI-Powered Journey Through Scripture
             </p>
-            
+
+            <!-- Translation Selector (Home Page) -->
+            <div class="w-full max-w-xl mx-auto mb-4">
+                <label class="block text-center mb-2 font-inter text-sm transition-colors"
+                       :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#7a6f5f]'">
+                    Bible Translation:
+                </label>
+                <select x-model="selectedTranslation"
+                        class="w-full rounded-xl px-5 py-3 font-inter text-lg border-2 transition-all focus:outline-none text-center cursor-pointer appearance-none"
+                        :class="darkMode
+                            ? 'bg-[#243044] border-[#C0C5D9]/30 text-[#F5F5F0] focus:border-[#C0C5D9]'
+                            : 'bg-[#FFFDF9] border-[#e0d9cb] text-[#3d3225] focus:border-[#c4960c] shadow-[0_4px_12px_rgba(61,50,37,0.08)]'">
+                    <!-- Popular Translations -->
+                    <optgroup label="Popular">
+                        <option value="ESV">ESV - English Standard</option>
+                        <option value="NIV">NIV - New International</option>
+                        <option value="KJV">KJV - King James</option>
+                        <option value="NKJV">NKJV - New King James</option>
+                        <option value="NASB">NASB - New American Standard</option>
+                        <option value="NLT">NLT - New Living</option>
+                    </optgroup>
+                    <!-- Additional Translations -->
+                    <optgroup label="Additional">
+                        <option value="AMP">AMP - Amplified</option>
+                        <option value="CSB">CSB - Christian Standard</option>
+                        <option value="MSG">MSG - The Message</option>
+                        <option value="NRSV">NRSV - New Revised Standard</option>
+                        <option value="WEB">WEB - World English</option>
+                        <option value="YLT">YLT - Young's Literal</option>
+                    </optgroup>
+                    <!-- Historical Translations -->
+                    <optgroup label="Historical">
+                        <option value="Tyndale">Tyndale (1525)</option>
+                    </optgroup>
+                </select>
+            </div>
+
             <!-- Search Box -->
             <div class="w-full max-w-xl mx-auto mb-6">
                 <input
