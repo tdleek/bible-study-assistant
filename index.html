@@ -260,6 +260,16 @@
                     <span>📖 Study Plan</span>
                 </button>
 
+                <!-- Reading Plans Button -->
+                <button @click="openReadingPlans()"
+                        class="px-3 py-2 rounded-lg font-inter text-sm border transition-all hover:scale-105"
+                        :class="showReadingPlans
+                            ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white')
+                            : (darkMode ? 'bg-[#243044] text-[#C0C5D9] border-[#C0C5D9]/30' : 'bg-[#FFFDF9] text-[#5c5245] border-[#d4cabb]')"
+                        title="Pre-built reading plans">
+                    <span>📅 Reading Plans</span>
+                </button>
+
                 <!-- Theme Toggle -->
                 <button @click="darkMode = !darkMode"
                         class="w-10 h-10 rounded-lg flex items-center justify-center border transition-all hover:scale-105"
@@ -796,6 +806,256 @@
                 </div>
             </div>
 
+            <!-- ==================== READING PLANS ==================== -->
+            <div x-show="showReadingPlans && !loading"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 transform translate-y-4"
+                 x-transition:enter-end="opacity-100 transform translate-y-0"
+                 class="mb-8">
+
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">📅</span>
+                        <div>
+                            <h2 class="font-playfair text-2xl transition-colors"
+                                :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
+                                Reading Plans
+                            </h2>
+                            <p class="font-inter text-sm transition-colors"
+                               :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
+                                Pre-built plans to guide your Scripture journey
+                            </p>
+                        </div>
+                    </div>
+                    <button @click="closeReadingPlans()"
+                            class="p-2 rounded-lg transition-all hover:scale-105"
+                            :class="darkMode ? 'text-[#9BA4B8] hover:bg-[#243044]' : 'text-[#7a6f5f] hover:bg-[#F0EBE1]'">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Loading State -->
+                <div x-show="loadingReadingPlans" class="text-center py-16">
+                    <div class="animate-spin rounded-full h-12 w-12 border-2 mx-auto"
+                         :class="darkMode ? 'border-[#C0C5D9] border-t-transparent' : 'border-[#c4960c] border-t-transparent'"></div>
+                    <p class="font-inter mt-4 transition-colors"
+                       :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
+                        Loading reading plans...
+                    </p>
+                </div>
+
+                <!-- Plans List (no plan selected) -->
+                <div x-show="!loadingReadingPlans && !selectedPlan"
+                     class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <template x-for="plan in readingPlansData?.plans || []" :key="plan.id">
+                        <div @click="selectPlan(plan)"
+                             class="rounded-2xl p-5 border cursor-pointer transition-all hover:scale-[1.02]"
+                             :class="darkMode
+                                 ? 'bg-gradient-to-br from-[#243044] to-[#2D3A52] border-[#C0C5D9]/30 hover:border-[#C0C5D9]/60'
+                                 : 'bg-gradient-to-br from-[#FFFDF9] to-[#F0EBE1] border-[#e0d9cb] hover:border-[#c4960c]/50 shadow-[0_2px_8px_rgba(61,50,37,0.06)]'">
+
+                            <!-- Plan Icon & Name -->
+                            <div class="flex items-center gap-3 mb-3">
+                                <span class="text-2xl" x-text="plan.icon"></span>
+                                <h3 class="font-playfair text-lg transition-colors"
+                                    :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'"
+                                    x-text="plan.name"></h3>
+                            </div>
+
+                            <!-- Description -->
+                            <p class="font-inter text-sm mb-4 line-clamp-2 transition-colors"
+                               :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'"
+                               x-text="plan.description"></p>
+
+                            <!-- Duration & Progress -->
+                            <div class="flex items-center justify-between">
+                                <span class="font-inter text-xs px-2 py-1 rounded transition-colors"
+                                      :class="darkMode ? 'bg-[#C0C5D9]/10 text-[#C0C5D9]' : 'bg-[#c4960c]/10 text-[#c4960c]'"
+                                      x-text="plan.duration + ' days'"></span>
+
+                                <!-- Progress indicator (if started) -->
+                                <template x-if="getCompletedCount(plan.id) > 0">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-20 h-1.5 rounded-full overflow-hidden"
+                                             :class="darkMode ? 'bg-[#1A2332]' : 'bg-[#e0d9cb]'">
+                                            <div class="h-full rounded-full transition-all"
+                                                 :class="darkMode ? 'bg-[#C0C5D9]' : 'bg-[#c4960c]'"
+                                                 :style="`width: ${getPlanProgress(plan.id, plan.duration)}%`"></div>
+                                        </div>
+                                        <span class="font-inter text-xs transition-colors"
+                                              :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'"
+                                              x-text="getPlanProgress(plan.id, plan.duration) + '%'"></span>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Plan Overview (plan selected, no day viewing) -->
+                <div x-show="!loadingReadingPlans && selectedPlan && !viewingPlanDay"
+                     class="rounded-2xl p-6 border transition-colors"
+                     :class="darkMode
+                         ? 'bg-gradient-to-br from-[#243044] to-[#2D3A52] border-[#C0C5D9]/30'
+                         : 'bg-gradient-to-br from-[#FFFDF9] to-[#F0EBE1] border-[#e0d9cb] shadow-[0_4px_12px_rgba(61,50,37,0.08)]'">
+
+                    <!-- Back button & Plan Header -->
+                    <div class="flex items-center gap-4 mb-6">
+                        <button @click="backToPlans()"
+                                class="p-2 rounded-lg transition-all hover:scale-105"
+                                :class="darkMode ? 'bg-[#1A2332] text-[#C0C5D9] hover:bg-[#C0C5D9]/20' : 'bg-[#F0EBE1] text-[#5c5245] hover:bg-[#e0d9cb]'">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                        </button>
+                        <div class="flex items-center gap-3">
+                            <span class="text-3xl" x-text="selectedPlan?.icon"></span>
+                            <div>
+                                <h3 class="font-playfair text-xl transition-colors"
+                                    :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'"
+                                    x-text="selectedPlan?.name"></h3>
+                                <p class="font-inter text-sm transition-colors"
+                                   :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'"
+                                   x-text="selectedPlan?.duration + ' days'"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-inter text-sm transition-colors"
+                                  :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#5c5245]'">
+                                Progress: <span x-text="getCompletedCount(selectedPlan?.id)"></span> / <span x-text="selectedPlan?.duration"></span> days
+                            </span>
+                            <span class="font-inter text-sm font-semibold transition-colors"
+                                  :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#c4960c]'"
+                                  x-text="getPlanProgress(selectedPlan?.id, selectedPlan?.duration) + '%'"></span>
+                        </div>
+                        <div class="w-full h-2 rounded-full overflow-hidden"
+                             :class="darkMode ? 'bg-[#1A2332]' : 'bg-[#e0d9cb]'">
+                            <div class="h-full rounded-full transition-all duration-500"
+                                 :class="darkMode ? 'bg-[#C0C5D9]' : 'bg-gradient-to-r from-[#c4960c] to-[#daa520]'"
+                                 :style="`width: ${getPlanProgress(selectedPlan?.id, selectedPlan?.duration)}%`"></div>
+                        </div>
+                    </div>
+
+                    <!-- Reset Progress Button -->
+                    <div x-show="getCompletedCount(selectedPlan?.id) > 0" class="mb-6">
+                        <button @click="resetPlanProgress(selectedPlan?.id)"
+                                class="font-inter text-xs px-3 py-1.5 rounded-lg transition-all hover:scale-105"
+                                :class="darkMode ? 'bg-red-900/20 text-red-400 hover:bg-red-900/30' : 'bg-red-50 text-red-600 hover:bg-red-100'">
+                            Reset Progress
+                        </button>
+                    </div>
+
+                    <!-- Days Grid -->
+                    <div class="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-10 gap-2">
+                        <template x-for="day in selectedPlan?.days || []" :key="day.day">
+                            <button @click="viewDay(day.day)"
+                                    class="aspect-square rounded-lg flex items-center justify-center font-inter text-sm font-medium transition-all hover:scale-110 relative"
+                                    :class="isDayCompleted(selectedPlan?.id, day.day)
+                                        ? (darkMode ? 'bg-[#C0C5D9] text-[#1A2332]' : 'bg-gradient-to-br from-[#c4960c] to-[#daa520] text-white')
+                                        : (darkMode ? 'bg-[#1A2332] text-[#9BA4B8] hover:bg-[#C0C5D9]/20' : 'bg-[#F0EBE1] text-[#5c5245] hover:bg-[#e0d9cb]')">
+                                <span x-text="day.day"></span>
+                                <span x-show="isDayCompleted(selectedPlan?.id, day.day)"
+                                      class="absolute -top-1 -right-1 text-xs">✓</span>
+                            </button>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Day Viewer (viewing specific day) -->
+                <div x-show="!loadingReadingPlans && selectedPlan && viewingPlanDay"
+                     class="rounded-2xl p-6 border transition-colors"
+                     :class="darkMode
+                         ? 'bg-gradient-to-br from-[#243044] to-[#2D3A52] border-[#C0C5D9]/30'
+                         : 'bg-gradient-to-br from-[#FFFDF9] to-[#F0EBE1] border-[#e0d9cb] shadow-[0_4px_12px_rgba(61,50,37,0.08)]'">
+
+                    <!-- Back & Navigation -->
+                    <div class="flex items-center justify-between mb-6">
+                        <button @click="backToOverview()"
+                                class="flex items-center gap-2 px-3 py-2 rounded-lg transition-all hover:scale-105"
+                                :class="darkMode ? 'bg-[#1A2332] text-[#C0C5D9] hover:bg-[#C0C5D9]/20' : 'bg-[#F0EBE1] text-[#5c5245] hover:bg-[#e0d9cb]'">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                            <span class="font-inter text-sm">Back to Overview</span>
+                        </button>
+
+                        <div class="flex items-center gap-2">
+                            <button @click="viewingPlanDay > 1 ? viewDay(viewingPlanDay - 1) : null"
+                                    :disabled="viewingPlanDay <= 1"
+                                    class="p-2 rounded-lg transition-all disabled:opacity-30"
+                                    :class="darkMode ? 'bg-[#1A2332] text-[#C0C5D9] hover:bg-[#C0C5D9]/20' : 'bg-[#F0EBE1] text-[#5c5245] hover:bg-[#e0d9cb]'">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                </svg>
+                            </button>
+                            <span class="font-inter text-sm px-2 transition-colors"
+                                  :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'"
+                                  x-text="'Day ' + viewingPlanDay + ' of ' + selectedPlan?.duration"></span>
+                            <button @click="viewingPlanDay < selectedPlan?.duration ? viewDay(viewingPlanDay + 1) : null"
+                                    :disabled="viewingPlanDay >= selectedPlan?.duration"
+                                    class="p-2 rounded-lg transition-all disabled:opacity-30"
+                                    :class="darkMode ? 'bg-[#1A2332] text-[#C0C5D9] hover:bg-[#C0C5D9]/20' : 'bg-[#F0EBE1] text-[#5c5245] hover:bg-[#e0d9cb]'">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Day Content -->
+                    <template x-if="selectedPlan?.days?.find(d => d.day === viewingPlanDay)">
+                        <div x-data="{ dayData: selectedPlan?.days?.find(d => d.day === viewingPlanDay) }">
+                            <!-- Day Title -->
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="text-2xl" x-text="selectedPlan?.icon"></span>
+                                <h3 class="font-playfair text-xl transition-colors"
+                                    :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'"
+                                    x-text="dayData?.title"></h3>
+                            </div>
+
+                            <!-- Focus -->
+                            <p class="font-lora text-base italic mb-6 transition-colors"
+                               :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#7a6f5f]'"
+                               x-text="dayData?.focus"></p>
+
+                            <!-- Readings -->
+                            <div class="mb-6">
+                                <h4 class="font-inter text-sm font-semibold mb-3 transition-colors"
+                                    :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#c4960c]'">
+                                    Today's Readings
+                                </h4>
+                                <div class="flex flex-wrap gap-2">
+                                    <template x-for="reading in dayData?.readings || []" :key="reading">
+                                        <button @click="goToReading(reading)"
+                                                class="px-4 py-2 rounded-lg font-inter text-sm border transition-all hover:scale-105"
+                                                :class="darkMode
+                                                    ? 'bg-[#1A2332] border-[#C0C5D9]/20 text-[#C0C5D9] hover:bg-[#C0C5D9]/10 hover:border-[#C0C5D9]/40'
+                                                    : 'bg-[#FFFDF9] border-[#e0d9cb] text-[#5c5245] hover:bg-[#F0EBE1] hover:border-[#c4960c]/30'"
+                                                x-text="reading"></button>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- Mark Complete Button -->
+                            <button @click="toggleDayComplete(selectedPlan?.id, viewingPlanDay)"
+                                    class="w-full py-3 rounded-xl font-inter font-semibold transition-all hover:scale-[1.02]"
+                                    :class="isDayCompleted(selectedPlan?.id, viewingPlanDay)
+                                        ? (darkMode ? 'bg-green-900/30 text-green-400 border border-green-500/30' : 'bg-green-50 text-green-700 border border-green-200')
+                                        : (darkMode ? 'bg-[#C0C5D9] text-[#1A2332] hover:bg-[#E8ECF4]' : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white hover:from-[#daa520] hover:to-[#e6b836]')">
+                                <span x-text="isDayCompleted(selectedPlan?.id, viewingPlanDay) ? '✓ Completed' : 'Mark as Complete'"></span>
+                            </button>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
             <!-- Verse Lookup Result -->
             <div x-show="verseLookupResult && !loading" 
                  class="mb-8 rounded-2xl p-8 border transition-colors"
@@ -1014,6 +1274,57 @@
                    :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
                     💡 <span class="cursor-pointer underline" @click="askAboutVerse()">Ask AI to explain this verse</span>
                 </p>
+
+                <!-- Cross-References Section (Treasury of Scripture Knowledge) -->
+                <div x-show="crossReferences.length > 0 || loadingCrossRefs"
+                     class="mt-6 pt-4 border-t"
+                     :class="darkMode ? 'border-[#C0C5D9]/20' : 'border-[#e0d9cb]'">
+
+                    <!-- Header with Toggle -->
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg">🔗</span>
+                            <h4 class="font-inter text-sm font-semibold transition-colors"
+                                :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#c4960c]'">
+                                Cross-References
+                            </h4>
+                            <span class="font-inter text-xs px-2 py-0.5 rounded transition-colors"
+                                  :class="darkMode ? 'bg-[#C0C5D9]/10 text-[#9BA4B8]' : 'bg-[#c4960c]/10 text-[#7a6f5f]'"
+                                  x-text="crossReferences.length + ' related passages'"></span>
+                        </div>
+                        <button @click="showCrossRefs = !showCrossRefs"
+                                class="font-inter text-xs px-2 py-1 rounded transition-all hover:scale-105"
+                                :class="darkMode ? 'text-[#9BA4B8] hover:text-[#C0C5D9]' : 'text-[#7a6f5f] hover:text-[#c4960c]'">
+                            <span x-text="showCrossRefs ? 'Hide' : 'Show'"></span>
+                        </button>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div x-show="loadingCrossRefs" class="py-2">
+                        <div class="animate-spin rounded-full h-5 w-5 border-2 mx-auto"
+                             :class="darkMode ? 'border-[#C0C5D9] border-t-transparent' : 'border-[#c4960c] border-t-transparent'"></div>
+                    </div>
+
+                    <!-- Cross-Reference Links -->
+                    <div x-show="showCrossRefs && !loadingCrossRefs && crossReferences.length > 0"
+                         class="flex flex-wrap gap-2">
+                        <template x-for="(ref, index) in crossReferences" :key="index">
+                            <button @click="goToCrossReference(ref)"
+                                    class="px-3 py-1.5 rounded-lg font-inter text-sm border transition-all hover:scale-105 cursor-pointer"
+                                    :class="darkMode
+                                        ? 'bg-[#1A2332]/50 border-[#C0C5D9]/20 text-[#C0C5D9] hover:bg-[#C0C5D9]/10 hover:border-[#C0C5D9]/40'
+                                        : 'bg-[#FFFDF9]/70 border-[#e0d9cb] text-[#5c5245] hover:bg-[#F0EBE1] hover:border-[#c4960c]/30'"
+                                    x-text="ref"></button>
+                        </template>
+                    </div>
+
+                    <!-- Source Attribution -->
+                    <p x-show="showCrossRefs && crossReferences.length > 0"
+                       class="mt-3 font-inter text-xs transition-colors"
+                       :class="darkMode ? 'text-[#9BA4B8]/60' : 'text-[#7a6f5f]/60'">
+                        Source: Treasury of Scripture Knowledge
+                    </p>
+                </div>
             </div>
 
             <!-- Translation Comparison View -->
@@ -1405,6 +1716,16 @@
                     'Parenting',
                     'Spiritual growth'
                 ],
+
+                // ===========================================
+                // PRE-BUILT READING PLANS
+                // ===========================================
+                showReadingPlans: false,          // Show the reading plans section
+                readingPlansData: null,           // Loaded from data/reading-plans.json
+                loadingReadingPlans: false,
+                selectedPlan: null,               // Currently selected plan object
+                viewingPlanDay: null,             // Currently viewing day (1-based)
+                readingPlanProgress: {},          // { planId: { completedDays: [1, 2, 3], startDate: '...' } }
 
                 // ===========================================
                 // INTERLINEAR DATABASE (Hebrew/Greek word-by-word) - EXPANDED VERSION
@@ -2516,6 +2837,9 @@
                         // Auto-fetch interlinear data in the background
                         this.fetchInterlinear();
 
+                        // Auto-fetch cross-references in the background
+                        this.fetchCrossReferences();
+
                         // If translation compare mode is on, fetch all translations
                         if (this.translationCompareMode) {
                             this.fetchTranslationComparison(query);
@@ -2546,6 +2870,9 @@
 
                             // Auto-fetch interlinear data in the background
                             this.fetchInterlinear();
+
+                            // Auto-fetch cross-references in the background
+                            this.fetchCrossReferences();
 
                             // If translation compare mode is on, fetch all translations
                             if (this.translationCompareMode) {
@@ -2645,6 +2972,13 @@
                         console.error('Error refreshing verse:', error);
                     }
                 },
+
+                // ===========================================
+                // CROSS-REFERENCES (Treasury of Scripture Knowledge)
+                // ===========================================
+                crossReferences: [],           // Array of cross-reference strings
+                loadingCrossRefs: false,
+                showCrossRefs: true,           // Show cross-references section by default
 
                 // ===========================================
                 // INTERLINEAR FUNCTIONS
@@ -2755,7 +3089,50 @@
                         }
                     } catch (e) { /* ignore parse errors */ }
                 },
-                
+
+                // ===========================================
+                // CROSS-REFERENCES FUNCTIONS
+                // ===========================================
+
+                // Fetch cross-references for the current verse from TSK data
+                async fetchCrossReferences() {
+                    if (!this.verseLookupResult || this.loadingCrossRefs) {
+                        return;
+                    }
+
+                    const ref = this.verseLookupResult.reference;
+                    console.log('fetchCrossReferences: Fetching for', ref);
+
+                    this.loadingCrossRefs = true;
+                    this.crossReferences = [];
+
+                    try {
+                        const url = `/api/cross-references?ref=${encodeURIComponent(ref)}`;
+                        const response = await fetch(url);
+                        const data = await response.json();
+
+                        if (data.crossReferences && data.crossReferences.length > 0) {
+                            this.crossReferences = data.crossReferences;
+                            console.log('fetchCrossReferences: Found', data.crossReferences.length, 'references');
+                        } else {
+                            console.log('fetchCrossReferences: No cross-references found');
+                        }
+                    } catch (error) {
+                        console.error('Cross-references fetch error:', error);
+                    } finally {
+                        this.loadingCrossRefs = false;
+                    }
+                },
+
+                // Navigate to a cross-reference verse
+                async goToCrossReference(ref) {
+                    this.userQuery = ref;
+                    this.crossReferences = [];
+                    await this.lookupVerse(ref);
+                    // Fetch cross-refs for the new verse
+                    this.fetchCrossReferences();
+                },
+
                 // ===========================================
                 // MAIN SEARCH HANDLER
                 // ===========================================
@@ -3276,6 +3653,143 @@ Each perspective should be 2-3 sentences. Use the ${this.selectedTranslation} tr
                     this.generatedStudyPlan = null;
                     this.studyPlanError = '';
                     this.expandedDay = null;
+                },
+
+                // ===========================================
+                // PRE-BUILT READING PLANS METHODS
+                // ===========================================
+
+                async openReadingPlans() {
+                    this.showReadingPlans = true;
+                    this.hasSearched = true;
+                    this.showNav = true;
+                    this.selectedPlan = null;
+                    this.viewingPlanDay = null;
+
+                    // Load reading plans data if not already loaded
+                    if (!this.readingPlansData) {
+                        await this.loadReadingPlansData();
+                    }
+
+                    // Load progress from localStorage
+                    this.loadReadingPlanProgress();
+                },
+
+                closeReadingPlans() {
+                    this.showReadingPlans = false;
+                    this.selectedPlan = null;
+                    this.viewingPlanDay = null;
+                    if (!this.verseLookupResult && !this.aiResponse && !this.perspectiveResponse) {
+                        this.hasSearched = false;
+                        this.showNav = false;
+                    }
+                },
+
+                async loadReadingPlansData() {
+                    this.loadingReadingPlans = true;
+                    try {
+                        const response = await fetch('/data/reading-plans.json');
+                        const data = await response.json();
+                        this.readingPlansData = data;
+                        console.log('Reading plans loaded:', data.plans?.length, 'plans');
+                    } catch (error) {
+                        console.error('Error loading reading plans:', error);
+                    } finally {
+                        this.loadingReadingPlans = false;
+                    }
+                },
+
+                selectPlan(plan) {
+                    this.selectedPlan = plan;
+                    this.viewingPlanDay = null;
+                },
+
+                backToPlans() {
+                    this.selectedPlan = null;
+                    this.viewingPlanDay = null;
+                },
+
+                viewDay(dayNum) {
+                    this.viewingPlanDay = dayNum;
+                },
+
+                backToOverview() {
+                    this.viewingPlanDay = null;
+                },
+
+                // Progress tracking (localStorage)
+                loadReadingPlanProgress() {
+                    try {
+                        const saved = localStorage.getItem('gospelpath_reading_progress');
+                        if (saved) {
+                            this.readingPlanProgress = JSON.parse(saved);
+                        }
+                    } catch (e) {
+                        console.error('Error loading reading progress:', e);
+                        this.readingPlanProgress = {};
+                    }
+                },
+
+                saveReadingPlanProgress() {
+                    try {
+                        localStorage.setItem('gospelpath_reading_progress', JSON.stringify(this.readingPlanProgress));
+                    } catch (e) {
+                        console.error('Error saving reading progress:', e);
+                    }
+                },
+
+                isDayCompleted(planId, dayNum) {
+                    const progress = this.readingPlanProgress[planId];
+                    if (!progress || !progress.completedDays) return false;
+                    return progress.completedDays.includes(dayNum);
+                },
+
+                toggleDayComplete(planId, dayNum) {
+                    if (!this.readingPlanProgress[planId]) {
+                        this.readingPlanProgress[planId] = {
+                            completedDays: [],
+                            startDate: new Date().toISOString()
+                        };
+                    }
+
+                    const progress = this.readingPlanProgress[planId];
+                    const index = progress.completedDays.indexOf(dayNum);
+
+                    if (index === -1) {
+                        progress.completedDays.push(dayNum);
+                        progress.completedDays.sort((a, b) => a - b);
+                    } else {
+                        progress.completedDays.splice(index, 1);
+                    }
+
+                    this.saveReadingPlanProgress();
+                },
+
+                getPlanProgress(planId, totalDays) {
+                    const progress = this.readingPlanProgress[planId];
+                    if (!progress || !progress.completedDays) return 0;
+                    return Math.round((progress.completedDays.length / totalDays) * 100);
+                },
+
+                getCompletedCount(planId) {
+                    const progress = this.readingPlanProgress[planId];
+                    if (!progress || !progress.completedDays) return 0;
+                    return progress.completedDays.length;
+                },
+
+                resetPlanProgress(planId) {
+                    if (confirm('Are you sure you want to reset your progress for this plan?')) {
+                        delete this.readingPlanProgress[planId];
+                        this.saveReadingPlanProgress();
+                    }
+                },
+
+                // Navigate to a verse from the reading plan
+                async goToReading(reading) {
+                    this.showReadingPlans = false;
+                    this.userQuery = reading;
+                    await this.lookupVerse(reading);
+                    this.fetchCrossReferences();
                 }
             }
         }

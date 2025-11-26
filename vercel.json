@@ -12,6 +12,10 @@
       "memory": 512,
       "maxDuration": 10
     },
+    "api/cross-references.js": {
+      "memory": 512,
+      "maxDuration": 10
+    },
     "api/test.js": {
       "memory": 256,
       "maxDuration": 5
