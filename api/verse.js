@@ -123,6 +123,45 @@ const BOOK_NAMES = {
   66: 'Revelation'
 };
 
+// =============================================================================
+// VERSE TEXT CLEANUP
+// =============================================================================
+// The Bolls.life API returns verse text with section headers concatenated.
+// For example: "The BeginningIn the beginning God created..."
+// This function removes those headers and fixes spacing issues.
+// =============================================================================
+function cleanVerseText(text) {
+    if (!text) return text;
+
+    // Remove common section headers that get concatenated at the start
+    const headersToRemove = [
+        /^The Beginning(?=[A-Z])/,
+        /^The Word Became Flesh(?=[A-Z])/,
+        /^The Birth of Jesus(?=[A-Z])/,
+        /^The Beatitudes(?=[A-Z])/,
+        /^The Lord's Prayer(?=[A-Z])/,
+        /^Psalm \d+(?=[A-Z])/,
+        /^A psalm of David\.?(?=[A-Z])/,
+        /^Of David\.?(?=[A-Z])/,
+        /^A maskil of David\.?(?=[A-Z])/,
+        /^For the director of music\.?(?=[A-Z])/,
+    ];
+
+    let cleaned = text;
+    for (const pattern of headersToRemove) {
+        cleaned = cleaned.replace(pattern, '');
+    }
+
+    // Fix missing spaces after punctuation (.,;:) followed by a letter
+    cleaned = cleaned.replace(/([.,;:])([A-Za-z])/g, '$1 $2');
+
+    // Fix missing spaces between lowercase and uppercase (like "budand" -> not fixable without dictionary)
+    // But we can fix common patterns like "failsand" where word ends in 's' before 'and'
+    cleaned = cleaned.replace(/(\w)(and|or|but|for|nor|yet|so)(?=[A-Z\s])/gi, '$1 $2');
+
+    return cleaned.trim();
+}
+
 // Translation mapping for Bolls.life
 // Note: 'TYNDALE' is handled separately via local JSON file
 const TRANSLATION_MAP = {
@@ -333,7 +372,7 @@ export default async function handler(req, res) {
     return res.status(200).json({
       reference: referenceKey,
       translation: requestedTranslation,
-      text: verseText,
+      text: cleanVerseText(verseText),
       bookNum: parsed.bookNum,
       chapter: parsed.chapter,
       verse: parsed.verseStart
