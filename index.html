@@ -3957,8 +3957,12 @@ Each perspective should be 2-3 sentences. Use the ${this.selectedTranslation} tr
                     this.goDeeperLoading = true;
 
                     try {
+                        // Normalize the reference - convert common formats to standard format
+                        let verseRef = this.goDeeperVerseRef.trim();
+                        verseRef = verseRef.replace(/(\d+)\s+(\d+)$/, '$1:$2');  // "John 10 10" → "John 10:10"
+                        verseRef = verseRef.replace(/(\d+)\.(\d+)$/, '$1:$2');   // "John 10.10" → "John 10:10"
+
                         // First, fetch the verse text using the existing verse API (GET request with query params)
-                        const verseRef = this.goDeeperVerseRef.trim();
                         const verseResponse = await fetch(`/api/verse?ref=${encodeURIComponent(verseRef)}&translation=${this.selectedTranslation}`);
 
                         const verseData = await verseResponse.json();

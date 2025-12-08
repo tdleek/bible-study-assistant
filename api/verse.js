@@ -227,18 +227,29 @@ function getTyndaleVerse(bookName, chapter, verseStart, verseEnd = verseStart) {
   return { text: verseText };
 }
 
+// Normalize verse reference to standard format (Book Chapter:Verse)
+function normalizeReference(ref) {
+  if (!ref) return ref;
+  ref = ref.trim();
+  // Convert common separators to colon
+  ref = ref.replace(/(\d+)\s+(\d+)$/, '$1:$2');  // space between chapter/verse
+  ref = ref.replace(/(\d+)\.(\d+)$/, '$1:$2');   // dot separator
+  ref = ref.replace(/(\d+)-(\d+)$/, '$1:$2');    // hyphen separator (if not a range)
+  return ref;
+}
+
 function parseReference(ref) {
   const match = ref.match(/^(\d?\s*\w+)\s+(\d+):(\d+)(?:-(\d+))?$/i);
   if (!match) return null;
-  
+
   const bookName = match[1].toLowerCase().trim();
   const chapter = parseInt(match[2]);
   const verseStart = parseInt(match[3]);
   const verseEnd = match[4] ? parseInt(match[4]) : verseStart;
-  
+
   const bookNum = BOOK_MAP[bookName];
   if (!bookNum) return null;
-  
+
   return { bookNum, chapter, verseStart, verseEnd, bookName: match[1] };
 }
 
@@ -254,15 +265,18 @@ export default async function handler(req, res) {
   }
   
   try {
-    const { ref, translation = 'ESV' } = req.query;
-    
-    if (!ref) {
-      return res.status(400).json({ 
-        error: 'Missing ref parameter', 
+    const { ref: rawRef, translation = 'ESV' } = req.query;
+
+    if (!rawRef) {
+      return res.status(400).json({
+        error: 'Missing ref parameter',
         usage: '/api/verse?ref=Genesis%201:1&translation=ESV'
       });
     }
-    
+
+    // Normalize the reference to handle various input formats
+    const ref = normalizeReference(rawRef);
+
     const parsed = parseReference(ref);
     if (!parsed) {
       return res.status(400).json({ 
