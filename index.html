@@ -2005,6 +2005,29 @@
         </div>
     </div>
 
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="py-6 px-4 border-t transition-colors"
+            :class="darkMode ? 'bg-[#1A2332] border-[#C0C5D9]/20' : 'bg-[#FAF7F2] border-[#e0d9cb]'">
+        <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+            <p class="font-inter text-xs"
+               :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
+                © 2025 GospelPath. All rights reserved.
+            </p>
+            <div class="flex items-center gap-4">
+                <a href="/terms"
+                   class="font-inter text-xs transition-colors hover:underline"
+                   :class="darkMode ? 'text-[#9BA4B8] hover:text-[#C0C5D9]' : 'text-[#7a6f5f] hover:text-[#c4960c]'">
+                    Terms of Service
+                </a>
+                <a href="/privacy"
+                   class="font-inter text-xs transition-colors hover:underline"
+                   :class="darkMode ? 'text-[#9BA4B8] hover:text-[#C0C5D9]' : 'text-[#7a6f5f] hover:text-[#c4960c]'">
+                    Privacy Policy
+                </a>
+            </div>
+        </div>
+    </footer>
+
     <!-- ==================== JAVASCRIPT ==================== -->
     <script>
         function gospelPathApp() {
