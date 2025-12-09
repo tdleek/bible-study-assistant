@@ -496,7 +496,7 @@
                         <input type="text"
                                x-model="goDeeperVerseRef"
                                @keydown.enter="homeGoDeep()"
-                               placeholder="Enter verse (e.g., John 3:16)"
+                               placeholder="John 3:16 or 'Story of David and Goliath'"
                                class="flex-1 rounded-xl px-4 py-3 font-inter text-sm border-2 transition-all focus:outline-none"
                                :class="darkMode
                                    ? 'bg-[#1A2332] border-[#C0C5D9]/30 text-[#F5F5F0] placeholder-[#9BA4B8] focus:border-[#C0C5D9]'
@@ -3995,6 +3995,98 @@ Use the ${this.selectedTranslation} translation when citing Scripture. Keep resp
                     }
                 },
 
+                // Check if input looks like a question rather than a verse reference
+                isQuestionInput(input) {
+                    if (!input) return false;
+                    const trimmed = input.trim().toLowerCase();
+
+                    // Check for question mark
+                    if (trimmed.includes('?')) return true;
+
+                    // Check for question words at the start
+                    const questionStarters = /^(what|who|where|when|why|how|tell|explain|describe|can you|could you|please)/i;
+                    if (questionStarters.test(trimmed)) return true;
+
+                    // Check for common question phrases
+                    const questionPhrases = /(story of|meaning of|about the|tell me|who is|who was|what is|what was|what does|what did|happened at|happened to|happened when)/i;
+                    if (questionPhrases.test(trimmed)) return true;
+
+                    // If it doesn't look like a verse reference (Book Chapter:Verse pattern), treat as question
+                    const versePattern = /^(\d?\s*[a-zA-Z]+)\s+\d+[:\.\s]\d+/;
+                    const simpleVersePattern = /^(\d?\s*[a-zA-Z]+)\s+\d+:\d+/;
+                    if (!versePattern.test(trimmed) && !simpleVersePattern.test(trimmed)) {
+                        // Could be a question if it has multiple words and no numbers in verse format
+                        const words = trimmed.split(/\s+/);
+                        if (words.length > 2) return true;
+                    }
+
+                    return false;
+                },
+
+                // Use AI to identify the primary Bible passage for a question
+                async identifyPassageFromQuestion(question) {
+                    try {
+                        const response = await fetch('/api/chat', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                messages: [
+                                    {
+                                        role: 'system',
+                                        content: `You are a Bible reference assistant. Given a question about the Bible, identify the single most relevant primary passage to study.
+
+RESPOND WITH ONLY the verse reference in standard format (e.g., "1 Samuel 17:1-51" or "John 3:16" or "Genesis 1:1-31").
+
+Rules:
+- Return ONLY the reference, no other text
+- Use standard book names (Genesis, Exodus, 1 Samuel, Matthew, etc.)
+- Include verse range if the story/topic spans multiple verses
+- For stories, give the core passage (not every mention)
+- If you cannot identify a specific passage, respond with "NONE"
+
+Examples:
+- "David and Goliath" → "1 Samuel 17:1-51"
+- "The prodigal son" → "Luke 15:11-32"
+- "What happened at Pentecost?" → "Acts 2:1-13"
+- "Who was Paul?" → "Acts 9:1-19"
+- "The Ten Commandments" → "Exodus 20:1-17"
+- "Jesus walking on water" → "Matthew 14:22-33"`
+                                    },
+                                    {
+                                        role: 'user',
+                                        content: question
+                                    }
+                                ],
+                                provider: 'groq'
+                            })
+                        });
+
+                        if (!response.ok) {
+                            console.error('Failed to identify passage');
+                            return null;
+                        }
+
+                        const data = await response.json();
+                        const passageRef = data.message?.trim();
+
+                        // Validate the response looks like a verse reference
+                        if (!passageRef || passageRef === 'NONE' || passageRef.length > 50) {
+                            return null;
+                        }
+
+                        // Basic validation that it looks like a reference
+                        const refPattern = /^(\d?\s*[a-zA-Z]+)\s+\d+/;
+                        if (!refPattern.test(passageRef)) {
+                            return null;
+                        }
+
+                        return passageRef;
+                    } catch (error) {
+                        console.error('Error identifying passage:', error);
+                        return null;
+                    }
+                },
+
                 // Home page Go Deeper entry point
                 async homeGoDeep() {
                     if (!this.goDeeperVerseRef.trim()) return;
@@ -4002,8 +4094,26 @@ Use the ${this.selectedTranslation} translation when citing Scripture. Keep resp
                     this.goDeeperLoading = true;
 
                     try {
-                        // Normalize the reference - convert common formats to standard format
                         let verseRef = this.goDeeperVerseRef.trim();
+                        let originalQuestion = null;
+
+                        // Check if this is a question rather than a verse reference
+                        if (this.isQuestionInput(verseRef)) {
+                            originalQuestion = verseRef;
+                            console.log('Detected question input, identifying passage...');
+
+                            // Use AI to identify the relevant passage
+                            const identifiedRef = await this.identifyPassageFromQuestion(verseRef);
+
+                            if (!identifiedRef) {
+                                throw new Error('I couldn\'t identify a specific Bible passage for that question. Try entering a verse reference like "John 3:16" or rephrase your question.');
+                            }
+
+                            console.log('Identified passage:', identifiedRef);
+                            verseRef = identifiedRef;
+                        }
+
+                        // Normalize the reference - convert common formats to standard format
                         verseRef = verseRef.replace(/(\d+)\s+(\d+)$/, '$1:$2');  // "John 10 10" → "John 10:10"
                         verseRef = verseRef.replace(/(\d+)\.(\d+)$/, '$1:$2');   // "John 10.10" → "John 10:10"
 
