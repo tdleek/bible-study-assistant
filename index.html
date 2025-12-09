@@ -141,6 +141,22 @@
             to { opacity: 1; transform: scale(1); }
         }
         .modal-content { animation: modalFadeIn 0.3s ease-out forwards; }
+
+        /* Go Deeper Preview Card Animations */
+        @keyframes cardSlideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .preview-card-1 { animation: cardSlideIn 0.5s ease-out 0.2s forwards; opacity: 0; }
+        .preview-card-2 { animation: cardSlideIn 0.5s ease-out 0.4s forwards; opacity: 0; }
+        .preview-card-3 { animation: cardSlideIn 0.5s ease-out 0.6s forwards; opacity: 0; }
+
+        /* Live Pulse Indicator */
+        @keyframes livePulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.1); }
+        }
+        .live-pulse { animation: livePulse 2s ease-in-out infinite; }
     </style>
 </head>
 
@@ -316,7 +332,7 @@
         </div>
         
         <!-- Hero Content -->
-        <div class="relative z-10 text-center max-w-3xl mx-auto pt-20">
+        <div class="relative z-10 text-center max-w-5xl mx-auto pt-20">
             <div class="mb-8 flex justify-center">
                 <div class="w-20 h-20 rounded-full flex items-center justify-center border-3"
                      :class="darkMode ? 'border-[#C0C5D9] bg-[#C0C5D9]/10' : 'border-[#c4960c] bg-[#c4960c]/10'">
@@ -329,10 +345,237 @@
                 GospelPath
             </h1>
             
-            <p class="font-lora text-xl md:text-2xl mb-12 transition-colors"
+            <p class="font-lora text-xl md:text-2xl mb-8 transition-colors"
                :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#7a6f5f]'">
                 Your AI-Powered Journey Through Scripture
             </p>
+
+            <!-- Go Deeper Hero Demo Section -->
+            <div class="w-full max-w-5xl mx-auto mt-8 mb-8">
+
+                <!-- Section Header -->
+                <div class="text-center mb-8">
+                    <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-inter font-semibold uppercase tracking-wider mb-4"
+                          :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#c4960c]/15 text-[#c4960c]'">
+                        <span>🔍</span> Open the Scriptures
+                    </span>
+                    <h2 class="font-playfair text-3xl md:text-4xl font-bold mb-3"
+                        :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
+                        See What You've Been Missing
+                    </h2>
+                    <p class="font-lora text-lg max-w-2xl mx-auto"
+                       :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
+                        Unlock the historical context, original languages, and connections that bring Scripture to life.
+                    </p>
+                </div>
+
+                <!-- Demo Container -->
+                <div class="rounded-3xl p-6 md:p-8 border-2 transition-all"
+                     :class="darkMode
+                         ? 'bg-gradient-to-br from-[#243044] to-[#2D3A52] border-[#C0C5D9]/30'
+                         : 'bg-gradient-to-br from-[#FFFDF9] to-[#F5F0E6] border-[#e0d9cb] shadow-[0_8px_32px_rgba(61,50,37,0.12)]'">
+
+                    <!-- Side-by-Side Demo Layout -->
+                    <div class="grid md:grid-cols-2 gap-6 md:gap-8">
+
+                        <!-- Left Side: Verse Display -->
+                        <div class="flex flex-col">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="px-2 py-0.5 rounded text-xs font-inter font-medium"
+                                      :class="darkMode ? 'bg-[#1A2332] text-[#9BA4B8]' : 'bg-[#3d3225]/10 text-[#7a6f5f]'">
+                                    ESV
+                                </span>
+                                <span class="font-inter text-sm font-semibold"
+                                      :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#c4960c]'">
+                                    John 3:16
+                                </span>
+                            </div>
+
+                            <div class="flex-1 rounded-2xl p-5 mb-4"
+                                 :class="darkMode ? 'bg-[#1A2332]/50' : 'bg-white/70'">
+                                <p class="font-lora text-lg leading-relaxed"
+                                   :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
+                                    "For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life."
+                                </p>
+                            </div>
+
+                            <button @click="goDeeperVerseRef = 'John 3:16'; homeGoDeep()"
+                                    :disabled="goDeeperLoading"
+                                    class="w-full py-4 rounded-xl font-inter font-semibold text-lg transition-all hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100"
+                                    :class="darkMode
+                                        ? 'bg-[#C0C5D9] text-[#1A2332] hover:bg-[#E8ECF4]'
+                                        : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white shadow-[0_4px_16px_rgba(196,150,12,0.3)]'">
+                                <span x-show="!goDeeperLoading" class="flex items-center justify-center gap-2">
+                                    <span>🔍</span> Go Deeper on This Verse
+                                </span>
+                                <span x-show="goDeeperLoading" class="flex items-center justify-center gap-2">
+                                    <span class="animate-spin">⏳</span> Analyzing...
+                                </span>
+                            </button>
+                        </div>
+
+                        <!-- Right Side: Preview Cards -->
+                        <div class="flex flex-col gap-3">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-inter font-medium"
+                                      :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#c4960c]/15 text-[#c4960c]'">
+                                    <span class="w-1.5 h-1.5 rounded-full live-pulse"
+                                          :class="darkMode ? 'bg-[#C0C5D9]' : 'bg-[#c4960c]'"></span>
+                                    Live Preview
+                                </span>
+                            </div>
+
+                            <!-- Historical Context Card -->
+                            <div class="preview-card-1 rounded-xl p-4 border transition-all"
+                                 :class="darkMode
+                                     ? 'bg-[#1A2332]/50 border-[#C0C5D9]/20'
+                                     : 'bg-white/70 border-[#e0d9cb]'">
+                                <div class="flex items-start gap-3">
+                                    <span class="text-xl">🏛️</span>
+                                    <div>
+                                        <h4 class="font-inter font-semibold text-sm mb-1"
+                                            :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
+                                            Historical Context
+                                        </h4>
+                                        <p class="font-lora text-sm leading-relaxed"
+                                           :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
+                                            Jesus spoke these words to Nicodemus, a Pharisee who came secretly by night, revealing God's rescue plan for all humanity...
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Original Greek Card -->
+                            <div class="preview-card-2 rounded-xl p-4 border transition-all"
+                                 :class="darkMode
+                                     ? 'bg-[#1A2332]/50 border-[#C0C5D9]/20'
+                                     : 'bg-white/70 border-[#e0d9cb]'">
+                                <div class="flex items-start gap-3">
+                                    <span class="text-xl">📜</span>
+                                    <div>
+                                        <h4 class="font-inter font-semibold text-sm mb-1"
+                                            :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
+                                            Original Greek
+                                        </h4>
+                                        <p class="font-lora text-sm leading-relaxed"
+                                           :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
+                                            <span class="font-semibold" :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#c4960c]'">ἀγαπάω (agapaō)</span> —
+                                            Not mere affection, but sacrificial, unconditional love that acts for another's good...
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Biblical Connections Card -->
+                            <div class="preview-card-3 rounded-xl p-4 border transition-all"
+                                 :class="darkMode
+                                     ? 'bg-[#1A2332]/50 border-[#C0C5D9]/20'
+                                     : 'bg-white/70 border-[#e0d9cb]'">
+                                <div class="flex items-start gap-3">
+                                    <span class="text-xl">🔗</span>
+                                    <div>
+                                        <h4 class="font-inter font-semibold text-sm mb-1"
+                                            :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
+                                            Biblical Connections
+                                        </h4>
+                                        <p class="font-lora text-sm leading-relaxed"
+                                           :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
+                                            Echoes Genesis 22 where Abraham offered Isaac, and fulfills Isaiah 53's prophecy of the suffering servant...
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Try Your Own Verse Section -->
+                <div class="mt-8 text-center">
+                    <p class="font-inter text-sm mb-4"
+                       :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
+                        Try your own verse or ask a question
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto mb-4">
+                        <input type="text"
+                               x-model="goDeeperVerseRef"
+                               @keydown.enter="homeGoDeep()"
+                               placeholder="Romans 8:28 or 'Story of the Prodigal Son'"
+                               class="flex-1 rounded-xl px-5 py-4 font-inter text-sm border-2 transition-all focus:outline-none focus:ring-4"
+                               :class="darkMode
+                                   ? 'bg-[#243044] border-[#C0C5D9]/30 text-[#F5F5F0] placeholder-[#9BA4B8] focus:border-[#C0C5D9] focus:ring-[#C0C5D9]/20'
+                                   : 'bg-white border-[#e0d9cb] text-[#3d3225] placeholder-[#a69d8a] focus:border-[#c4960c] focus:ring-[#c4960c]/20'">
+                        <button @click="homeGoDeep()"
+                                :disabled="goDeeperLoading || !goDeeperVerseRef.trim()"
+                                class="px-8 py-4 rounded-xl font-inter font-semibold transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
+                                :class="darkMode
+                                    ? 'bg-[#C0C5D9] text-[#1A2332] hover:bg-[#E8ECF4]'
+                                    : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white'">
+                            <span x-show="!goDeeperLoading">Go Deeper →</span>
+                            <span x-show="goDeeperLoading" class="flex items-center gap-2">
+                                <span class="animate-spin">⏳</span>
+                            </span>
+                        </button>
+                    </div>
+
+                    <!-- Quick Links -->
+                    <div class="flex flex-wrap items-center justify-center gap-2 text-sm font-inter"
+                         :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
+                        <span>Popular:</span>
+                        <button @click="goDeeperVerseRef = 'Romans 8:28'; homeGoDeep()"
+                                class="px-3 py-1.5 rounded-lg transition-all hover:scale-105"
+                                :class="darkMode ? 'text-[#C0C5D9] hover:bg-[#C0C5D9]/10' : 'text-[#c4960c] hover:bg-[#c4960c]/10'">
+                            Romans 8:28
+                        </button>
+                        <span>·</span>
+                        <button @click="goDeeperVerseRef = 'Psalm 23:1'; homeGoDeep()"
+                                class="px-3 py-1.5 rounded-lg transition-all hover:scale-105"
+                                :class="darkMode ? 'text-[#C0C5D9] hover:bg-[#C0C5D9]/10' : 'text-[#c4960c] hover:bg-[#c4960c]/10'">
+                            Psalm 23
+                        </button>
+                        <span>·</span>
+                        <button @click="goDeeperVerseRef = 'Jeremiah 29:11'; homeGoDeep()"
+                                class="px-3 py-1.5 rounded-lg transition-all hover:scale-105"
+                                :class="darkMode ? 'text-[#C0C5D9] hover:bg-[#C0C5D9]/10' : 'text-[#c4960c] hover:bg-[#c4960c]/10'">
+                            Jeremiah 29:11
+                        </button>
+                        <span>·</span>
+                        <button @click="goDeeperVerseRef = 'Philippians 4:13'; homeGoDeep()"
+                                class="px-3 py-1.5 rounded-lg transition-all hover:scale-105"
+                                :class="darkMode ? 'text-[#C0C5D9] hover:bg-[#C0C5D9]/10' : 'text-[#c4960c] hover:bg-[#c4960c]/10'">
+                            Philippians 4:13
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Value Proposition Badges -->
+                <div class="flex flex-wrap items-center justify-center gap-4 mt-8">
+                    <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-inter"
+                          :class="darkMode ? 'bg-[#243044] text-[#C0C5D9]' : 'bg-white text-[#3d3225] shadow-sm'">
+                        <span>✓</span> 100% Free
+                    </span>
+                    <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-inter"
+                          :class="darkMode ? 'bg-[#243044] text-[#C0C5D9]' : 'bg-white text-[#3d3225] shadow-sm'">
+                        <span>⚡</span> Instant Insights
+                    </span>
+                    <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-inter"
+                          :class="darkMode ? 'bg-[#243044] text-[#C0C5D9]' : 'bg-white text-[#3d3225] shadow-sm'">
+                        <span>📚</span> Seminary-Level Depth
+                    </span>
+                </div>
+            </div>
+
+            <!-- ==================== OR EXPLORE SECTION ==================== -->
+            <div class="w-full max-w-3xl mx-auto mt-16 mb-8">
+                <div class="flex items-center gap-4">
+                    <div class="flex-1 h-px" :class="darkMode ? 'bg-[#C0C5D9]/30' : 'bg-[#e0d9cb]'"></div>
+                    <span class="font-inter text-sm font-medium px-4"
+                          :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
+                        Or explore Scripture your way
+                    </span>
+                    <div class="flex-1 h-px" :class="darkMode ? 'bg-[#C0C5D9]/30' : 'bg-[#e0d9cb]'"></div>
+                </div>
+            </div>
 
             <!-- Translation Selector (Home Page) -->
             <div class="w-full max-w-xl mx-auto mb-4">
@@ -466,217 +709,6 @@
                         : 'bg-[#FFFDF9] text-[#5c5245] border-[#d4cabb] hover:bg-[#F0EBE1] hover:border-[#c4960c]'">
                     <span class="mr-2">📖</span> Create Study Plan
                 </button>
-            </div>
-
-            <!-- Go Deeper Hero Demo Section -->
-            <div class="w-full max-w-5xl mx-auto mt-16 mb-8">
-
-                <!-- Section Header -->
-                <div class="text-center mb-8">
-                    <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-inter font-semibold uppercase tracking-wider mb-4"
-                          :class="darkMode ? 'bg-[#C0C5D9]/20 text-[#C0C5D9]' : 'bg-[#c4960c]/15 text-[#c4960c]'">
-                        <span>🔍</span> Open the Scriptures
-                    </span>
-                    <h2 class="font-playfair text-3xl md:text-4xl font-bold mb-3"
-                        :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
-                        See What You've Been Missing
-                    </h2>
-                    <p class="font-lora text-lg max-w-2xl mx-auto"
-                       :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
-                        Unlock the historical context, original languages, and connections that bring Scripture to life.
-                    </p>
-                </div>
-
-                <!-- Demo Container -->
-                <div class="rounded-3xl p-6 md:p-8 border-2 transition-all"
-                     :class="darkMode
-                         ? 'bg-gradient-to-br from-[#243044] to-[#2D3A52] border-[#C0C5D9]/30'
-                         : 'bg-gradient-to-br from-[#FFFDF9] to-[#F5F0E6] border-[#e0d9cb] shadow-[0_8px_32px_rgba(61,50,37,0.12)]'">
-
-                    <!-- Side-by-Side Demo Layout -->
-                    <div class="grid md:grid-cols-2 gap-6 md:gap-8">
-
-                        <!-- Left Side: Verse Display -->
-                        <div class="flex flex-col">
-                            <div class="flex items-center gap-2 mb-3">
-                                <span class="px-2 py-0.5 rounded text-xs font-inter font-medium"
-                                      :class="darkMode ? 'bg-[#1A2332] text-[#9BA4B8]' : 'bg-[#3d3225]/10 text-[#7a6f5f]'">
-                                    ESV
-                                </span>
-                                <span class="font-inter text-sm font-semibold"
-                                      :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#c4960c]'">
-                                    John 3:16
-                                </span>
-                            </div>
-
-                            <div class="flex-1 rounded-2xl p-5 mb-4"
-                                 :class="darkMode ? 'bg-[#1A2332]/50' : 'bg-white/70'">
-                                <p class="font-lora text-lg leading-relaxed"
-                                   :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
-                                    "For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life."
-                                </p>
-                            </div>
-
-                            <button @click="goDeeperVerseRef = 'John 3:16'; homeGoDeep()"
-                                    :disabled="goDeeperLoading"
-                                    class="w-full py-4 rounded-xl font-inter font-semibold text-lg transition-all hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100"
-                                    :class="darkMode
-                                        ? 'bg-[#C0C5D9] text-[#1A2332] hover:bg-[#E8ECF4]'
-                                        : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white shadow-[0_4px_16px_rgba(196,150,12,0.3)]'">
-                                <span x-show="!goDeeperLoading" class="flex items-center justify-center gap-2">
-                                    <span>🔍</span> Go Deeper on This Verse
-                                </span>
-                                <span x-show="goDeeperLoading" class="flex items-center justify-center gap-2">
-                                    <span class="animate-spin">⏳</span> Analyzing...
-                                </span>
-                            </button>
-                        </div>
-
-                        <!-- Right Side: Preview Cards -->
-                        <div class="flex flex-col gap-3">
-                            <p class="font-inter text-xs uppercase tracking-wider mb-1"
-                               :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
-                                What you'll discover:
-                            </p>
-
-                            <!-- Historical Context Card -->
-                            <div class="rounded-xl p-4 border transition-all"
-                                 :class="darkMode
-                                     ? 'bg-[#1A2332]/50 border-[#C0C5D9]/20'
-                                     : 'bg-white/70 border-[#e0d9cb]'">
-                                <div class="flex items-start gap-3">
-                                    <span class="text-xl">🏛️</span>
-                                    <div>
-                                        <h4 class="font-inter font-semibold text-sm mb-1"
-                                            :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
-                                            Historical Context
-                                        </h4>
-                                        <p class="font-lora text-sm leading-relaxed"
-                                           :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
-                                            Jesus spoke these words to Nicodemus, a Pharisee who came secretly by night, revealing God's rescue plan for all humanity...
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Original Greek Card -->
-                            <div class="rounded-xl p-4 border transition-all"
-                                 :class="darkMode
-                                     ? 'bg-[#1A2332]/50 border-[#C0C5D9]/20'
-                                     : 'bg-white/70 border-[#e0d9cb]'">
-                                <div class="flex items-start gap-3">
-                                    <span class="text-xl">📜</span>
-                                    <div>
-                                        <h4 class="font-inter font-semibold text-sm mb-1"
-                                            :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
-                                            Original Greek
-                                        </h4>
-                                        <p class="font-lora text-sm leading-relaxed"
-                                           :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
-                                            <span class="font-semibold" :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#c4960c]'">ἀγαπάω (agapaō)</span> —
-                                            Not mere affection, but sacrificial, unconditional love that acts for another's good...
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Biblical Connections Card -->
-                            <div class="rounded-xl p-4 border transition-all"
-                                 :class="darkMode
-                                     ? 'bg-[#1A2332]/50 border-[#C0C5D9]/20'
-                                     : 'bg-white/70 border-[#e0d9cb]'">
-                                <div class="flex items-start gap-3">
-                                    <span class="text-xl">🔗</span>
-                                    <div>
-                                        <h4 class="font-inter font-semibold text-sm mb-1"
-                                            :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
-                                            Biblical Connections
-                                        </h4>
-                                        <p class="font-lora text-sm leading-relaxed"
-                                           :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
-                                            Echoes Genesis 22 where Abraham offered Isaac, and fulfills Isaiah 53's prophecy of the suffering servant...
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Try Your Own Verse Section -->
-                <div class="mt-8 text-center">
-                    <p class="font-inter text-sm mb-4"
-                       :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
-                        Try your own verse or ask a question
-                    </p>
-
-                    <div class="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto mb-4">
-                        <input type="text"
-                               x-model="goDeeperVerseRef"
-                               @keydown.enter="homeGoDeep()"
-                               placeholder="Romans 8:28 or 'Story of the Prodigal Son'"
-                               class="flex-1 rounded-xl px-5 py-4 font-inter text-sm border-2 transition-all focus:outline-none focus:ring-4"
-                               :class="darkMode
-                                   ? 'bg-[#243044] border-[#C0C5D9]/30 text-[#F5F5F0] placeholder-[#9BA4B8] focus:border-[#C0C5D9] focus:ring-[#C0C5D9]/20'
-                                   : 'bg-white border-[#e0d9cb] text-[#3d3225] placeholder-[#a69d8a] focus:border-[#c4960c] focus:ring-[#c4960c]/20'">
-                        <button @click="homeGoDeep()"
-                                :disabled="goDeeperLoading || !goDeeperVerseRef.trim()"
-                                class="px-8 py-4 rounded-xl font-inter font-semibold transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
-                                :class="darkMode
-                                    ? 'bg-[#C0C5D9] text-[#1A2332] hover:bg-[#E8ECF4]'
-                                    : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white'">
-                            <span x-show="!goDeeperLoading">Go Deeper →</span>
-                            <span x-show="goDeeperLoading" class="flex items-center gap-2">
-                                <span class="animate-spin">⏳</span>
-                            </span>
-                        </button>
-                    </div>
-
-                    <!-- Quick Links -->
-                    <div class="flex flex-wrap items-center justify-center gap-2 text-sm font-inter"
-                         :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
-                        <span>Popular:</span>
-                        <button @click="goDeeperVerseRef = 'Romans 8:28'; homeGoDeep()"
-                                class="px-3 py-1.5 rounded-lg transition-all hover:scale-105"
-                                :class="darkMode ? 'text-[#C0C5D9] hover:bg-[#C0C5D9]/10' : 'text-[#c4960c] hover:bg-[#c4960c]/10'">
-                            Romans 8:28
-                        </button>
-                        <span>·</span>
-                        <button @click="goDeeperVerseRef = 'Psalm 23:1'; homeGoDeep()"
-                                class="px-3 py-1.5 rounded-lg transition-all hover:scale-105"
-                                :class="darkMode ? 'text-[#C0C5D9] hover:bg-[#C0C5D9]/10' : 'text-[#c4960c] hover:bg-[#c4960c]/10'">
-                            Psalm 23
-                        </button>
-                        <span>·</span>
-                        <button @click="goDeeperVerseRef = 'Jeremiah 29:11'; homeGoDeep()"
-                                class="px-3 py-1.5 rounded-lg transition-all hover:scale-105"
-                                :class="darkMode ? 'text-[#C0C5D9] hover:bg-[#C0C5D9]/10' : 'text-[#c4960c] hover:bg-[#c4960c]/10'">
-                            Jeremiah 29:11
-                        </button>
-                        <span>·</span>
-                        <button @click="goDeeperVerseRef = 'Philippians 4:13'; homeGoDeep()"
-                                class="px-3 py-1.5 rounded-lg transition-all hover:scale-105"
-                                :class="darkMode ? 'text-[#C0C5D9] hover:bg-[#C0C5D9]/10' : 'text-[#c4960c] hover:bg-[#c4960c]/10'">
-                            Philippians 4:13
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Value Proposition Badges -->
-                <div class="flex flex-wrap items-center justify-center gap-4 mt-8">
-                    <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-inter"
-                          :class="darkMode ? 'bg-[#243044] text-[#C0C5D9]' : 'bg-white text-[#3d3225] shadow-sm'">
-                        <span>✓</span> 100% Free
-                    </span>
-                    <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-inter"
-                          :class="darkMode ? 'bg-[#243044] text-[#C0C5D9]' : 'bg-white text-[#3d3225] shadow-sm'">
-                        <span>⚡</span> Instant Insights
-                    </span>
-                    <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-inter"
-                          :class="darkMode ? 'bg-[#243044] text-[#C0C5D9]' : 'bg-white text-[#3d3225] shadow-sm'">
-                        <span>📚</span> Seminary-Level Depth
-                    </span>
-                </div>
             </div>
 
             <!-- Tagline -->
