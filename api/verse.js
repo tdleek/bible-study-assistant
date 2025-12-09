@@ -234,7 +234,9 @@ function normalizeReference(ref) {
   // Convert common separators to colon
   ref = ref.replace(/(\d+)\s+(\d+)$/, '$1:$2');  // space between chapter/verse
   ref = ref.replace(/(\d+)\.(\d+)$/, '$1:$2');   // dot separator
-  ref = ref.replace(/(\d+)-(\d+)$/, '$1:$2');    // hyphen separator (if not a range)
+  if (!ref.includes(':')) {
+    ref = ref.replace(/(\d+)-(\d+)$/, '$1:$2');  // hyphen separator (only if no colon present)
+  }
   return ref;
 }
 
