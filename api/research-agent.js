@@ -44,14 +44,15 @@ export default async function handler(req, res) {
         // Step 2: Execute the plan (fetch from various tools)
         const research = await executeResearchPlan(plan, translation);
 
-        // Step 3: Synthesize into final answer
-        const answer = await synthesizeAnswer(question, research);
+        // Step 3: Synthesize into final answer (now returns { answer, followUpQuestions })
+        const synthesis = await synthesizeAnswer(question, research);
 
         return res.status(200).json({
             question,
             plan,
             research,
-            answer
+            answer: synthesis.answer,
+            followUpQuestions: synthesis.followUpQuestions || []
         });
     } catch (error) {
         console.error('Research agent error:', error);
@@ -261,16 +262,40 @@ Using this research, provide a thorough but accessible answer. Include:
 - Connections between passages
 - Practical application
 
-Be specific and cite the research. Write in a warm, educational tone.`
+Be specific and cite the research. Write in a warm, educational tone.
+
+IMPORTANT: At the very end of your response, add exactly 3 follow-up questions the user might want to explore next. Format them like this:
+
+---FOLLOWUP---
+1. [First follow-up question]
+2. [Second follow-up question]
+3. [Third follow-up question]
+
+Make the questions natural continuations of the topic that would lead to meaningful further study.`
             }, {
                 role: 'user',
                 content: question
             }],
             temperature: 0.7,
-            max_tokens: 1500
+            max_tokens: 1800
         })
     });
 
     const data = await response.json();
-    return data.choices[0]?.message?.content || 'Unable to synthesize research.';
+    const fullResponse = data.choices[0]?.message?.content || 'Unable to synthesize research.';
+
+    // Parse out the follow-up questions
+    const parts = fullResponse.split('---FOLLOWUP---');
+    const answer = parts[0].trim();
+
+    let followUpQuestions = [];
+    if (parts[1]) {
+        // Extract questions from numbered list
+        const matches = parts[1].match(/\d\.\s*(.+)/g);
+        if (matches) {
+            followUpQuestions = matches.map(q => q.replace(/^\d\.\s*/, '').trim());
+        }
+    }
+
+    return { answer, followUpQuestions };
 }

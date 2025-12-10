@@ -1399,6 +1399,31 @@
                         </div>
                     </div>
 
+                    <!-- Follow-up Questions -->
+                    <div x-show="researchResult?.followUpQuestions?.length > 0"
+                         class="rounded-xl border overflow-hidden"
+                         :class="darkMode ? 'bg-[#243044] border-[#C0C5D9]/20' : 'bg-white border-[#e0d9cb]'">
+                        <div class="px-5 py-4 border-b"
+                             :class="darkMode ? 'border-[#C0C5D9]/20 bg-[#1A2332]/50' : 'border-[#e0d9cb] bg-[#F5F0E6]'">
+                            <h3 class="font-playfair text-lg flex items-center gap-2"
+                                :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
+                                <span>📝</span> Keep Exploring
+                            </h3>
+                        </div>
+                        <div class="px-5 py-4 space-y-2">
+                            <template x-for="(question, index) in researchResult?.followUpQuestions || []" :key="index">
+                                <button @click="researchQuery = question; runResearchAgent()"
+                                        class="w-full text-left px-4 py-3 rounded-lg font-inter text-sm transition-all duration-200 flex items-center gap-3 group"
+                                        :class="darkMode
+                                            ? 'bg-[#1A2332]/50 hover:bg-[#1A2332] text-[#C0C5D9] hover:text-[#F5F5F0]'
+                                            : 'bg-[#F5F0E6] hover:bg-[#e8e1d3] text-[#5c5245] hover:text-[#3d3225]'">
+                                    <span class="text-lg opacity-50 group-hover:opacity-100 transition-opacity">🔬</span>
+                                    <span x-text="question"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
