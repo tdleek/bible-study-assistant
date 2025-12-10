@@ -526,22 +526,50 @@
 
                 <!-- Smart Input Section -->
                 <div class="mt-8">
-                    <div class="relative max-w-xl mx-auto">
-                        <input type="text"
-                               x-model="goDeeperVerseRef"
-                               @keydown.enter="isQuestion(goDeeperVerseRef) ? (researchQuery = goDeeperVerseRef, runResearchAgent()) : homeGoDeep()"
-                               placeholder="Enter a verse (John 3:16) or ask a question..."
-                               class="w-full px-5 py-4 pr-12 rounded-xl border-2 font-inter text-base transition-all duration-300 focus:outline-none"
-                               :class="darkMode
-                                   ? 'bg-[#1A2332] border-[#C0C5D9]/30 text-[#F5F5F0] placeholder-[#9BA4B8] focus:border-[#C0C5D9]'
-                                   : 'bg-white border-[#d4cabb] text-[#3d3225] placeholder-[#a69d8a] focus:border-[#c4960c]'">
+                    <!-- Translation + Input Row -->
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 max-w-2xl mx-auto">
 
-                        <!-- Clear button -->
-                        <button x-show="goDeeperVerseRef.length > 0"
-                                @click="goDeeperVerseRef = ''"
-                                class="absolute right-4 top-1/2 -translate-y-1/2 text-lg opacity-50 hover:opacity-100 transition-opacity">
-                            ✕
-                        </button>
+                        <!-- Translation Selector -->
+                        <div class="relative">
+                            <select x-model="selectedTranslation"
+                                    class="appearance-none px-4 py-4 pr-10 rounded-xl border-2 font-inter text-sm font-medium cursor-pointer transition-all duration-300 focus:outline-none"
+                                    :class="darkMode
+                                        ? 'bg-[#1A2332] border-[#C0C5D9]/30 text-[#F5F5F0] focus:border-[#C0C5D9]'
+                                        : 'bg-white border-[#d4cabb] text-[#3d3225] focus:border-[#c4960c]'">
+                                <option value="ESV">ESV</option>
+                                <option value="NIV">NIV</option>
+                                <option value="KJV">KJV</option>
+                                <option value="NKJV">NKJV</option>
+                                <option value="NASB">NASB</option>
+                                <option value="NLT">NLT</option>
+                                <option value="AMP">AMP</option>
+                                <option value="CSB">CSB</option>
+                                <option value="MSG">MSG</option>
+                            </select>
+                            <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                                 :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#7a6f5f]'">
+                                ▼
+                            </div>
+                        </div>
+
+                        <!-- Input Field -->
+                        <div class="relative flex-1">
+                            <input type="text"
+                                   x-model="goDeeperVerseRef"
+                                   @keydown.enter="isQuestion(goDeeperVerseRef) ? (researchQuery = goDeeperVerseRef, runResearchAgent()) : homeGoDeep()"
+                                   placeholder="Enter a verse (John 3:16) or ask a question..."
+                                   class="w-full px-5 py-4 pr-12 rounded-xl border-2 font-inter text-base transition-all duration-300 focus:outline-none"
+                                   :class="darkMode
+                                       ? 'bg-[#1A2332] border-[#C0C5D9]/30 text-[#F5F5F0] placeholder-[#9BA4B8] focus:border-[#C0C5D9]'
+                                       : 'bg-white border-[#d4cabb] text-[#3d3225] placeholder-[#a69d8a] focus:border-[#c4960c]'">
+
+                            <!-- Clear button -->
+                            <button x-show="goDeeperVerseRef.length > 0"
+                                    @click="goDeeperVerseRef = ''"
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-lg opacity-50 hover:opacity-100 transition-opacity">
+                                ✕
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Smart Action Buttons -->
@@ -1273,16 +1301,40 @@
                         </div>
                     </div>
 
-                    <!-- Verses Studied -->
+                    <!-- Passages Studied -->
                     <div x-show="researchResult?.research?.verses?.length > 0"
                          class="rounded-xl border overflow-hidden"
                          :class="darkMode ? 'bg-[#243044] border-[#C0C5D9]/20' : 'bg-white border-[#e0d9cb]'">
-                        <div class="px-5 py-4 border-b"
+                        <div class="px-5 py-4 border-b flex items-center justify-between"
                              :class="darkMode ? 'border-[#C0C5D9]/20 bg-[#1A2332]/50' : 'border-[#e0d9cb] bg-[#F5F0E6]'">
                             <h3 class="font-playfair text-lg flex items-center gap-2"
                                 :class="darkMode ? 'text-[#E8ECF4]' : 'text-[#3d3225]'">
                                 <span>📖</span> Passages Studied
                             </h3>
+
+                            <!-- Translation Toggle -->
+                            <div class="relative">
+                                <select x-model="selectedTranslation"
+                                        @change="refetchResearchVerses()"
+                                        class="appearance-none pl-3 pr-8 py-1.5 rounded-lg border text-xs font-inter font-medium cursor-pointer transition-all"
+                                        :class="darkMode
+                                            ? 'bg-[#1A2332] border-[#C0C5D9]/30 text-[#C0C5D9]'
+                                            : 'bg-white border-[#d4cabb] text-[#5c5245]'">
+                                    <option value="ESV">ESV</option>
+                                    <option value="NIV">NIV</option>
+                                    <option value="KJV">KJV</option>
+                                    <option value="NKJV">NKJV</option>
+                                    <option value="NASB">NASB</option>
+                                    <option value="NLT">NLT</option>
+                                    <option value="AMP">AMP</option>
+                                    <option value="CSB">CSB</option>
+                                    <option value="MSG">MSG</option>
+                                </select>
+                                <div class="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-xs"
+                                     :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#7a6f5f]'">
+                                    ▼
+                                </div>
+                            </div>
                         </div>
                         <div class="divide-y" :class="darkMode ? 'divide-[#C0C5D9]/20' : 'divide-[#e0d9cb]'">
                             <template x-for="verse in researchResult?.research?.verses || []" :key="verse.reference">
@@ -4778,6 +4830,41 @@ Examples:
                     if (!this.verseLookupResult && !this.aiResponse) {
                         this.hasSearched = false;
                         this.showNav = false;
+                    }
+                },
+
+                async refetchResearchVerses() {
+                    if (!this.researchResult?.plan?.verses) return;
+
+                    // Show loading state on verses
+                    const originalVerses = this.researchResult.research.verses;
+                    this.researchResult.research.verses = originalVerses.map(v => ({
+                        ...v,
+                        text: 'Loading...'
+                    }));
+
+                    try {
+                        const response = await fetch('/api/research-agent', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                question: this.researchQuery,
+                                translation: this.selectedTranslation,
+                                versesOnly: true,
+                                plan: this.researchResult.plan
+                            })
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.research?.verses) {
+                                this.researchResult.research.verses = data.research.verses;
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Failed to refetch verses:', error);
+                        // Restore original on error
+                        this.researchResult.research.verses = originalVerses;
                     }
                 },
 

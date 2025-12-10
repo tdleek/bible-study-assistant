@@ -5,7 +5,33 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { question, translation = 'ESV' } = req.body;
+    const { question, translation = 'ESV', versesOnly = false, plan: existingPlan = null } = req.body;
+
+    // If versesOnly mode, just refetch the verses with the new translation
+    if (versesOnly && existingPlan?.verses) {
+        try {
+            const research = { verses: [], context: [], crossReferences: [] };
+
+            for (const verseRef of existingPlan.verses) {
+                try {
+                    const verseData = await fetchVerseText(verseRef, translation);
+                    if (verseData) {
+                        research.verses.push({
+                            reference: verseRef,
+                            text: verseData
+                        });
+                    }
+                } catch (e) {
+                    console.error(`Failed to fetch ${verseRef}:`, e);
+                }
+            }
+
+            return res.status(200).json({ research });
+        } catch (error) {
+            console.error('Verse refetch error:', error);
+            return res.status(500).json({ error: 'Failed to refetch verses' });
+        }
+    }
 
     if (!question) {
         return res.status(400).json({ error: 'Question is required' });
