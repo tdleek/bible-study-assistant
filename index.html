@@ -530,27 +530,21 @@
                     <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 max-w-2xl mx-auto">
 
                         <!-- Translation Selector -->
-                        <div class="relative">
-                            <select x-model="selectedTranslation"
-                                    class="appearance-none px-4 py-4 pr-10 rounded-xl border-2 font-inter text-sm font-medium cursor-pointer transition-all duration-300 focus:outline-none"
-                                    :class="darkMode
-                                        ? 'bg-[#1A2332] border-[#C0C5D9]/30 text-[#F5F5F0] focus:border-[#C0C5D9]'
-                                        : 'bg-white border-[#d4cabb] text-[#3d3225] focus:border-[#c4960c]'">
-                                <option value="ESV">ESV</option>
-                                <option value="NIV">NIV</option>
-                                <option value="KJV">KJV</option>
-                                <option value="NKJV">NKJV</option>
-                                <option value="NASB">NASB</option>
-                                <option value="NLT">NLT</option>
-                                <option value="AMP">AMP</option>
-                                <option value="CSB">CSB</option>
-                                <option value="MSG">MSG</option>
-                            </select>
-                            <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
-                                 :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#7a6f5f]'">
-                                ▼
-                            </div>
-                        </div>
+                        <select x-model="selectedTranslation"
+                                class="px-4 py-4 rounded-xl border-2 font-inter text-sm font-medium cursor-pointer transition-all duration-300 focus:outline-none min-w-[90px]"
+                                :class="darkMode
+                                    ? 'bg-[#1A2332] border-[#C0C5D9]/30 text-[#F5F5F0] focus:border-[#C0C5D9]'
+                                    : 'bg-white border-[#d4cabb] text-[#3d3225] focus:border-[#c4960c]'">
+                            <option value="ESV">ESV</option>
+                            <option value="NIV">NIV</option>
+                            <option value="KJV">KJV</option>
+                            <option value="NKJV">NKJV</option>
+                            <option value="NASB">NASB</option>
+                            <option value="NLT">NLT</option>
+                            <option value="AMP">AMP</option>
+                            <option value="CSB">CSB</option>
+                            <option value="MSG">MSG</option>
+                        </select>
 
                         <!-- Input Field -->
                         <div class="relative flex-1">
