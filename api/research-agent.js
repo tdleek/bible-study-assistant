@@ -192,7 +192,19 @@ async function fetchVerseText(ref, translation) {
             v.verse >= parseInt(verseStart) && v.verse <= parseInt(verseEnd)
         );
 
-        return selectedVerses.map(v => v.text).join(' ');
+        // Combine verse texts and strip Strong's numbers
+        let text = selectedVerses.map(v => v.text).join(' ');
+
+        // Remove Strong's concordance tags like <S>1234</S>
+        text = text.replace(/<S>\d+<\/S>/g, '');
+
+        // Also remove any other HTML-like tags that might be present
+        text = text.replace(/<[^>]*>/g, '');
+
+        // Clean up extra whitespace
+        text = text.replace(/\s+/g, ' ').trim();
+
+        return text;
     } catch (e) {
         console.error('Verse fetch error:', e);
         return null;
