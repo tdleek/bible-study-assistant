@@ -524,78 +524,90 @@
                     </div>
                 </div>
 
-                <!-- Try Your Own Verse Section -->
-                <div class="mt-8 text-center">
-                    <p class="font-inter text-sm mb-4"
-                       :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
-                        Try your own verse or ask a question
-                    </p>
-
-                    <div class="flex flex-col sm:flex-row gap-3 max-w-xl mx-auto mb-4">
+                <!-- Smart Input Section -->
+                <div class="mt-8">
+                    <div class="relative max-w-xl mx-auto">
                         <input type="text"
                                x-model="goDeeperVerseRef"
-                               @keydown.enter="homeGoDeep()"
-                               placeholder="Romans 8:28 or 'Story of the Prodigal Son'"
-                               class="flex-1 rounded-xl px-5 py-4 font-inter text-sm border-2 transition-all focus:outline-none focus:ring-4"
+                               @keydown.enter="isQuestion(goDeeperVerseRef) ? (researchQuery = goDeeperVerseRef, runResearchAgent()) : homeGoDeep()"
+                               placeholder="Enter a verse (John 3:16) or ask a question..."
+                               class="w-full px-5 py-4 pr-12 rounded-xl border-2 font-inter text-base transition-all duration-300 focus:outline-none"
                                :class="darkMode
-                                   ? 'bg-[#243044] border-[#C0C5D9]/30 text-[#F5F5F0] placeholder-[#9BA4B8] focus:border-[#C0C5D9] focus:ring-[#C0C5D9]/20'
-                                   : 'bg-white border-[#e0d9cb] text-[#3d3225] placeholder-[#a69d8a] focus:border-[#c4960c] focus:ring-[#c4960c]/20'">
+                                   ? 'bg-[#1A2332] border-[#C0C5D9]/30 text-[#F5F5F0] placeholder-[#9BA4B8] focus:border-[#C0C5D9]'
+                                   : 'bg-white border-[#d4cabb] text-[#3d3225] placeholder-[#a69d8a] focus:border-[#c4960c]'">
+
+                        <!-- Clear button -->
+                        <button x-show="goDeeperVerseRef.length > 0"
+                                @click="goDeeperVerseRef = ''"
+                                class="absolute right-4 top-1/2 -translate-y-1/2 text-lg opacity-50 hover:opacity-100 transition-opacity">
+                            ✕
+                        </button>
+                    </div>
+
+                    <!-- Smart Action Buttons -->
+                    <div class="flex items-center justify-center gap-3 mt-4">
+                        <!-- Go Deeper Button - for verses -->
                         <button @click="homeGoDeep()"
-                                :disabled="goDeeperLoading || !goDeeperVerseRef.trim()"
-                                class="px-8 py-4 rounded-xl font-inter font-semibold transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
-                                :class="darkMode
-                                    ? 'bg-[#C0C5D9] text-[#1A2332] hover:bg-[#E8ECF4]'
-                                    : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white'">
-                            <span x-show="!goDeeperLoading">Go Deeper →</span>
-                            <span x-show="goDeeperLoading" class="flex items-center gap-2">
-                                <span class="animate-spin">⏳</span>
-                            </span>
+                                :disabled="!goDeeperVerseRef.trim() || goDeeperLoading"
+                                class="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-inter text-sm font-semibold transition-all duration-300 disabled:opacity-40"
+                                :class="[
+                                    darkMode
+                                        ? 'bg-gradient-to-r from-[#C0C5D9] to-[#9BA4B8] text-[#1A2332] hover:shadow-lg hover:shadow-[#C0C5D9]/20'
+                                        : 'bg-gradient-to-r from-[#c4960c] to-[#d4a91c] text-white hover:shadow-lg hover:shadow-[#c4960c]/30',
+                                    !isQuestion(goDeeperVerseRef) && goDeeperVerseRef.trim() ? 'ring-2 ring-offset-2' : '',
+                                    darkMode ? 'ring-[#C0C5D9] ring-offset-[#1A2332]' : 'ring-[#c4960c] ring-offset-[#FAF7F2]'
+                                ]">
+                            <span>🔍</span>
+                            <span x-text="goDeeperLoading ? 'Analyzing...' : 'Go Deeper'"></span>
                         </button>
-                    </div>
 
-                    <!-- Quick Links -->
-                    <div class="flex flex-wrap items-center justify-center gap-2 text-sm font-inter"
-                         :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
-                        <span>Popular:</span>
-                        <button @click="goDeeperVerseRef = 'Romans 8:28'; homeGoDeep()"
-                                class="px-3 py-1.5 rounded-lg transition-all hover:scale-105"
-                                :class="darkMode ? 'text-[#C0C5D9] hover:bg-[#C0C5D9]/10' : 'text-[#c4960c] hover:bg-[#c4960c]/10'">
-                            Romans 8:28
-                        </button>
-                        <span>·</span>
-                        <button @click="goDeeperVerseRef = 'Psalm 23:1'; homeGoDeep()"
-                                class="px-3 py-1.5 rounded-lg transition-all hover:scale-105"
-                                :class="darkMode ? 'text-[#C0C5D9] hover:bg-[#C0C5D9]/10' : 'text-[#c4960c] hover:bg-[#c4960c]/10'">
-                            Psalm 23
-                        </button>
-                        <span>·</span>
-                        <button @click="goDeeperVerseRef = 'Jeremiah 29:11'; homeGoDeep()"
-                                class="px-3 py-1.5 rounded-lg transition-all hover:scale-105"
-                                :class="darkMode ? 'text-[#C0C5D9] hover:bg-[#C0C5D9]/10' : 'text-[#c4960c] hover:bg-[#c4960c]/10'">
-                            Jeremiah 29:11
-                        </button>
-                        <span>·</span>
-                        <button @click="goDeeperVerseRef = 'Philippians 4:13'; homeGoDeep()"
-                                class="px-3 py-1.5 rounded-lg transition-all hover:scale-105"
-                                :class="darkMode ? 'text-[#C0C5D9] hover:bg-[#C0C5D9]/10' : 'text-[#c4960c] hover:bg-[#c4960c]/10'">
-                            Philippians 4:13
-                        </button>
-                    </div>
-
-                    <!-- Deep Research Option -->
-                    <div class="mt-6 text-center">
-                        <p class="font-inter text-xs mb-2"
-                           :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
-                            Have a complex question?
-                        </p>
-                        <button @click="researchQuery = goDeeperVerseRef || 'How does John 3:16 connect to the Old Testament?'; runResearchAgent()"
-                                :disabled="researchLoading"
-                                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-inter text-sm font-medium transition-all hover:scale-105 disabled:opacity-50 border"
-                                :class="darkMode
-                                    ? 'bg-[#243044] text-[#C0C5D9] border-[#C0C5D9]/30 hover:bg-[#2D3A52]'
-                                    : 'bg-white text-[#5c5245] border-[#d4cabb] hover:border-[#c4960c] shadow-sm'">
+                        <!-- Deep Research Button - for questions -->
+                        <button @click="researchQuery = goDeeperVerseRef; runResearchAgent()"
+                                :disabled="!goDeeperVerseRef.trim() || researchLoading"
+                                class="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-inter text-sm font-semibold transition-all duration-300 border-2 disabled:opacity-40"
+                                :class="[
+                                    darkMode
+                                        ? 'bg-[#243044] text-[#C0C5D9] border-[#C0C5D9]/30 hover:border-[#C0C5D9] hover:bg-[#2D3A52]'
+                                        : 'bg-white text-[#5c5245] border-[#d4cabb] hover:border-[#c4960c] shadow-sm',
+                                    isQuestion(goDeeperVerseRef) && goDeeperVerseRef.trim() ? 'ring-2 ring-offset-2' : '',
+                                    darkMode ? 'ring-[#C0C5D9] ring-offset-[#1A2332]' : 'ring-[#c4960c] ring-offset-[#FAF7F2]'
+                                ]">
                             <span>🔬</span>
                             <span x-text="researchLoading ? 'Researching...' : 'Deep Research'"></span>
+                        </button>
+                    </div>
+
+                    <!-- Helper text that changes based on input -->
+                    <p class="text-center mt-3 font-inter text-xs transition-colors"
+                       :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
+                        <span x-show="!goDeeperVerseRef.trim()">
+                            Try "Romans 8:28" for verse context or "What does the Bible say about forgiveness?" for research
+                        </span>
+                        <span x-show="goDeeperVerseRef.trim() && !isQuestion(goDeeperVerseRef)">
+                            Looks like a verse — <strong>Go Deeper</strong> will show context, original language & connections
+                        </span>
+                        <span x-show="goDeeperVerseRef.trim() && isQuestion(goDeeperVerseRef)">
+                            Great question — <strong>Deep Research</strong> will analyze multiple passages and synthesize an answer
+                        </span>
+                    </p>
+
+                    <!-- Popular suggestions -->
+                    <div class="flex flex-wrap items-center justify-center gap-2 mt-4">
+                        <span class="font-inter text-xs" :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">Try:</span>
+                        <button @click="goDeeperVerseRef = 'Romans 8:28'"
+                                class="px-3 py-1 rounded-full text-xs font-inter transition-colors"
+                                :class="darkMode ? 'bg-[#C0C5D9]/10 text-[#C0C5D9] hover:bg-[#C0C5D9]/20' : 'bg-[#c4960c]/10 text-[#c4960c] hover:bg-[#c4960c]/20'">
+                            Romans 8:28
+                        </button>
+                        <button @click="goDeeperVerseRef = 'Psalm 23'"
+                                class="px-3 py-1 rounded-full text-xs font-inter transition-colors"
+                                :class="darkMode ? 'bg-[#C0C5D9]/10 text-[#C0C5D9] hover:bg-[#C0C5D9]/20' : 'bg-[#c4960c]/10 text-[#c4960c] hover:bg-[#c4960c]/20'">
+                            Psalm 23
+                        </button>
+                        <button @click="goDeeperVerseRef = 'What does the Bible say about hope?'"
+                                class="px-3 py-1 rounded-full text-xs font-inter transition-colors"
+                                :class="darkMode ? 'bg-[#C0C5D9]/10 text-[#C0C5D9] hover:bg-[#C0C5D9]/20' : 'bg-[#c4960c]/10 text-[#c4960c] hover:bg-[#c4960c]/20'">
+                            What does the Bible say about hope?
                         </button>
                     </div>
                 </div>
