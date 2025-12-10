@@ -714,9 +714,17 @@
             </div>
 
             <!-- Tagline -->
-            <p class="mt-12 font-lora text-sm italic transition-colors"
+            <p class="mt-16 font-lora text-sm italic transition-colors"
                :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
                 "Your word is a lamp to my feet and a light to my path." — Psalm 119:105
+            </p>
+
+            <!-- Contact -->
+            <p class="mt-4 font-inter text-xs transition-colors"
+               :class="darkMode ? 'text-[#9BA4B8]' : 'text-[#7a6f5f]'">
+                Questions? <a href="mailto:gospelpath40@outlook.com"
+                              class="underline hover:no-underline transition-colors"
+                              :class="darkMode ? 'text-[#C0C5D9] hover:text-[#E8ECF4]' : 'text-[#c4960c] hover:text-[#daa520]'">gospelpath40@outlook.com</a>
             </p>
         </div>
     </section>
@@ -4191,6 +4199,19 @@ Use the ${this.selectedTranslation} translation when citing Scripture. Keep resp
                     return false;
                 },
 
+                // Smart routing helper - detects if input is a general question
+                isQuestion(input) {
+                    const trimmed = input.trim().toLowerCase();
+                    if (trimmed.endsWith('?')) return true;
+                    const questionStarters = [
+                        'who ', 'what ', 'when ', 'where ', 'why ', 'how ',
+                        'is ', 'are ', 'does ', 'do ', 'can ', 'could ',
+                        'would ', 'should ', 'which ', 'whom ',
+                        'tell me ', 'explain ', 'describe ', 'how many ', 'how much '
+                    ];
+                    return questionStarters.some(q => trimmed.startsWith(q));
+                },
+
                 // Use AI to identify the primary Bible passage for a question
                 async identifyPassageFromQuestion(question) {
                     try {
@@ -4258,6 +4279,14 @@ Examples:
                 // Home page Go Deeper entry point
                 async homeGoDeep() {
                     if (!this.goDeeperVerseRef.trim()) return;
+
+                    // Smart routing: if it's a question, use main search instead
+                    if (this.isQuestion(this.goDeeperVerseRef)) {
+                        this.userQuery = this.goDeeperVerseRef;
+                        this.goDeeperVerseRef = '';
+                        await this.handleSearch();
+                        return;
+                    }
 
                     this.goDeeperLoading = true;
 
