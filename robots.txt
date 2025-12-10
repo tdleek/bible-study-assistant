@@ -1,0 +1,6 @@
+# GospelPath robots.txt
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://gospelpath.org/sitemap.xml
