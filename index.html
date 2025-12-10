@@ -253,7 +253,7 @@
                 <!-- Translation Selector -->
                 <!-- When translation changes, re-fetch the current verse in the new translation -->
                 <select x-model="selectedTranslation"
-                        @change="refreshWithNewTranslation()"
+                        @change="refreshWithNewTranslation(); if(showResearchAgent && researchResult) refetchResearchVerses()"
                         class="rounded-lg px-3 py-2 font-inter text-sm border cursor-pointer transition-colors"
                         :class="darkMode
                             ? 'bg-[#243044] text-[#F5F5F0] border-[#C0C5D9]/30'
