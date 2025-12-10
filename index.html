@@ -1333,9 +1333,24 @@
                         <div class="divide-y" :class="darkMode ? 'divide-[#C0C5D9]/20' : 'divide-[#e0d9cb]'">
                             <template x-for="verse in researchResult?.research?.verses || []" :key="verse.reference">
                                 <div class="px-5 py-4">
-                                    <h4 class="font-inter text-sm font-semibold mb-2"
-                                        :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#c4960c]'"
-                                        x-text="verse.reference"></h4>
+                                    <!-- Verse Header with Go Deeper Button -->
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h4 class="font-inter text-sm font-semibold"
+                                            :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#c4960c]'"
+                                            x-text="verse.reference"></h4>
+
+                                        <!-- Go Deeper Button -->
+                                        <button @click="goDeeperVerseRef = verse.reference; homeGoDeep(); closeResearchAgent();"
+                                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-inter font-medium transition-all duration-200 border"
+                                                :class="darkMode
+                                                    ? 'bg-[#1A2332] border-[#C0C5D9]/30 text-[#C0C5D9] hover:bg-[#C0C5D9]/20 hover:border-[#C0C5D9]/50'
+                                                    : 'bg-[#F5F0E6] border-[#d4cabb] text-[#5c5245] hover:bg-[#c4960c]/10 hover:border-[#c4960c]/50'">
+                                            <span>🔍</span>
+                                            <span>Go Deeper</span>
+                                        </button>
+                                    </div>
+
+                                    <!-- Verse Text -->
                                     <p class="font-lora text-sm leading-relaxed"
                                        :class="darkMode ? 'text-[#F5F5F0]' : 'text-[#3d3225]'"
                                        x-text="verse.text"></p>
