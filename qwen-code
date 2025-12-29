@@ -1,0 +1,140 @@
+#!/bin/bash
+
+MODEL="qwen2.5-coder:7b"
+
+# Function to gather project context
+gather_context() {
+    local context="Working Directory: $(pwd)\n\n"
+
+    # Add git info if available
+    if git rev-parse --git-dir > /dev/null 2>&1; then
+        context+="Git Branch: $(git branch --show-current)\n"
+        context+="Git Status:\n$(git status --porcelain)\n\n"
+    fi
+
+    # Add project structure (limited depth)
+    context+="Project Structure:\n"
+    context+="$(find . -type f -name "*.py" -o -name "*.js" -o -name "*.sh" -o -name "*.md" -o -name "*.json" -o -name "*.yml" -o -name "*.yaml" | grep -v node_modules | grep -v .git | head -20)\n\n"
+
+    echo -e "$context"
+}
+
+# Function to read specific files
+read_files() {
+    local files=("$@")
+    local content=""
+
+    for file in "${files[@]}"; do
+        if [[ -f "$file" ]]; then
+            content+="\n--- File: $file ---\n"
+            content+="$(cat "$file")\n"
+            content+="\n--- End of $file ---\n"
+        fi
+    done
+
+    echo -e "$content"
+}
+
+# Test mode
+if [[ "$1" == "--test" ]]; then
+    echo "🧪 Testing enhanced qwen-code..."
+    echo "📡 Gathering project context..."
+    gather_context
+    echo "📡 Calling Qwen2.5-Coder-7B..."
+    ollama run $MODEL "Write a simple Hello World function in Python"
+    exit 0
+fi
+
+# Help mode
+if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
+    echo "Enhanced Qwen Code Assistant (Claude Code-like)"
+    echo ""
+    echo "Usage:"
+    echo "  qwen-code \"instruction\"                    # Basic instruction"
+    echo "  qwen-code --file script.py \"analyze this\"  # Analyze specific file"
+    echo "  qwen-code --project \"add logging\"          # Full project context"
+    echo "  qwen-code --files *.py \"review all Python\" # Multiple files"
+    echo "  qwen-code --test                            # Test functionality"
+    echo ""
+    echo "Examples:"
+    echo "  qwen-code \"Create a REST API endpoint\""
+    echo "  qwen-code --file app.py \"Add error handling\""
+    echo "  qwen-code --project \"Debug the authentication issue\""
+    exit 0
+fi
+
+# Project context mode (like Claude Code)
+if [[ "$1" == "--project" ]]; then
+    shift
+    echo "🎯 Task: $*"
+    echo "📁 Gathering full project context..."
+
+    context=$(gather_context)
+    prompt="$context\n\nProject Analysis Request: $*\n\nPlease analyze the entire project context and provide a comprehensive solution."
+
+    echo "🤖 Qwen2.5-Coder analysis:"
+    echo -e "$prompt" | ollama run $MODEL
+    exit 0
+fi
+
+# Multiple files mode
+if [[ "$1" == "--files" ]]; then
+    shift
+    # Extract files and instruction
+    files=()
+    instruction=""
+
+    # Collect all arguments until we find non-file arguments
+    for arg in "$@"; do
+        if [[ -f "$arg" ]] || [[ "$arg" == *.* ]]; then
+            # Expand wildcards
+            for file in $arg; do
+                [[ -f "$file" ]] && files+=("$file")
+            done
+        else
+            instruction+="$arg "
+        fi
+    done
+
+    echo "🎯 Task: $instruction"
+    echo "📁 Analyzing files: ${files[*]}"
+
+    file_content=$(read_files "${files[@]}")
+    prompt="Files to analyze:\n$file_content\n\nTask: $instruction\n\nPlease provide analysis and recommendations."
+
+    echo "🤖 Qwen2.5-Coder analysis:"
+    echo -e "$prompt" | ollama run $MODEL
+    exit 0
+fi
+
+# Single file mode
+if [[ "$1" == "--file" ]] && [[ -n "$2" ]] && [[ -n "$3" ]]; then
+    file="$2"
+    shift 2
+    instruction="$*"
+
+    echo "📁 Analyzing file: $file"
+    echo "🎯 Task: $instruction"
+
+    if [[ ! -f "$file" ]]; then
+        echo "❌ File not found: $file"
+        exit 1
+    fi
+
+    file_content=$(cat "$file")
+    prompt="File: $file\n\nFile Contents:\n$file_content\n\nTask: $instruction\n\nPlease analyze this file and provide detailed recommendations."
+
+    echo "🤖 Qwen2.5-Coder analysis:"
+    echo -e "$prompt" | ollama run $MODEL
+    exit 0
+fi
+
+# Default mode - basic instruction
+if [[ -z "$1" ]]; then
+    echo "Usage: qwen-code \"instruction\" or qwen-code --help for more options"
+    exit 1
+fi
+
+echo "🎯 Task: $*"
+echo "🤖 Qwen2.5-Coder says:"
+ollama run $MODEL "$*"
