@@ -1,0 +1,62 @@
+OG-IMAGE GENERATION PROMPT FOR GOSPELPATH.ORG
+==============================================
+
+IMAGE SPECIFICATIONS:
+- Dimensions: 1200px × 630px (landscape orientation)
+- Format: PNG
+- Purpose: Social media preview (Facebook, Twitter, LinkedIn, iMessage)
+
+DESIGN PROMPT:
+Create a warm, inviting social media banner image (1200x630px) for a Bible study app called "GospelPath".
+
+VISUAL STYLE:
+- Background: Warm parchment texture (#FAF7F2) with subtle aged paper feel
+- Accent colors: Deep gold (#c4960c) and rich charcoal (#3d3225)
+- Aesthetic: Scholarly yet accessible, reverent but modern
+
+KEY ELEMENTS:
+1. MAIN TITLE: "GospelPath"
+   - Font: Elegant serif (similar to Playfair Display)
+   - Size: Large, prominent
+   - Color: Deep charcoal (#3d3225)
+   - Position: Upper third of image
+
+2. TAGLINE: "Seminary-Level Bible Study, Completely Free"
+   - Font: Clean serif
+   - Size: Medium
+   - Color: Warm gold accent (#c4960c)
+   - Position: Below title
+
+3. VISUAL METAPHOR:
+   - Subtle overlay of an open ancient scroll or Bible on parchment
+   - Faint Hebrew/Greek letters in the background (barely visible, elegant)
+   - Maybe a soft path or road metaphor in the design
+   - Clean, not cluttered
+
+4. FOOTER TEXT: "AI-Powered • Greek & Hebrew • Cultural Context"
+   - Font: Simple sans-serif
+   - Size: Small
+   - Color: Charcoal (#3d3225)
+   - Position: Bottom of image
+
+MOOD & FEELING:
+- Warm and welcoming
+- Scholarly and trustworthy
+- Timeless yet modern
+- Inspirational without being cheesy
+- Professional but accessible
+
+AVOID:
+- Overly religious stock imagery (glowing crosses, heavenly beams)
+- Clip art or generic symbols
+- Busy, cluttered layouts
+- Hard-to-read text
+- Dark or cold color palettes
+
+INSPIRATION:
+Think: Ancient library meets modern app • Seminary textbook meets startup • Wisdom meets accessibility
+
+---
+
+ALTERNATIVE SIMPLIFIED PROMPT (for quick generation):
+"Create a 1200x630px social media banner for 'GospelPath', a Bible study app. Warm parchment background (#FAF7F2), elegant serif typography for the title 'GospelPath' in charcoal (#3d3225), gold accent tagline 'Seminary-Level Bible Study, Completely Free' (#c4960c). Subtle ancient scroll or Hebrew/Greek letter overlay. Clean, scholarly, warm aesthetic. Include footer text 'AI-Powered • Greek & Hebrew • Cultural Context'. Professional, trustworthy, accessible design."
