@@ -829,21 +829,27 @@
         <div class="max-w-4xl mx-auto">
             
             <!-- Loading State -->
-            <div x-show="loading" class="text-center py-20">
+            <div x-show="loading || loadingFromUrl" class="text-center py-20">
                 <div class="loading-pulse">
                     <span class="text-6xl">✝</span>
                 </div>
                 <p class="mt-6 font-lora text-lg transition-colors"
-                   :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#7a6f5f]'">
-                    Searching the Scriptures...
+                   :class="darkMode ? 'text-[#C0C5D9]' : 'text-[#7a6f5f]'"
+                   x-text="loadingFromUrl ? 'Loading shared verse...' : 'Searching the Scriptures...'">
                 </p>
             </div>
             
             <!-- Error Message -->
-            <div x-show="errorMessage && !loading"
+            <div x-show="errorMessage && !loading && !loadingFromUrl"
                  class="rounded-xl p-6 mb-8 border"
                  :class="darkMode ? 'bg-red-900/20 border-red-500/30 text-red-300' : 'bg-red-50 border-red-200 text-red-700'">
                 <p class="font-inter" x-text="errorMessage"></p>
+                <button x-show="errorMessage.includes('Invalid verse') || errorMessage.includes('Could not find')"
+                        @click="resetToHome()"
+                        class="mt-4 px-4 py-2 rounded-lg font-inter text-sm transition-all"
+                        :class="darkMode ? 'bg-[#C0C5D9] text-[#1A2332] hover:bg-[#E8ECF4]' : 'bg-[#c4960c] text-white hover:bg-[#daa520]'">
+                    Go Back Home
+                </button>
             </div>
 
             <!-- ==================== STUDY PLAN GENERATOR ==================== -->
@@ -2524,14 +2530,27 @@
                 </div>
             </div>
 
-            <!-- Close Button -->
-            <button @click="closeXray()"
-                    class="w-full mt-6 py-3 rounded-lg font-inter font-semibold transition-all hover:scale-[1.02]"
-                    :class="darkMode
-                        ? 'bg-[#C0C5D9] text-[#1A2332] hover:bg-[#E8ECF4]'
-                        : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white hover:from-[#daa520] hover:to-[#e6b836] shadow-[0_4px_12px_rgba(196,150,12,0.3)]'">
-                Close
-            </button>
+            <!-- Action Buttons -->
+            <div class="flex gap-3 mt-6">
+                <!-- Share Link Button -->
+                <button @click="copyShareLink('deeper')"
+                        class="flex-1 py-3 rounded-lg font-inter font-semibold transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
+                        :class="shareLinkCopied
+                            ? (darkMode ? 'bg-green-600 text-white' : 'bg-green-500 text-white')
+                            : (darkMode ? 'bg-[#1A2332] text-[#C0C5D9] border border-[#C0C5D9]/30 hover:border-[#C0C5D9]' : 'bg-white text-[#5c5245] border border-[#d4cabb] hover:border-[#c4960c]')">
+                    <span x-show="!shareLinkCopied">🔗 Share Link</span>
+                    <span x-show="shareLinkCopied">✓ Link Copied!</span>
+                </button>
+
+                <!-- Close Button -->
+                <button @click="closeXray()"
+                        class="flex-1 py-3 rounded-lg font-inter font-semibold transition-all hover:scale-[1.02]"
+                        :class="darkMode
+                            ? 'bg-[#C0C5D9] text-[#1A2332] hover:bg-[#E8ECF4]'
+                            : 'bg-gradient-to-r from-[#c4960c] to-[#daa520] text-white hover:from-[#daa520] hover:to-[#e6b836] shadow-[0_4px_12px_rgba(196,150,12,0.3)]'">
+                    Close
+                </button>
+            </div>
         </div>
     </div>
 
@@ -2681,6 +2700,10 @@
                 // Home page Go Deeper entry point
                 goDeeperVerseRef: '',             // Verse reference input on home page
                 goDeeperLoading: false,           // Loading state for home page entry
+
+                // URL Parameter Sharing
+                shareLinkCopied: false,           // Show "Link Copied!" feedback
+                loadingFromUrl: false,            // Loading state when auto-triggering from URL
 
                 // ===========================================
                 // RESEARCH AGENT - Deep Research for Complex Questions
@@ -3683,6 +3706,165 @@
                 init() {
                     this.loadDailyVerse();
                     this.loadInterlinearCache();
+                    this.handleUrlParameters();
+                },
+
+                // ===========================================
+                // URL PARAMETER HANDLING
+                // ===========================================
+                async handleUrlParameters() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const verse = urlParams.get('verse');
+                    const feature = urlParams.get('feature');
+                    const translation = urlParams.get('translation');
+
+                    // If no verse parameter, nothing to do
+                    if (!verse) return;
+
+                    // Set translation if provided (before lookup)
+                    if (translation && this.availableTranslations.some(t => t.value === translation)) {
+                        this.selectedTranslation = translation;
+                    }
+
+                    // Update OG meta tags for shared link
+                    this.updateMetaTags(verse, feature);
+
+                    // Validate verse reference format
+                    const verseRef = decodeURIComponent(verse);
+                    if (!this.isValidVerseReference(verseRef)) {
+                        console.error('Invalid verse reference in URL:', verseRef);
+                        this.errorMessage = `Invalid verse reference: "${verseRef}". Please use format like "John 3:16" or "Psalm 23:1-3"`;
+                        this.hasSearched = true;
+                        this.showNav = true;
+                        return;
+                    }
+
+                    this.loadingFromUrl = true;
+                    this.userQuery = verseRef;
+
+                    try {
+                        // Lookup the verse first
+                        const found = await this.lookupVerse(verseRef);
+
+                        if (!found) {
+                            this.errorMessage = `Could not find verse: "${verseRef}". Please check the reference.`;
+                            this.loadingFromUrl = false;
+                            return;
+                        }
+
+                        // Auto-trigger feature based on URL parameter
+                        if (feature === 'deeper' && this.verseLookupResult) {
+                            // Trigger Go Deeper
+                            await this.fetchXray(this.verseLookupResult.reference, this.verseLookupResult.text);
+                        } else if (feature === 'compare' && this.verseLookupResult) {
+                            // Trigger Translation Compare
+                            this.translationCompareMode = true;
+                            await this.fetchTranslationComparison(this.verseLookupResult.reference);
+                        } else if (feature === 'interlinear') {
+                            // Show Interlinear
+                            this.showInterlinear = true;
+                            this.fetchInterlinear();
+                        }
+
+                    } catch (error) {
+                        console.error('Error loading from URL:', error);
+                        this.errorMessage = `Error loading verse: ${error.message}`;
+                    } finally {
+                        this.loadingFromUrl = false;
+                    }
+                },
+
+                // Validate verse reference format
+                isValidVerseReference(ref) {
+                    if (!ref || ref.trim().length === 0) return false;
+
+                    // Match patterns like: "John 3:16", "1 John 1:9", "Psalm 23:1-3", "Genesis 1:1"
+                    // Also handles: "john 3:16", "JOHN 3:16", "John 3.16", "John 3 16"
+                    const versePattern = /^(1|2|3|I|II|III|i|ii|iii)?\s*[A-Za-z]+\s+\d+[\s:\.]\d+(-\d+)?$/i;
+                    return versePattern.test(ref.trim());
+                },
+
+                // Update Open Graph meta tags dynamically
+                updateMetaTags(verse, feature) {
+                    const decodedVerse = decodeURIComponent(verse);
+                    let title = `${decodedVerse} - GospelPath`;
+                    let description = `Study ${decodedVerse} with AI-powered insights on GospelPath.`;
+
+                    if (feature === 'deeper') {
+                        title = `Go Deeper: ${decodedVerse} - GospelPath`;
+                        description = `Discover the historical context, original language insights, and biblical connections of ${decodedVerse}.`;
+                    } else if (feature === 'compare') {
+                        title = `Compare Translations: ${decodedVerse} - GospelPath`;
+                        description = `Compare ${decodedVerse} across multiple Bible translations.`;
+                    } else if (feature === 'interlinear') {
+                        title = `Interlinear: ${decodedVerse} - GospelPath`;
+                        description = `Study ${decodedVerse} word-by-word in the original Hebrew or Greek.`;
+                    }
+
+                    // Update document title
+                    document.title = title;
+
+                    // Update OG meta tags
+                    const ogTitle = document.querySelector('meta[property="og:title"]');
+                    const ogDescription = document.querySelector('meta[property="og:description"]');
+                    const ogUrl = document.querySelector('meta[property="og:url"]');
+                    const twitterTitle = document.querySelector('meta[name="twitter:title"]');
+                    const twitterDescription = document.querySelector('meta[name="twitter:description"]');
+                    const twitterUrl = document.querySelector('meta[name="twitter:url"]');
+
+                    const currentUrl = window.location.href;
+
+                    if (ogTitle) ogTitle.setAttribute('content', title);
+                    if (ogDescription) ogDescription.setAttribute('content', description);
+                    if (ogUrl) ogUrl.setAttribute('content', currentUrl);
+                    if (twitterTitle) twitterTitle.setAttribute('content', title);
+                    if (twitterDescription) twitterDescription.setAttribute('content', description);
+                    if (twitterUrl) twitterUrl.setAttribute('content', currentUrl);
+                },
+
+                // Generate shareable URL for current state
+                generateShareUrl(feature = 'deeper') {
+                    const baseUrl = window.location.origin + window.location.pathname;
+                    const params = new URLSearchParams();
+
+                    // Use xrayVerseRef for Go Deeper, or verseLookupResult.reference
+                    const verseRef = this.xrayVerseRef || this.verseLookupResult?.reference;
+                    if (!verseRef) return null;
+
+                    params.set('verse', verseRef);
+                    params.set('feature', feature);
+                    params.set('translation', this.selectedTranslation);
+
+                    return `${baseUrl}?${params.toString()}`;
+                },
+
+                // Copy share link to clipboard
+                async copyShareLink(feature = 'deeper') {
+                    const url = this.generateShareUrl(feature);
+                    if (!url) return;
+
+                    try {
+                        await navigator.clipboard.writeText(url);
+                        this.shareLinkCopied = true;
+
+                        // Reset after 2 seconds
+                        setTimeout(() => {
+                            this.shareLinkCopied = false;
+                        }, 2000);
+
+                        // Track share event in analytics
+                        if (typeof gtag === 'function') {
+                            gtag('event', 'share', {
+                                method: 'clipboard',
+                                content_type: feature,
+                                item_id: this.xrayVerseRef || this.verseLookupResult?.reference
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Failed to copy link:', error);
+                        // Fallback: show URL in alert
+                        alert('Copy this link to share:\n' + url);
+                    }
                 },
                 
                 loadDailyVerse() {
@@ -4471,6 +4653,18 @@ Use the ${this.selectedTranslation} translation when citing Scripture. Keep resp
                     this.showStudyPlanGenerator = false;
                     this.generatedStudyPlan = null;
                     this.closeXray();
+
+                    // Clear URL parameters and reset document title
+                    this.clearUrlParameters();
+                },
+
+                // Clear URL parameters when going back home
+                clearUrlParameters() {
+                    if (window.location.search) {
+                        const cleanUrl = window.location.origin + window.location.pathname;
+                        window.history.replaceState({}, '', cleanUrl);
+                        document.title = 'GospelPath – Your AI-Powered Journey Through Scripture';
+                    }
                 },
 
                 // ===========================================
@@ -4733,6 +4927,7 @@ Examples:
                     this.xrayVerseRef = null;
                     this.xrayFollowUpQuery = '';
                     this.xrayFollowUpResponse = '';
+                    this.shareLinkCopied = false;
                 },
 
                 async askXrayFollowUp() {
